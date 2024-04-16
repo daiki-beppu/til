@@ -16,10 +16,10 @@
   - [2.5. 太字 bold \< strong \> | \< b \>](#25-太字-bold--strong----b-)
   - [2.6. コードブロック code borck \< pre \>](#26-コードブロック-code-borck--pre-)
   - [2.7. インラインコード code span \< code \>](#27-インラインコード-code-span--code-)
-  - [打ち消し線 strike-through line \< strike \>](#打ち消し線-strike-through-line--strike-)
-  - [リンク rink \< a \>](#リンク-rink--a-)
-  - [チェックボックス chack box \< input type="checkbox" \>](#チェックボックス-chack-box--input-typecheckbox-)
-  - [テーブル table \< table \>](#テーブル-table--table-)
+  - [2.8. 打ち消し線 strike-through line \< strike \>](#28-打ち消し線-strike-through-line--strike-)
+  - [2.9. リンク rink \< a \>](#29-リンク-rink--a-)
+  - [2.10. チェックボックス chack box \< input type="checkbox" \>](#210-チェックボックス-chack-box--input-typecheckbox-)
+  - [2.11. テーブル table \< table \>](#211-テーブル-table--table-)
 
 ## 1.1. VScode でのプレビュー
 
@@ -198,7 +198,7 @@ hello() # Hello_World
 と入力
 ```
 
-## 打ち消し線 strike-through line < strike >
+## 2.8. 打ち消し線 strike-through line < strike >
 
 ~~プログラミング難しい~~
 
@@ -209,7 +209,7 @@ hello() # Hello_World
 
 ```
 
-## リンク rink < a >
+## 2.9. リンク rink < a >
 
 [ 別府 大貴の til リポジトリ ](https://github.com/daiki-beppu/til)
 
@@ -220,7 +220,7 @@ hello() # Hello_World
 
 ```
 
-## チェックボックス chack box < input type="checkbox" >
+## 2.10. チェックボックス chack box < input type="checkbox" >
 
 - [x] ruby
 - [ ] Java
@@ -235,7 +235,7 @@ hello() # Hello_World
 
 ```
 
-## テーブル table < table >
+## 2.11. テーブル table < table >
 
 | ID  | 名前 |
 | --- | ---- |
