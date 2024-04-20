@@ -6,7 +6,7 @@ web とは "World Wide Web"の略で
 インターネットを介して文書などのリソースを提供するもの
 
 リソースには URL が割り当てられている
-URL は "Uniform Resource Locater "の略
+URL は " Uniform Resource Locater "の略
 
 インターネット上の web ページやファイルの位置や場所を示すもの
 
