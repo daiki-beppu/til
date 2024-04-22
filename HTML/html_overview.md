@@ -4,7 +4,7 @@
 
 ## HTML とは
 
-**" Hyper Text Markup Languege "** の略
+**Hyper Text Markup Languege** の略
 Web ページを表示するために用いられるマークアップ言語
 
 本来は学術論文を電子化するために設計された言語
