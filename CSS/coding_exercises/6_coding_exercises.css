@@ -1,0 +1,30 @@
+/* 書いてほしいCSSは以下のとおりです：
+
+h1（見出し要素）
+- 緑(green)色のテキスト
+h2（見出し要素）
+- マジェンタ(magenta)色
+段落要素
+- 白(white)色のテキスト
+- 黒(black)色の背景色
+ボタン
+- 赤(red)色のテキスト
+ - ピンク(pink)色の背景色 */
+
+h1 {
+  color: green;
+}
+
+h2 {
+  color: magenta;
+}
+
+p {
+  color: white;
+  background-color: black;
+}
+
+button {
+  color: #ff0000;
+  background-color: pink;
+}
