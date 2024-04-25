@@ -2,47 +2,35 @@
 
 文字列 + 文字列で連結することができる
 
-```deff_javascript
-
-console.log("ゴムゴムの" + "バズーカ！")
+```javascript
+console.log("ゴムゴムの" + "バズーカ！");
 // 出力は ゴムゴムのバズーカ！
-
 ```
 
 数値 + 数値で計算することができる
 
-```deff_javascript
-
-足し算 +
-console.log(100 + 10)
+```javascript
+足し算 + console.log(100 + 10);
 // 110
 
-引き算 -
-console.log(100 - 10)
+引き算 - console.log(100 - 10);
 // 90
 
-掛け算 *
-console.log(10 * 10)
+掛け算 * console.log(10 * 10);
 // 100
 
-割り算 /
-console.log(100 / 10)
+割り算 / console.log(100 / 10);
 // 10
 
-あまりの計算 %
-console.log (10 % 3)
+あまりの計算 % console.log(10 % 3);
 // 1
-
 ```
 
 文字列と数値を + しようとした場合は？
 **数値が文字列と認識される**
 
-```deff_javascript
-
-例
-console.log(100 + "10")
+```javascript
+例;
+console.log(100 + "10");
 //出力は10010となる
-
 ```
-

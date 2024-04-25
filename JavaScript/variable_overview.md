@@ -15,7 +15,7 @@
 - var は再代入が可能で再宣言も可能
   - ※ var は現在はほとんど使われないというか var を使ったら負けだと思え
 
-```deff_javascript
+```javascript
 記述例
 
 const foo = "foo"

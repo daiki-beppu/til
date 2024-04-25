@@ -4,7 +4,7 @@ for 文は繰り返したいときに使う
 
 1〜10 までを繰り返し出力する
 
-```deff_javascript
+```javascript
 
 記述例
 
@@ -16,7 +16,7 @@ for (let i = 1; i <= 10; i++>) {
 
 配列の要素を取り出して出力
 
-```deff_javascript
+```javascript
 
 記述例
 

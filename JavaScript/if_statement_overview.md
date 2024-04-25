@@ -5,7 +5,7 @@ if 文は条件を分岐させたいときに使う
 生年月日が一致していたら"Happy Brith Day!!"を出力
 一致しなかったら"Your not Birth Day"と出力
 
-```deff_javascirpt
+```javascirpt
 
 記述例
 
@@ -29,7 +29,7 @@ Happy Brith Day!!と出力される
 
 先程のコードに 12 月生まれの場合 "your birthday month same !"と出力する記述を追加してみる
 
-```
+```javascript
 
 記述例
 
