@@ -16,22 +16,22 @@
   - ※ var は現在はほとんど使われないというか var を使ったら負けだと思え
 
 ```javascript
-記述例
+記述例;
 
-const foo = "foo"
+const foo = "foo";
 
-let bar = "bar"
+let bar = "bar";
 
-var fooVar= "foobar"
-
+var fooVar = "foobar";
 ```
 
-まとめ: 変数の宣言
-|変数名|再代入|再宣言|
-|-|-|-|
-|const|不可|不可|
-|let|可能|不可|
-|var|可能|可能|
+### まとめ: 変数の宣言
+
+| 変数名 | 再代入 | 再宣言 |
+| ------ | ------ | ------ |
+| const  | 不可   | 不可   |
+| let    | 可能   | 不可   |
+| var    | 可能   | 可能   |
 
 ※var は現在はほとんど使われないというか var を使ったら負けだと思え
 
