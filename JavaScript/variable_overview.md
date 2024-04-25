@@ -16,7 +16,7 @@
   - ※ var は現在はほとんど使われないというか var を使ったら負けだと思え
 
 ```javascript
-記述例;
+記述例
 
 const foo = "foo";
 
