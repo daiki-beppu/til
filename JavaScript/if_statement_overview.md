@@ -2,10 +2,10 @@
 
 if 文は条件を分岐させたいときに使う
 例えば
-生年月日が一致していたら"Happy Brith Day!!"を出力
+生年月日が一致していたら"Happy Birth Day!!"を出力
 一致しなかったら"Your not Birth Day"と出力
 
-```javascirpt
+```JavaScript
 
 記述例
 
@@ -14,7 +14,7 @@ const birthdayMonth = 12;
 const birthday = 28;
 
 if (birthdayYear == 1996 && birthdayMonth == 12 && birthday == 28) {
-  console.log("Happy Brith Day!!");
+  console.log("Happy Birth Day!!");
 } else {
   console.log("Your not Birth Day");
 }
@@ -23,7 +23,7 @@ if (birthdayYear == 1996 && birthdayMonth == 12 && birthday == 28) {
 ```
 
 この場合、生年月日は一致しているので
-Happy Brith Day!!と出力される
+Happy Birth Day!!と出力される
 
 また、複数の条件がある場合は else if を使う
 
@@ -38,10 +38,10 @@ const birthdayMonth = 12;
 const birthday = 28;
 
 if (birthdayYear == 1996 && birthdayMonth == 12 && birthday == 28) {
-  console.log("Happy Brith Day!!");
+  console.log("Happy Birth Day!!");
 
 //ここから
-} else if (brithdayYear == 1996 && birthdayMonth == 12) {
+} else if (birthdayYear == 1996 && birthdayMonth == 12) {
   console.log("your birthday month same !");
 
 //ここまでが追加したコード
