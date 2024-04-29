@@ -113,9 +113,9 @@ ID >クラス,属性,擬似クラス > 要素,疑似要素
 ```css
 記述例
 
-/* a に ホバーしたとき */
-a:hover {
-  text-decoration: none;
+/*componyクラス に ホバーしたとき */
+.compony:hover {
+  color: black;
 }
 
 /* n番目の div に対して */
