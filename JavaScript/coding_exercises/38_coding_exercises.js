@@ -1,10 +1,25 @@
-// 関数から値をreturnしてみましょう！multiplyという関数を作ってください。
-// 2つの数字を受け取って、その数字の乗算した値をreturnしてください。returnするように注意してください！console.logではありません！
+//  * isShortsWeather Function
+// 短パンででかけても良いような気温かどうかを判断するisShortsWeatherという関数を作ってください！
 
-// multiply(2,3) // 6
-// multiply(9,9) // 81
-// multiply(5,4) // 20
+// パラメータは一つ受け取る関数にしてください。例えばtemperatureなど
 
-function multiply(x, y) {
-  return x * y;
+// temperatureが25以上であれば、trueをreturnしてください
+
+// そうでなければfalseをreturnしてください
+
+// （注意：temperatureはセ氏を前提にしてます。華氏圏の生徒がいましたらごめんなさい）
+
+// isShortsWeather(25) //true
+// isShortsWeather(15) //false
+// isShortsWeather(35) //true
+
+function isShortsWeather(temperature) {
+  if (temperature >= 25) {
+    return true;
+  } else {
+    return false;
+  }
 }
+
+
+
