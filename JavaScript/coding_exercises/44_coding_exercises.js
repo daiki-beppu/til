@@ -1,22 +1,16 @@
-// メソッドのthisの演習問題
-// henというオブジェクトを定義してください。
-// 2つのプロパティと、1つのメソッドを定義してください：
+// * メソッドの演習問題
+// squareというオブジェクトを定義して、areaとperimeterというメソッドをもたせてください。
+// areaはsideという引数を一つ受け取って、sideを2乗した値を返します
+// perimeterはsideを受け取って、4を乗算した値を返します
 
-// nameは'Helen'にしてください
-// eggCountは0にしてください
-// layAnEggというメソッドを定義してください。
-// このメソッドは、自分のeggCountを1加算して、'EGG'という文字列をreturnしてください。（thisを使う必要があります）
+// square.area(10) //100
+// square.perimeter(10) //40
 
-// hen.name // "Helen"
-// hen.eggCount // 0
-// hen.layAnEgg() // "EGG"
-// hen.layAnEgg() // "EGG"
-// hen.eggCount // 2
-
-const hen = {
-  name: "Helen",
-  eggCount: 0,
-  layAnEgg: function () {
-    return (this.eggCount += 1), "EGG";
+const square = {
+  area: function (side) {
+    return side * side;
+  },
+  perimeter: function (side) {
+    return side * 4;
   },
 };
