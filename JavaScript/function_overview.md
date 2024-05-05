@@ -157,8 +157,6 @@ function returnFunction() {
   }
 }
 
-
-
 ```
 
 ## コールバック関数について
