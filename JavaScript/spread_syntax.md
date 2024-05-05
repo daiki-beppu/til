@@ -75,5 +75,67 @@ console.log(currentProfile);
 
 レスト構文とは引数をまとめて渡すための構文
 
-> [!WARNING] > `...パラメーター`
+> [!WARNING]
 > スプレッド構文と同じ記述に見えるが逆の動きをするので注意！
+
+### argument オブジェクト
+
+アロー関数以外のすべての関数で使える配列のようなオブジェクト
+厳密には配列ではなく `push` や `pop` は使えないただ `length` は使える
+argument オブジェクトには関数に渡された引数がすべて入っている
+
+```JavaScript
+
+記述例
+
+function strLength() {
+  console.log(arguments);
+}
+
+strLength();
+// [Arguments] {}
+
+strLength("cat", "にゃんこ", "ぬこ様");
+// [Arguments] { '0': 'cat', '1': 'にゃんこ', '2': 'ぬこ様' }
+
+// 文字列の長さが最大の値を返す関数
+function maxStrLength() {
+  return arguments.reduce((maxStr, str) => {
+    if (str.length < maxStr.length) {
+      return maxStr;
+    } else {
+      return str;
+    }
+  });
+}
+
+maxStrLength("cat", "にゃんこ", "ぬこ様");
+// TypeError: arguments.reduce is not a function
+// argumentsは配列ではないためエラーになる
+
+
+```
+
+こういったときにレスト構文が使える
+
+```JavaScript
+
+記述例
+
+// 文字列の長さが最大の値を返す関数
+function maxStrLength(...words) {
+  return words.reduce((maxStr, str) => {
+    if (str.length < maxStr.length) {
+      return maxStr;
+    } else {
+      return str;
+    }
+  });
+}
+
+※ ...wordsのを...を忘れないように！
+
+console.log(maxStrLength("cat", "にゃんこ", "ぬこ様"));
+// にゃんこ
+
+```
