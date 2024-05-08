@@ -14,7 +14,7 @@ DOM イベントとはユーザーのアクションによって
 
 ```JavaScript
 
-// クリックするたびにランダムで文字色が変わる
+// クリックするたびにpタグの要素の文字色がランダムで変わる
 const p = document.querySelector("p");
 
 const randomColor = () => {
@@ -31,3 +31,29 @@ p.addEventListener("click", () => {
 // p や color を他の要素やCSSプロパティに変更しても使える
 
 ```
+
+## preventDefaultメソッド
+
+フォーム内のボタンをクリックしたときの挙動は
+サーバーへフォームを送信しようとする
+
+この挙動だとボタンを押してフォームの内容をページ内で表示させたい場合に
+思った挙動にならなかったり、毎回すべてがリロードされユーザー体験が著しく低下する
+
+これを防ぐために`preventDefault`を使う
+
+`preventDefault`はその要素がデフォルトで持っている挙動を無効化する
+
+```JavaScript
+
+記述例
+
+const formButton = document.querySelector("from button");
+
+// フォームのボタンが持っているデフォルトの挙動を無効化
+formButton.preventDefault()
+
+```
+
+
+
