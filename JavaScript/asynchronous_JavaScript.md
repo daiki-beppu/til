@@ -1,5 +1,11 @@
 # 非同期な JavaScript
 
+非同期な JavaScript とは
+読み込みやサーバー通信などの実行に時間がかかる処理が走った際に
+その処理が完了するまで待たずに次の処理に移ることができるようにする仕組みのこと
+
+イメージとしては、レストランでシェフが料理を作ってる間にスタッフが何もできないのがこれまでの同期的な JavaScript で、シェフが料理を作ってる間にお皿を用意したり、お客さんに配膳に行ったりできるのが非同期な JavaScript です
+
 ## コールスタック
 
 > コールスタック (call stack) は、インタープリター (ウェブブラウザー内の JavaScript インタープリターなど) の仕組みの一つで、複数階層の関数を呼び出したスクリプト内の位置を追跡し続けることです。 — どの関数が現在実行されているのか、その関数の中でどの関数が呼び出されたか、などです。
@@ -28,3 +34,98 @@ JavaScript 自身は次の処理に移っている
 そしてコールバック関数を使うことで特定のタイミングで
 JavaScript はコールバック関数で帰ってきた処理を行うことで
 シングルスレッドでも並列していろんな処理を行うことができる
+
+## async function
+
+async function は 非同期関数を宣言しその中で await キーワードを使うことで非同期な JavaScript を書くことができる
+
+- async は必ず Promise を返す
+- 関数が値を返せば Promise その値で resolve する
+- 関数がエラーを throw した場合 Promise はそのエラーで reject する
+
+---
+
+- async は必ず Promise を返す
+- 関数が値を返せば Promise その値で resolve する
+
+```JavaScript
+
+記述例
+
+async function greeting() {
+  return "Hello,World!!";
+}
+
+greeting();
+// Promise {<fulfilled>: 'Hello,World!!'}
+
+// アロー関数でも async は使える
+const greeting = async () => {
+  return "Hello,World!";
+};
+
+greeting();
+// Promise {<fulfilled>: 'Hello,World!'}
+
+```
+
+- 関数がエラーを throw した場合 Promise はそのエラーで reject する
+
+```JavaScript
+
+// throw を使うことでrejectになる
+async function error() {
+  throw new Error("エラーが発生しました");
+}
+//Promise {<rejected>: Error: エラーが発生しました
+```
+
+### await キーワード
+
+- await は async 関数でしか使えない
+- await は Promise が resolve または reject するまで async 関数の実行を一時停止する
+
+```JavaScript
+
+記述例
+
+// スタートボタンをクリックすると1秒ごとに背景色がランダムで変わる
+let intervalId; // タイマーのIDを保持する変数
+
+const delayedColorChange = async () => {
+  const randomColor = () => {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  await new Promise((resolve, reject) => {
+    intervalId = setTimeout(() => {
+      document.body.style.backgroundColor = randomColor();
+      resolve();
+    }, 1000);
+  });
+};
+
+const rainbow = async () => {
+  while (true) {
+    await delayedColorChange();
+  }
+};
+
+const start = document.querySelector("#start");
+
+start.addEventListener("click", () => {
+  rainbow();
+});
+
+// ストップをクリックすると止まる
+const stop = document.querySelector("#stop");
+
+stop.addEventListener("click", () => {
+  clearInterval(intervalId); //
+  document.body.style.backgroundColor = "";
+});
+
+```
