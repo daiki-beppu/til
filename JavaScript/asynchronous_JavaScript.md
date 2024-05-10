@@ -161,38 +161,36 @@ async await が使えるようになったのは ES2017 でそれ以前では別
 // スタートボタンをクリックすると1秒ごとに背景色がランダムで変わる
 let intervalId; // タイマーのIDを保持する変数
 
-const delayedColorChange = async () => {
-  const randomColor = () => {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return `rgb(${r}, ${g}, ${b})`;
-  };
+const randomColor = () => {
+  const r = Math.floor(Math.random() * 255);
+  const g = Math.floor(Math.random() * 255);
+  const b = Math.floor(Math.random() * 255);
+  return `rgb(${r}, ${g}, ${b})`;
+};
 
-  // Promiseに関しては後ほど詳述
+const delayedColorChange = async () => {
   await new Promise((resolve, reject) => {
     intervalId = setTimeout(() => {
       document.body.style.backgroundColor = randomColor();
       resolve();
-    }, 1000);
+    }, 2000);
   });
 };
 
 const rainbow = async () => {
   while (true) {
-    await delayedColorChange();
+    const data = await delayedColorChange();
+    console.log(data);
   }
 };
 
 const start = document.querySelector("#start");
-
 start.addEventListener("click", () => {
   rainbow();
 });
 
 // ストップをクリックすると止まる
 const stop = document.querySelector("#stop");
-
 stop.addEventListener("click", () => {
   clearInterval(intervalId); //
   document.body.style.backgroundColor = "";
@@ -206,30 +204,26 @@ stop.addEventListener("click", () => {
 
 let intervalId; // タイマーのIDを保持する変数
 
-const delayedColorChange = () => {
-  const randomColor = () => {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return `rgb(${r}, ${g}, ${b})`;
-  };
+const randomColor = () => {
+  const r = Math.floor(Math.random() * 255);
+  const g = Math.floor(Math.random() * 255);
+  const b = Math.floor(Math.random() * 255);
+  return `rgb(${r}, ${g}, ${b})`;
+};
 
-  .then (() => {
-    new Promise((resolve, reject) => {
-      intervalId = setTimeout(() => {
+const delayedColorChange = () => {
+  return new Promise((resolve, reject) => {
+    intervalId = setTimeout(() => {
       document.body.style.backgroundColor = randomColor();
       resolve();
     }, 1000);
   });
-  })
 };
 
 const rainbow = () => {
-  while (true) {
-    .then (() => {
-      delayedColorChange();
-    })
-  }
+  delayedColorChange().then(() => {
+    rainbow();
+  });
 };
 
 const start = document.querySelector("#start");
@@ -237,7 +231,6 @@ const start = document.querySelector("#start");
 start.addEventListener("click", () => {
   rainbow();
 });
-
 // ストップをクリックすると止まる
 const stop = document.querySelector("#stop");
 
@@ -246,5 +239,38 @@ stop.addEventListener("click", () => {
   document.body.style.backgroundColor = "";
 });
 
+
+```
+
+### resolve reject された値の処理
+
+resolve された値は変数に代入することができる
+
+```JavaScript
+記述例
+
+const delayedColorChange = async () => {
+  const randomColor = () => {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  await new Promise((resolve, reject) => {
+    intervalId = setTimeout(() => {
+      document.body.style.backgroundColor = randomColor();
+      resolve();
+    }, 1000);
+  });
+};
+
+const rainbow = async () => {
+  while (true) {
+    const data = await delayedColorChange();
+  }
+};
+
+console.log(data);
 
 ```
