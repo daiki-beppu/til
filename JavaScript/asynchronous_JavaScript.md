@@ -35,6 +35,19 @@ JavaScript 自身は次の処理に移っている
 JavaScript はコールバック関数で帰ってきた処理を行うことで
 シングルスレッドでも並列していろんな処理を行うことができる
 
+## Promise オブジェクト
+
+Promise オブジェクトは非同期処理の完了もしくは失敗の結果とその値を表す
+
+Promise オブジェクトには 3 つの状態があり
+
+- `pending` 待機状態 => 失敗も成功もしていない状態
+- `fulfilled` 履行状態 => 処理が成功し完了した状態
+- `rejected` 拒否状態 => 処理が失敗した状態
+
+待機状態の Promise の最終状態は
+fulfilled か rejected のどちらかになる
+
 ## async function
 
 async function は 非同期関数を宣言しその中で await キーワードを使うことで非同期な JavaScript を書くことができる
@@ -42,6 +55,7 @@ async function は 非同期関数を宣言しその中で await キーワード
 - async は必ず Promise を返す
 - 関数が値を返せば Promise その値で resolve する
 - 関数がエラーを throw した場合 Promise はそのエラーで reject する
+- resolve された値を変数に代入してデータを取り出すことができる
 
 ---
 
@@ -100,6 +114,7 @@ const delayedColorChange = async () => {
     return `rgb(${r}, ${g}, ${b})`;
   };
 
+  // Promiseに関しては後ほど詳述
   await new Promise((resolve, reject) => {
     intervalId = setTimeout(() => {
       document.body.style.backgroundColor = randomColor();
@@ -127,5 +142,109 @@ stop.addEventListener("click", () => {
   clearInterval(intervalId); //
   document.body.style.backgroundColor = "";
 });
+
+```
+
+### async await を使わない非同期処理
+
+async await が使えるようになったのは ES2017 でそれ以前では別の方法で記述していた
+
+`then` を用いて記述する
+その方法はプロミスチェーンと呼ばれる
+
+```JavaScript
+
+記述例
+
+//async await で記述したコード
+
+// スタートボタンをクリックすると1秒ごとに背景色がランダムで変わる
+let intervalId; // タイマーのIDを保持する変数
+
+const delayedColorChange = async () => {
+  const randomColor = () => {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  // Promiseに関しては後ほど詳述
+  await new Promise((resolve, reject) => {
+    intervalId = setTimeout(() => {
+      document.body.style.backgroundColor = randomColor();
+      resolve();
+    }, 1000);
+  });
+};
+
+const rainbow = async () => {
+  while (true) {
+    await delayedColorChange();
+  }
+};
+
+const start = document.querySelector("#start");
+
+start.addEventListener("click", () => {
+  rainbow();
+});
+
+// ストップをクリックすると止まる
+const stop = document.querySelector("#stop");
+
+stop.addEventListener("click", () => {
+  clearInterval(intervalId); //
+  document.body.style.backgroundColor = "";
+});
+
+```
+
+```JavaScript
+
+// async await で記述したコードをthenを用いて記述する
+
+let intervalId; // タイマーのIDを保持する変数
+
+const delayedColorChange = () => {
+  const randomColor = () => {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  .then (() => {
+    new Promise((resolve, reject) => {
+      intervalId = setTimeout(() => {
+      document.body.style.backgroundColor = randomColor();
+      resolve();
+    }, 1000);
+  });
+  })
+};
+
+const rainbow = () => {
+  while (true) {
+    .then (() => {
+      delayedColorChange();
+    })
+  }
+};
+
+const start = document.querySelector("#start");
+
+start.addEventListener("click", () => {
+  rainbow();
+});
+
+// ストップをクリックすると止まる
+const stop = document.querySelector("#stop");
+
+stop.addEventListener("click", () => {
+  clearInterval(intervalId); //
+  document.body.style.backgroundColor = "";
+});
+
 
 ```
