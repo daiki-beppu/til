@@ -56,12 +56,11 @@ var fooVar = "foobar";
 // マジックナンバーは避ける
 
 // NG例
-const message = skills.length > 5) ? "エラー" : "ok";
+const message = skills.length > 5 ? "エラー" : "ok";
 // 5がどんな意味のある数値なのかがわからない
 
 // OK例
 const maxSkills = 5
-const message = skills.length > maxSkills) ? "エラー" : "ok";
-
+const message = skills.length > maxSkills ? "エラー" : "ok";
 
 ```
