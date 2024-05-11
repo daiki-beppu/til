@@ -247,30 +247,46 @@ stop.addEventListener("click", () => {
 resolve された値は変数に代入することができる
 
 ```JavaScript
+
 記述例
 
-const delayedColorChange = async () => {
-  const randomColor = () => {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return `rgb(${r}, ${g}, ${b})`;
-  };
-
-  await new Promise((resolve, reject) => {
-    intervalId = setTimeout(() => {
-      document.body.style.backgroundColor = randomColor();
-      resolve();
-    }, 1000);
+const fakeRequest = (url) => {
+  return new Promise((resolve, reject) => {
+    const delay = Math.floor(Math, random() * 4500 + 500);
+    setTimeout(() => {
+      if (delay > 4000) {
+        reject("コネクションタイムアウト");
+      } else {
+        resolve(`http://${url}`);
+      }
+    }, delay);
   });
 };
 
-const rainbow = async () => {
-  while (true) {
-    const data = await delayedColorChange();
+const makeRequest = async () => {
+  // resolve された値をdata変数に代入
+  const data = await fakeRequest("google.com");
+  console.log(data);
+};
+
+makeRequest()
+// resolve したとき data 変数には http://google.com が入っている
+
+```
+
+reject したときの値は`try catch`で取得
+
+```JavaScript
+
+const makeRequest = async () => {
+  try {
+    const data = await fakeRequest("google.com");
+    console.log(data);
+  } catch (error) {
+    console.log("エラーが発生しました");
   }
 };
 
-console.log(data);
+makeRequest();
 
 ```
