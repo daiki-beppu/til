@@ -47,3 +47,21 @@ var fooVar = "foobar";
 - 予約語は変数の名に設定できない(例: `const` , `name`)
 - キャメルケース(例: `camelCase`)
 - 動詞 → 目的語で記述 (例: `getRequest`)
+- マジックナンバーは避ける
+
+```JavaScript
+
+記述例
+
+// マジックナンバーは避ける
+
+// NG例
+const message = skills.length > 5) ? "エラー" : "ok";
+// 5がどんな意味のある数値なのかがわからない
+
+// OK例
+const maxSkills = 5
+const message = skills.length > maxSkills) ? "エラー" : "ok";
+
+
+```
