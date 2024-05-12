@@ -1,4 +1,4 @@
-# AJAX 入門
+# Ajax 入門
 
 Ajax とは
 
