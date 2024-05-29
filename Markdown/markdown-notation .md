@@ -190,13 +190,21 @@ hello() # Hello_World
 `echo "Hello World"`
 と入力
 
+インラインコード内でバッククォートを表示する事もできる
+`` ` ``
+
 ```
 記述例
 
 ターミナルで
 `echo "Hello World" `
 と入力
+
+インラインコード内でバッククォートを使いたいときは
+`` ` ``と入力
 ```
+
+≈
 
 ## 2.8. 打ち消し線 strike-through line < strike >
 
