@@ -27,6 +27,8 @@ const gui = new GUI();
 gui.add(boxGroup.position, "y").min(-3).max(3).step(0.01);
 ```
 
+こちらの記述をを追加しても画面に反映されず以下のエラーが発生
+
 ```js
 ReferenceError: document is not defined
     at eval (./app/page.tsx:17:13)
