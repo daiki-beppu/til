@@ -79,7 +79,7 @@ material.wireframe = true;
 ### opacity プロパティ
 
 透明度を制御するプロパティ
-透明度を制御することを Three.js に伝えるために`transparent`を`ture`にする必要がある
+透明度を制御することを Three.js に伝えるために`transparent`を`true`にする必要がある
 
 ```js
 material.transparent = true;
@@ -244,8 +244,8 @@ material.gradientMap = gradientTextur;
 const material = new THREE.MeshToonMaterial();
 
 // 拡大フィルター
-gradientTextur.magFilter = THREE.NearestFilter;
-material.gradientMap = gradientTextur;
+gradientTexture.magFilter = THREE.**NearestFilter**;
+material.gradientMap = gradientTexture;
 ```
 
 [![Image from Gyazo](https://i.gyazo.com/b080a1db412139188843f327be0e8fc5.png)](https://gyazo.com/b080a1db412139188843f327be0e8fc5)
@@ -319,7 +319,7 @@ import GUI from "lil-gui";
 
 lil-gui をインスタンス化してデバッグ UI の追加
 
-```js
+````js
 // デバッグUI
 
 // lil-guiをインスタンス化
@@ -366,7 +366,7 @@ const rgbeLoader = new RGBELoader();
 rgbeLoader.load("./textures/environmentMap/2k.hdr", (environmentMap) => {
   // シーンに適用
   // mappingプロパティをTHREE.EquirectangularReflectionMapping(反射マップ)に変更
-  environmentMap.mapping = THREE.EquirectangularReflactionMapping;
+  environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 
   // EquirectangularReflectionMapping(反射マップ)に変更することで反射を計算してくれる
 
@@ -426,14 +426,14 @@ material.displacementScale = 1; // デフォルトは 1
 
 ```js
 // メタリックテクスチャの適用
-material.metalnessMap = doorMetallnessTexture;
+material.metalnessMap = doorMetalnessTexture;
 ```
 
 ### roughnessMap プロパティ
 
 ```js
 // ラフネステクスチャの適用
-material.roughnessMap = doorRouphnessTexture;
+material.roughnessMap = doorRoughnessTexture;
 ```
 
 ### normalMap プロパティ
@@ -577,3 +577,4 @@ material.thickness = 0.5; // デフォルトは 0
 [![Image from Gyazo](https://i.gyazo.com/f84b657039b514ac508abb3d45604e53.png)](https://gyazo.com/f84b657039b514ac508abb3d45604e53)
 
 屈折率は表現する物質によって異なります。詳しくは[こちらを参照](https://en.wikipedia.org/wiki/List_of_refractive_indices)
+````
