@@ -319,7 +319,7 @@ import GUI from "lil-gui";
 
 lil-gui をインスタンス化してデバッグ UI の追加
 
-````js
+```js
 // デバッグUI
 
 // lil-guiをインスタンス化
@@ -577,4 +577,7 @@ material.thickness = 0.5; // デフォルトは 0
 [![Image from Gyazo](https://i.gyazo.com/f84b657039b514ac508abb3d45604e53.png)](https://gyazo.com/f84b657039b514ac508abb3d45604e53)
 
 屈折率は表現する物質によって異なります。詳しくは[こちらを参照](https://en.wikipedia.org/wiki/List_of_refractive_indices)
-````
+
+```
+
+```
