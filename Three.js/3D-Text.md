@@ -73,6 +73,9 @@ fontLoader.load("/fonts/helvetiker_regular.typeface.json", () => {
 ### ジオメトリの作成
 
 ```js
+// テキストジオメトリのインポート
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+
 fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
   const textGeometry = new TextGeometry("Hello Three.js ! ", {
     font: font, // THREE.Fontのインスタンス
@@ -125,15 +128,18 @@ fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
 
 for (let i = 0; i < 100; i += 1) {
   // ドーナツの形を作成
-  const radius = 0.3;
-  const tube = 0.2;
-  const radiusSegments = 20;
-  const tubeSegments = 45;
+ const donutParams = {
+    radius: 0.3,
+    tube: 0.2,
+    radiusSegments: 20,
+    tubeSegments: 45,
+  };
+
   const donutGeometory = new THREE.TorusGeometry(
-    radius,
-    tube,
-    radiusSegments,
-    tubeSegments
+    donutParams.radius,
+    donutParams.tube,
+    donutParams.radiusSegments,
+    donutParams.tubeSegments
   );
 
   const donut = new THREE.Mesh(donutGeometory, material);
@@ -175,16 +181,19 @@ for (let i = 0; i < 100; i += 1) {
 
 ```js
 // ジオメトリをループの外で記述
-const radius = 0.3;
-const tube = 0.2;
-const radiusSegments = 20;
-const tubeSegments = 45;
-const donutGeometory = new THREE.TorusGeometry(
-  radius,
-  tube,
-  radiusSegments,
-  tubeSegments
-);
+ const donutParams = {
+    radius: 0.3,
+    tube: 0.2,
+    radiusSegments: 20,
+    tubeSegments: 45,
+  };
+
+  const donutGeometory = new THREE.TorusGeometry(
+    donutParams.radius,
+    donutParams.tube,
+    donutParams.radiusSegments,
+    donutParams.tubeSegments
+  );
 
 for (let i = 0; i < 100; i += 1) {
   const donut = new THREE.Mesh(donutGeometory, material);
