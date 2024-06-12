@@ -11,6 +11,3 @@ renderer.shadowMap.type = THREE.PCFShadowMap;
 
 ```
 
-##
-
-##
