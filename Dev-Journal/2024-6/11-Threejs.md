@@ -1,4 +1,4 @@
-# 2024/6/8 開発日誌
+# 2024/6/11 開発日誌
 
 制作物
 https://threejs-demo-rose.vercel.app/
