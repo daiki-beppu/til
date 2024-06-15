@@ -31,45 +31,31 @@ scene.add(plane);
 
 [![Image from Gyazo](https://i.gyazo.com/c9987ad7634cf6a201553374f6dc46f7.png)](https://gyazo.com/c9987ad7634cf6a201553374f6dc46f7)
 
-### ライトを ambientLight と directionalLight の 2 つにする
+### 影の投影と描画を有効にする
 
 ```tsx
+// レンダラー
+// 影を有効にする
+renderer.shadowMap.enabled = true;
+
+// 影の品質設定
+renderer.shadowMap.type = THREE.PCFShadowMap;
+
+// オブジェクト
+// 3D テキスト
+text.castShadow = true;
+
+// が下を投影する壁
+plane.receiveShadow = true;
+
 // ライト
-const ambientLightParams = {
-  color: 0xffffff,
-  intensity: 1,
-};
-
-const ambientLight = new THREE.AmbientLight(
-  ambientLightParams.color,
-  ambientLightParams.intensity
-);
-
-const directionalLightParams = {
-  color: 0xffffff,
-  intensity: 2,
-};
-
-const directionalLight = new THREE.DirectionalLight(
-  directionalLightParams.color,
-  directionalLightParams.intensity
-);
-directionalLight.position.set(0, -1, 2);
+// 影の投影を有効にする
 directionalLight.castShadow = true;
+```
 
-directionalLight.shadow.mapSize.width = 1024;
-directionalLight.shadow.mapSize.height = 1024;
+### ヘルパーを使って影の最適化
 
-// 影の生成範囲を制御
-directionalLight.shadow.camera.top = 2;
-directionalLight.shadow.camera.right = 3;
-directionalLight.shadow.camera.bottom = -2;
-directionalLight.shadow.camera.left = -3;
-directionalLight.shadow.camera.near = 0.7;
-directionalLight.shadow.camera.far = 4;
-
-scene.add(ambientLight, directionalLight);
-
+```tsx
 // ライトヘルパー
 const directionalLightHelper = new THREE.DirectionalLightHelper(
   directionalLight,
@@ -84,6 +70,20 @@ const directionalLighCameratHelper = new THREE.CameraHelper(
 );
 directionalLighCameratHelper.visible = false;
 scene.add(directionalLighCameratHelper);
+```
+
+```tsx
+// 影の解像度を設定
+directionalLight.shadow.mapSize.width = 1024;
+directionalLight.shadow.mapSize.height = 1024;
+
+// 影の生成範囲を制御
+directionalLight.shadow.camera.top = 2;
+directionalLight.shadow.camera.right = 3;
+directionalLight.shadow.camera.bottom = -2;
+directionalLight.shadow.camera.left = -3;
+directionalLight.shadow.camera.near = 0.7;
+directionalLight.shadow.camera.far = 4;
 ```
 
 ## 目的 2 : デバック UI で ヘルパーの表示切替
