@@ -1,5 +1,17 @@
 # ジオメトリについて
 
+- [ジオメトリについて](#ジオメトリについて)
+  - [ジオメトリとは](#ジオメトリとは)
+  - [Three.js で用意されているジオメトリ](#threejs-で用意されているジオメトリ)
+    - [ジオメトリのパラメーター](#ジオメトリのパラメーター)
+  - [オリジナルのジオメトリを作成](#オリジナルのジオメトリを作成)
+    - [`BufferGeometry`をインスタンス化](#buffergeometryをインスタンス化)
+    - [`BufferGeometry`に頂点を追加する](#buffergeometryに頂点を追加する)
+    - [`BufferAttribute`に変換](#bufferattributeに変換)
+    - [`BufferAttribute`を`BufferGeometry`に追加する](#bufferattributeをbuffergeometryに追加する)
+  - [ランダムな三角形ををたくさん生成する](#ランダムな三角形ををたくさん生成する)
+
+
 ## ジオメトリとは
 
 Three.js でジオメトリは頂点と面で構成される

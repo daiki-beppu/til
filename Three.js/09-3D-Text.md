@@ -1,5 +1,17 @@
 # 3D テキストについて
 
+- [3D テキストについて](#3d-テキストについて)
+  - [フォントの設定](#フォントの設定)
+  - [フォントの読み込み](#フォントの読み込み)
+    - [FontLoader のインポート](#fontloader-のインポート)
+    - [FontLoader をインスタンス化](#fontloader-をインスタンス化)
+    - [フォントを読み込む](#フォントを読み込む)
+  - [3D テキストの表示](#3d-テキストの表示)
+    - [ジオメトリの作成](#ジオメトリの作成)
+    - [テキストの中央揃え](#テキストの中央揃え)
+    - [オブジェクトの追加(ドーナツ)](#オブジェクトの追加ドーナツ)
+    - [最適化](#最適化)
+
 3D テキストを表示させるには
 以下の手順を行います。
 
@@ -26,7 +38,7 @@
 
 ## フォントの読み込み
 
-Three.jsで3Dテキストを表示するには、フォントを読み込む必要があります。
+Three.js で 3D テキストを表示するには、フォントを読み込む必要があります。
 
 フォントの読み込みは以下の手順で行う
 
@@ -74,7 +86,7 @@ fontLoader.load("/fonts/helvetiker_regular.typeface.json", () => {
 
 ```js
 // テキストジオメトリのインポート
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 
 fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
   const textGeometry = new TextGeometry("Hello Three.js ! ", {
@@ -128,7 +140,7 @@ fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
 
 for (let i = 0; i < 100; i += 1) {
   // ドーナツの形を作成
- const donutParams = {
+  const donutParams = {
     radius: 0.3,
     tube: 0.2,
     radiusSegments: 20,
@@ -181,19 +193,19 @@ for (let i = 0; i < 100; i += 1) {
 
 ```js
 // ジオメトリをループの外で記述
- const donutParams = {
-    radius: 0.3,
-    tube: 0.2,
-    radiusSegments: 20,
-    tubeSegments: 45,
-  };
+const donutParams = {
+  radius: 0.3,
+  tube: 0.2,
+  radiusSegments: 20,
+  tubeSegments: 45,
+};
 
-  const donutGeometory = new THREE.TorusGeometry(
-    donutParams.radius,
-    donutParams.tube,
-    donutParams.radiusSegments,
-    donutParams.tubeSegments
-  );
+const donutGeometory = new THREE.TorusGeometry(
+  donutParams.radius,
+  donutParams.tube,
+  donutParams.radiusSegments,
+  donutParams.tubeSegments
+);
 
 for (let i = 0; i < 100; i += 1) {
   const donut = new THREE.Mesh(donutGeometory, material);
