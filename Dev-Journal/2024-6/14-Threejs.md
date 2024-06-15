@@ -53,6 +53,8 @@ plane.receiveShadow = true;
 directionalLight.castShadow = true;
 ```
 
+[![Image from Gyazo](https://i.gyazo.com/0495ed4ccfb216f3df1e06bc82f6512e.png)](https://gyazo.com/0495ed4ccfb216f3df1e06bc82f6512e)
+
 ### ヘルパーを使って影の最適化
 
 ```tsx
@@ -85,6 +87,10 @@ directionalLight.shadow.camera.left = -3;
 directionalLight.shadow.camera.near = 0.7;
 directionalLight.shadow.camera.far = 4;
 ```
+
+[![Image from Gyazo](https://i.gyazo.com/cf1d0e81bea8817d308eecee8bd04117.png)](https://gyazo.com/cf1d0e81bea8817d308eecee8bd04117)
+
+[![Image from Gyazo](https://i.gyazo.com/39eda81ed9d44cddf5eff47db421c118.png)](https://gyazo.com/39eda81ed9d44cddf5eff47db421c118)
 
 ## 目的 2 : デバック UI で ヘルパーの表示切替
 
