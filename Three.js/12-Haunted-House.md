@@ -11,6 +11,12 @@
     - [茂みの作成](#茂みの作成)
   - [墓の作成](#墓の作成)
   - [テクスチャを適用する](#テクスチャを適用する)
+    - [床のテクスチャを適用する](#床のテクスチャを適用する)
+    - [家の壁にテクスチャ適用する](#家の壁にテクスチャ適用する)
+    - [家の屋根にテクスチャを適用する](#家の屋根にテクスチャを適用する)
+    - [ドアにテクスチャを適用する](#ドアにテクスチャを適用する)
+    - [茂みにテクスチャを適用する](#茂みにテクスチャを適用する)
+    - [墓にテクスチャを適用する](#墓にテクスチャを適用する)
 
 ## タイマーの設定
 
@@ -270,3 +276,385 @@ for (let i = 0; i < 30; i += 1) {
 テクスチャを探すのにおすすめサイトは[Poly Haven](https://polyhaven.com/)です。
 
 高品質なテクスチャが無料でダウンロードでき、商用利用が可能なものもたくさんあります。
+
+### 床のテクスチャを適用する
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/1002112d8ab3f227bdfd496d0c892543.png)](https://gyazo.com/1002112d8ab3f227bdfd496d0c892543)
+
+```js
+// テクスチャのロード
+
+// alphaMap アルファテクスチャ
+const floorAlphaTexture = textureLoader.load("./floor/alpha.jpg");
+
+// map アルベドテクスチャ
+const floorColorTexture = textureLoader.load(
+  "./floor/mud_forest_1k/mud_forest_diff_1k.jpg"
+);
+
+// aoMap, roughnessMap, metalnessMap アンビエントオクルージョン、ラフネス、メタルネス
+const floorARMTexture = textureLoader.load(
+  "./floor/mud_forest_1k/mud_forest_arm_1k.jpg"
+);
+
+// normalMap 法線マップ
+const floorNormalTexture = textureLoader.load(
+  "./floor/mud_forest_1k/mud_forest_nor_gl_1k.jpg"
+);
+
+// displacementMap 高さマップ
+const floorDisplacementTexture = textureLoader.load(
+  "./floor/mud_forest_1k/mud_forest_disp_1k.jpg"
+);
+```
+
+```js
+// テクスチャが大きすぎるので修正する
+
+// テクスチャを水平、垂直方向に8回繰り返す
+floorColorTexture.repeat.set(8, 8);
+
+// テクスチャの水平方向(S方向)のラップモードを設定
+floorColorTexture.wrapS = THREE.RepeatWrapping;
+
+// テクスチャの垂直方向(T方向)のラップモードを設定
+floorColorTexture.wrapT = THREE.RepeatWrapping;
+floorColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+floorARMTexture.repeat.set(8, 8);
+floorARMTexture.wrapS = THREE.RepeatWrapping;
+floorARMTexture.wrapT = THREE.RepeatWrapping;
+
+floorNormalTexture.repeat.set(8, 8);
+floorNormalTexture.wrapS = THREE.RepeatWrapping;
+floorNormalTexture.wrapT = THREE.RepeatWrapping;
+
+floorDisplacementTextuer.repeat.set(8, 8);
+floorDisplacementTextuer.wrapS = THREE.RepeatWrapping;
+floorDisplacementTextuer.wrapT = THREE.RepeatWrapping;
+
+// 4 つのテクスチャが水平、垂直方向に 8 回繰り返される
+```
+
+```js
+// マテリアルにテクスチャを設定
+
+//オブジェクト
+const floorParams = {
+  width: 20,
+  height: 20,
+  widthSegments: 100,
+  heightSegments: 100,
+};
+
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(
+    floorParams.width,
+    floorParams.height,
+    floorParams.widthSegments,
+    floorParams.heightSegments
+  ),
+  new THREE.MeshStandardMaterial({
+    transparent: true,
+    alphaMap: floorAlphaTexture,
+    map: floorColorTexture,
+    aoMap: floorARMTexture,
+    roughnessMap: floorARMTexture,
+    metalnessMap: floorARMTexture,
+    normalMap: floorNormalTexture,
+    displacementMap: floorDisplacementTexture,
+    // 高さマップの効果を設定
+    displacementScale: 0.3,
+
+    // 高さマップの基準位置を -0.2 シフト
+    displacementBias: -0.2,
+  })
+);
+```
+
+`displacementScale` と `displacementBias`を設定しないと地面が盛り上がりすぎている
+
+[![Image from Gyazo](https://i.gyazo.com/5d3606ecf3a12db2baadbd2485652385.png)](https://gyazo.com/5d3606ecf3a12db2baadbd2485652385)
+
+他のテクスチャも同様に設定していく
+新しく出てきた部分以外は説明を割愛
+
+### 家の壁にテクスチャ適用する
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/60f690ab3de6dd0aba2077206f2181e2.png)](https://gyazo.com/60f690ab3de6dd0aba2077206f2181e2)
+
+[![Image from Gyazo](https://i.gyazo.com/dbc395f408e4ee944fb34dfa206da712.png)](https://gyazo.com/dbc395f408e4ee944fb34dfa206da712)
+
+```js
+// テクスチャ
+const wallColorTexture = textureLoader.load(
+  "./wall/weathered_planks_1k/weathered_planks_diff_1k.jpg"
+);
+wallColorTexture.repeat.set(1.5, 1.5);
+wallColorTexture.wrapS = THREE.RepeatWrapping;
+wallColorTexture.wrapT = THREE.RepeatWrapping;
+wallColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+const wallARMTexture = textureLoader.load(
+  "./wall/weathered_planks_1k/weathered_planks_diff_1k.jpg"
+);
+wallARMTexture.repeat.set(1.5, 1.5);
+wallARMTexture.wrapS = THREE.RepeatWrapping;
+wallARMTexture.wrapT = THREE.RepeatWrapping;
+
+const wallNormalTexture = textureLoader.load(
+  ".wall/weathered_planks_1k/weathered_planks_nor_gl_1k.jpg"
+);
+wallNormalTexture.repeat.set(1.5, 1.5);
+wallNormalTexture.wrapS = THREE.RepeatWrapping;
+wallNormalTexture.wrapT = THREE.RepeatWrapping;
+```
+
+```js
+// オブジェクト
+const wallsParams = {
+  width: 4,
+  height: 2.5,
+  depth: 4,
+};
+
+const walls = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    wallsParams.width,
+    wallsParams.height,
+    wallsParams.depth
+  ),
+  new THREE.MeshStandardMaterial({
+    map: wallColorTexture,
+    aoMap: wallARMTexture,
+    roughnessMap: wallARMTexture,
+    metalnessMap: wallARMTexture,
+    normalMap: wallNormalTexture,
+  })
+);
+```
+
+### 家の屋根にテクスチャを適用する
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/e176f76a439a798a51778c858634b0d7.png)](https://gyazo.com/e176f76a439a798a51778c858634b0d7)
+
+```js
+// テクスチャ
+const roofColorTexture = textureLoader.load(
+  "./roof/roof_slates_02_1k/roof_slates_02_diff_1k.jpg"
+);
+
+roofColorTexture.repeat.set(3, 1);
+roofColorTexture.wrapS = THREE.RepeatWrapping;
+roofColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+const roofARMTexture = textureLoader.load(
+  "./roof/roof_slates_02_1k/roof_slates_02_arm_1k.jpg"
+);
+roofARMTexture.repeat.set(3, 1);
+roofARMTexture.wrapS = THREE.RepeatWrapping;
+
+const roofNormalTexture = textureLoader.load(
+  "./roof/roof_slates_02_1k/roof_slates_02_nor_gl_1k.jpg"
+);
+roofNormalTexture.repeat.set(3, 1);
+roofNormalTexture.wrapS = THREE.RepeatWrapping;
+
+// 垂直方向の値が 1 以上でないためwarpT は設定する必要がない
+```
+
+```js
+// オブジェクト
+const roofParams = {
+  radius: 3.5,
+  height: 1.5,
+  radiusSegments: 4,
+};
+
+const roof = new THREE.Mesh(
+  new THREE.ConeGeometry(
+    roofParams.radius,
+    roofParams.height,
+    roofParams.radiusSegments
+  ),
+  new THREE.MeshStandardMaterial({
+    map: roofColorTexture,
+    aoMap: roofARMTexture,
+    roughnessMap: roofARMTexture,
+    metalnessMap: roofARMTexture,
+    normalMap: roofNormalTexture,
+  })
+);
+```
+
+### ドアにテクスチャを適用する
+
+完成イメージ
+[![Image from Gyazo](https://i.gyazo.com/fdfae4d1b3e9c2e26e863854c911fd04.png)](https://gyazo.com/fdfae4d1b3e9c2e26e863854c911fd04)
+
+[![Image from Gyazo](https://i.gyazo.com/24899751fe0cba9cc547e06c3ad769d5.png)](https://gyazo.com/24899751fe0cba9cc547e06c3ad769d5)
+
+```js
+// テクスチャ
+const doorColorTexture = textureLoader.load("./door/color.jpg");
+const doorAlphaTexture = textureLoader.load("./door/alpha.jpg");
+const doorAmbientOcclusionTexture = textureLoader.load(
+  "./door/ambientOcclusion.jpg"
+);
+const doorHeightTexture = textureLoader.load("./door/height.jpg");
+const doorNormalTexture = textureLoader.load("./door/normal.jpg");
+const doorMetalnessTexture = textureLoader.load("./door/metalness.jpg");
+const doorRoughnessTexture = textureLoader.load("./door/roughness.jpg");
+```
+
+```js
+// オブジェクト
+const door = new THREE.Mesh(
+  new THREE.PlaneGeometry(
+    doorParams.width,
+    doorParams.height,
+    doorParams.widthSegments,
+    doorParams.heightSegments
+  ),
+  new THREE.MeshStandardMaterial({
+    map: doorColorTexture,
+    transparent: true,
+    alphaMap: doorAlphaTexture,
+    aoMap: doorAmbientOcclusionTexture,
+    displacementMap: doorHeightTexture,
+    displacementScale: 0.15,
+    displacementBias: -0.04,
+    normalMap: doorNormalTexture,
+    metalnessMap: doorMetalnessTexture,
+    roughnessMap: doorRoughnessTexture,
+  })
+);
+```
+
+### 茂みにテクスチャを適用する
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/b9df6837f6fd504b86a06f9a4c5ec07e.png)](https://gyazo.com/b9df6837f6fd504b86a06f9a4c5ec07e)
+
+[![Image from Gyazo](https://i.gyazo.com/25b19a25fda32415088b2c4a67903739.png)](https://gyazo.com/25b19a25fda32415088b2c4a67903739)
+
+```js
+// テクスチャ
+const bushColorTexture = textureLoader.load(
+  "./bush/leaves_forest_ground_1k/leaves_forest_ground_diff_1k.jpg"
+);
+bushColorTexture.repeat.set(2, 1);
+bushColorTexture.wrapS = THREE.RepeatWrapping;
+bushColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+const bushARMTexture = textureLoader.load(
+  "./bush/leaves_forest_ground_1k/leaves_forest_ground_arm_1k.jpg"
+);
+bushARMTexture.repeat.set(2, 1);
+bushARMTexture.wrapS = THREE.RepeatWrapping;
+
+const bushNormalTexture = textureLoader.load(
+  "./bush/leaves_forest_ground_1k/leaves_forest_ground_nor_gl_1k.jpg"
+);
+bushNormalTexture.repeat.set(2, 1);
+bushNormalTexture.wrapS = THREE.RepeatWrapping;
+```
+
+```js
+// オブジェクト
+const bushParams = {
+  radius: 1,
+  widthSegments: 16,
+  heightSegments: 16,
+};
+
+const bushGeometry = new THREE.SphereGeometry(
+  bushParams.radius,
+  bushParams.widthSegments,
+  bushParams.heightSegments
+);
+
+const bushMaterial = new THREE.MeshStandardMaterial({
+  color: "#ccffcc",
+  map: bushColorTexture,
+  aoMap: bushARMTexture,
+  roughnessMap: bushARMTexture,
+  metalnessMap: bushARMTexture,
+  normalMap: bushNormalTexture,
+});
+
+const bush1 = new THREE.Mesh(bushGeometry, bushMaterial);
+bush1.scale.setScalar(0.5);
+bush1.position.set(0.8, 0.2, 2.2);
+bush1.rotation.x = -0.75;
+
+const bush2 = new THREE.Mesh(bushGeometry, bushMaterial);
+bush2.scale.setScalar(0.25);
+bush2.position.set(1.4, 0.1, 2.1);
+bush2.rotation.x = -0.75;
+
+const bush3 = new THREE.Mesh(bushGeometry, bushMaterial);
+bush3.scale.setScalar(0.4);
+bush3.position.set(-0.8, 0.1, 2.2);
+bush3.rotation.x = -0.75;
+
+const bush4 = new THREE.Mesh(bushGeometry, bushMaterial);
+bush4.scale.setScalar(0.15);
+bush4.position.set(-1, 0.05, 2.6);
+bush4.rotation.x = -0.75;
+
+houseGroup.add(bush1, bush2, bush3, bush4);
+```
+
+### 墓にテクスチャを適用する
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/6ce7e8f4a28bec59830a86f04c6cc545.jpg)](https://gyazo.com/6ce7e8f4a28bec59830a86f04c6cc545)
+
+```js
+// テクスチャ
+const graveColorTexture = textureLoader.load(
+  "./grave/plastered_stone_wall_1k/plastered_stone_wall_diff_1k.jpg"
+);
+graveColorTexture.repeat.set(0.3, 0.4);
+graveColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+const graveARMTexture = textureLoader.load(
+  "./grave/plastered_stone_wall_1k/plastered_stone_wall_arm_1k.jpg"
+);
+graveARMTexture.repeat.set(0.3, 0.4);
+
+const graveNormalTexture = textureLoader.load(
+  "./grave/plastered_stone_wall_1k/plastered_stone_wall_nor_gl_1k.jpg"
+);
+graveNormalTexture.repeat.set(0.3, 0.4);
+const graveParams = {
+  width: 0.6,
+  height: 0.8,
+  depth: 0.2,
+};
+```
+
+```js
+// オブジェクト
+const graveGeometry = new THREE.BoxGeometry(
+  graveParams.width,
+  graveParams.height,
+  graveParams.depth
+);
+const graveMaterial = new THREE.MeshStandardMaterial({
+  map: graveColorTexture,
+  aoMap: graveARMTexture,
+  roughnessMap: graveARMTexture,
+  metalnessMap: graveARMTexture,
+  normalMap: graveNormalTexture,
+});
+```
