@@ -17,6 +17,7 @@
     - [ドアにテクスチャを適用する](#ドアにテクスチャを適用する)
     - [茂みにテクスチャを適用する](#茂みにテクスチャを適用する)
     - [墓にテクスチャを適用する](#墓にテクスチャを適用する)
+  - [ドアライトの追加](#ドアライトの追加)
 
 ## タイマーの設定
 
@@ -657,4 +658,21 @@ const graveMaterial = new THREE.MeshStandardMaterial({
   metalnessMap: graveARMTexture,
   normalMap: graveNormalTexture,
 });
+```
+
+## ドアライトの追加
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/4e3629a21720a7e4df5cf9600a5cc692.png)](https://gyazo.com/4e3629a21720a7e4df5cf9600a5cc692)
+
+```js
+// PointLight をインスタンス化
+const doorLight = new THREE.PointLight("#ff7d46", 5);
+
+// ライトの位置を調整
+doorLight.position.set(0, 2.2, 2.5);
+
+// シーンに追加
+scene.add(doorLight);
 ```
