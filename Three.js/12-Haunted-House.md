@@ -19,6 +19,9 @@
     - [墓にテクスチャを適用する](#墓にテクスチャを適用する)
   - [ドアライトの追加](#ドアライトの追加)
   - [幽霊の追加](#幽霊の追加)
+  - [影の追加](#影の追加)
+    - [ループで墓に影を追加](#ループで墓に影を追加)
+    - [影の最適化](#影の最適化)
 
 ## タイマーの設定
 
@@ -738,4 +741,71 @@ const tick = () => {
 };
 
 tick();
+```
+
+## 影の追加
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/42cf9490d4eb44b4fed42dc71771be9a.png)](https://gyazo.com/42cf9490d4eb44b4fed42dc71771be9a)
+
+```js
+// 影の投影と描画の設定
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+// 影の投影を設定
+directionalLight.castShadow = true;
+ghost1.castShadow = true;
+ghost2.castShadow = true;
+ghost3.castShadow = true;
+walls.castShadow = true;
+roof.castShadow = true;
+
+// 影の描画を設定
+floor.receiveShadow = true;
+walls.receiveShadow = true;
+```
+
+### ループで墓に影を追加
+
+墓のオブジェクトはループ内で生成するため個別にアクセスできない。
+
+そのため Group クラスが持つ children プロパティを使いグループ内のすべての墓オブジェクトに影の設定を追加する
+
+```js
+// ループで各墓に影の設定
+for (const grave of graves.children) {
+  grave.castShadow = true;
+  grave.receiveShadow = true;
+}
+```
+
+### 影の最適化
+
+```js
+// 影の解像度を設定
+directionalLight.shadow.mapSize.width = 256;
+directionalLight.shadow.mapSize.height = 256;
+
+ghost1.shadow.mapSize.width = 256;
+ghost1.shadow.mapSize.height = 256;
+
+ghost2.shadow.mapSize.width = 256;
+ghost2.shadow.mapSize.height = 256;
+
+ghost3.shadow.mapSize.width = 256;
+ghost3.shadow.mapSize.height = 256;
+
+// 影の投影範囲を調整
+directionalLight.shadow.camera.top = 8;
+directionalLight.shadow.camera.bottom = -8;
+directionalLight.shadow.camera.right = 8;
+directionalLight.shadow.camera.left = -8;
+directionalLight.shadow.camera.near = 1;
+directionalLight.shadow.camera.far = 20;
+
+ghost1.shadow.camera.far = 10;
+ghost2.shadow.camera.far = 10;
+ghost3.shadow.camera.far = 10;
 ```
