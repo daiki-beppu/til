@@ -23,6 +23,8 @@
     - [ループで墓に影を追加](#ループで墓に影を追加)
     - [影の最適化](#影の最適化)
   - [空の追加](#空の追加)
+  - [霧の追加](#霧の追加)
+  - [テクスチャの最適化](#テクスチャの最適化)
 
 ## タイマーの設定
 
@@ -812,3 +814,79 @@ ghost3.shadow.camera.far = 10;
 ```
 
 ## 空の追加
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/daae8b1a0695aa99bc269981e7efdb12.png)](https://gyazo.com/daae8b1a0695aa99bc269981e7efdb12)
+
+```js
+// Sky のインポート
+import { Sky } from "three/addons/objects/Sky.js";
+```
+
+```js
+// Sky をインスタンス化
+const sky = new Sky();
+
+// 空の大きさを設定
+sky.scale.set(100, 100, 100);
+
+// シーンに追加
+scene.add(sky);
+```
+
+```js
+// パラメータを設定
+
+// 空の濁度(空気中の浮遊物質の量)を設定
+sky.material.uniforms["turbidity"].value = 10; // 値が大きいほど空が濁り霞む
+// 晴天時には低めの値、霧やスモッグが多い場合は高めの値を設定
+
+// レイリー散乱 (空の青さ) を設定
+sky.material.uniforms["rayleigh"].value = 3; // 値が大きいほど空が蒼く、クリアに表示される
+// 晴天時には高めの値が適している
+
+// ミー散乱 (空の色合いや霞み具合) を設定
+sky.material.uniforms["mieCoefficient"].value = 1; // 値が大きいほど空が霞んだり、夕焼けのような赤みがかった色になる
+
+// ミー散乱の方向性 (散乱具合) を設定
+sky.material.uniforms["mieDirectionalG"].value = 0.95; // 0 に近いほど 全方向かつ均等に 1 に近いほど特定の方向に集中
+// 夕焼けや朝焼けを表現するのに重要なパラメータ
+
+// 太陽の位置 を設定
+sky.material.uniforms["sunPosition"].value.set(0.3, -0.038, -0.95);
+```
+
+## 霧の追加
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/9a22e71b47a394509c3608e0c594b731.png)](https://gyazo.com/9a22e71b47a394509c3608e0c594b731)
+
+霧の追加は 2 通りの方法がある
+
+- `Fog`
+- `FogExp2`
+
+```js
+// Fog を使った方法
+scene.fog = new THREE.Fog(
+  "#04343f", // color: 霧の色を設定
+  1, // near: 霧が始まる距離を設定
+  13 // far: 霧が完全に濃くなる距離を設定
+);
+```
+
+```js
+// FogExp2 を使った方法
+scene.fog = new THREE.FogExp2(
+  "#04343f", // color
+  0.1 // density: 霧の密度を設定
+);
+```
+
+今回は FogExp2 を使った方法で記述している
+
+## テクスチャの最適化
+
+`jpg` や `png` を `webp` に変換することで見た目をあまり損なうことなくロード時間の短縮につながる
