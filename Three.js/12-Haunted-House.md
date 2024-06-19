@@ -890,3 +890,28 @@ scene.fog = new THREE.FogExp2(
 ## テクスチャの最適化
 
 `jpg` や `png` を `webp` に変換することで見た目をあまり損なうことなくロード時間の短縮につながる
+
+**変換前 14.2MB 全体で 16.3MB**
+
+[![Image from Gyazo](https://i.gyazo.com/a422db7bd09e177f11b310294e778069.png)](https://gyazo.com/a422db7bd09e177f11b310294e778069)
+
+`jpg` を `webp` に変換した結果
+
+**1.6MB 全体で 3.8MB**
+
+[![Image from Gyazo](https://i.gyazo.com/b764fd03b7fe7e6f08af58eb98543054.png)](https://gyazo.com/b764fd03b7fe7e6f08af58eb98543054)
+
+**約 88 %** のパフォーマンスを改善することができた！
+
+画像のコンバートはいろんなサイトで実現可能
+
+今回は[こちらのサイト](https://cloudconvert.com/)で変換した
+
+[CloudConvert ](https://cloudconvert.com/)
+
+この他にも
+
+- [Squoosh](https://squoosh.app/)
+- [TinyPNG](https://tinypng.com/)
+
+こちらのサイトもオススメ
