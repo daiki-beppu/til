@@ -829,7 +829,7 @@ import { Sky } from "three/addons/objects/Sky.js";
 const sky = new Sky();
 
 // 空の大きさを設定
-sky.scale.set(100, 100, 100);
+sky.scale.set(100, 100, 100); //  または sky.scale.setScalar(100)
 
 // シーンに追加
 scene.add(sky);
