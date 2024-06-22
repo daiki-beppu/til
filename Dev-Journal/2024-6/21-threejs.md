@@ -119,7 +119,7 @@ pickupSelectorKnob.rotation.z = Math.PI / 6;
 guiterGroup.add(pickupSelectorKnob);
 ```
 
-## コントロールノブの追加
+## 目的 2 : コントロールノブの追加
 
 [![Image from Gyazo](https://i.gyazo.com/087dcaac34dd6d24c5fdadd55372fe7a.png)](https://gyazo.com/087dcaac34dd6d24c5fdadd55372fe7a)
 
@@ -302,7 +302,7 @@ rearToneGuiterKnobFolder
   .name("z軸 移動");
 ```
 
-## ブリッジの追加
+## 目的 3 : ブリッジの追加
 
 完成イメージ
 
@@ -334,7 +334,7 @@ bridge.position.z = bodyParams.depth / 2 + 0.01;
 guiterGroup.add(bridge);
 ```
 
-## テイルピースの追加
+## 目的 4 : テイルピースの追加
 
 完成イメージ
 
