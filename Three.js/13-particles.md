@@ -10,6 +10,7 @@
       - [depthTest を無効にする問題点](#depthtest-を無効にする問題点)
     - [depthWrite の設定](#depthwrite-の設定)
   - [パーティクル (粒子) にランダムな色を設定する](#パーティクル-粒子-にランダムな色を設定する)
+  - [パーティクルにアニメーションを付与](#パーティクルにアニメーションを付与)
 
 ## パーティクル (粒子) の作成
 
@@ -69,7 +70,7 @@ const particlesGeometry = new THREE.BufferGeometry();
 // パーティクルの数
 const count = 5000;
 
-// パーティクルを格納する配列を作成
+// パーティクルの位置を格納する配列を作成
 const position = new Float32Array(count * 3);
 
 // 各パーティクルは3つの値(x,y,z)を持つため、const * 3 のサイズの Float32Array を作成する
@@ -78,16 +79,16 @@ const position = new Float32Array(count * 3);
 ```js
 // 配列 position に ランダムな値を設定
 for (let i = 0; i < count * 3; i++) {
-  position[i] = (Math.random() - 0.5) * 10; // -0.5 ~ 5 までの値を設定
+  position[i] = (Math.random() - 0.5) * 10; // -0.5 から 5 までの値を設定
 }
 ```
 
 ```js
 // パーティクルの位置をジオメトリに設定
-particlesGeomettry.setAttribute(
+particlesGeometry.setAttribute(
   "position", // position 属性をジオメトリに設定
   new THREE.BufferAttribute(
-    position, //属性に使用するデータを設定
+    position, // 属性に使用するデータを設定
     3 // 各頂点のデータ数を設定
   )
 );
@@ -105,7 +106,7 @@ const particlesMaterial = new THREE.PointsMaterial({
 
 ```js
 // パーティクルの作成
-const particles = new THREE.Points(particlesGeomettry, particlesMaterial);
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 
 // シーンに追加
 scene.add(particles);
@@ -164,7 +165,7 @@ const particlesMaterial = new THREE.PointsMaterial({
 [![Image from Gyazo](https://i.gyazo.com/0b0c5ec1f7a510eb6078cd4ee30b1343.png)](https://gyazo.com/0b0c5ec1f7a510eb6078cd4ee30b1343)
 
 ちゃんと透過するようになった！
-だけどよく見ると輪郭部分が透過していない...
+だけどよく見ると輪郭部分が完全に透過していないので注意が必要
 完璧とは言えないが使えなくもない。
 
 ### depthTest の設定
@@ -183,7 +184,6 @@ const particlesMaterial = new THREE.PointsMaterial({
   transparent: true,
   alphaMap: particlesTexture,
   depthTest: false,
-  AdditiveBlending,
   size: 0.1,
   sizeAttenuation: true,
 });
@@ -203,7 +203,7 @@ const particlesMaterial = new THREE.PointsMaterial({
 
 `depthTest` を無効に設定した場合、大きな問題点が生じる
 
-こちらを見てもらうとわかりやすい
+以下の画像を見てもらうとわかりやすいでしょう。
 
 [![Image from Gyazo](https://i.gyazo.com/bcb76e4bff740d6eac08bd5e75561e09.png)](https://gyazo.com/bcb76e4bff740d6eac08bd5e75561e09)
 
@@ -211,7 +211,7 @@ const particlesMaterial = new THREE.PointsMaterial({
 
 これは多くの開発者が意図しない挙動だと考えられるので設定する場合は注意が必要。
 
-次に紹介する`depthWrite` を設定することで多くの場合は意図した挙動になる可能性が高い！
+多くの場合、次に紹介する `depthWrite` を設定することで、意図したとおりの描画結果が得られます。
 
 ### depthWrite の設定
 
@@ -246,3 +246,149 @@ const particlesMaterial = new THREE.PointsMaterial({
 [![Image from Gyazo](https://i.gyazo.com/e93b1ad42bbeffef1a43add22bf83452.png)](https://gyazo.com/e93b1ad42bbeffef1a43add22bf83452)
 
 ## パーティクル (粒子) にランダムな色を設定する
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/7554d3284252b24ae71a53df58dfc348.gif)](https://gyazo.com/7554d3284252b24ae71a53df58dfc348)
+
+```js
+const particlesGeometry = new THREE.BufferGeometry();
+const count = 20000;
+
+const position = new Float32Array(count * 3);
+
+// パーティクルの色を格納するための配列を作成
+const colors = new Float32Array(count * 3); // rgb の 3 つ値を使用するため * 3
+
+for (let i = 0; i < count * 3; i++) {
+  position[i] = (Math.random() - 0.5) * 10;
+
+  // rgb に 0 から 1までのランダムな数字を設定
+  colors[i] = Math.random(); // rgb の各値が 1 に近いほど 白く 0 に近いほど黒くなる
+}
+
+particlesGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(position, 3)
+);
+particlesGeometry.setAttribute(
+  "color", // color 属性をジオメトリに設定
+  new THREE.BufferAttribute(
+    colors, // 属性に使用するデータを設定
+    3 // rgb の3つ値を使用するため 3
+  )
+);
+
+const particlesTexture = textureLoader.load("./textures/particles/2.png");
+particlesTexture.colorSpace = THREE.SRGBColorSpace;
+
+const particlesMaterial = new THREE.PointsMaterial({
+  transparent: true,
+  alphaMap: particlesTexture,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending, // ピクセルの色をすでに描画されているピクセルの色と重ね合わせる設定
+  size: 0.1,
+  sizeAttenuation: true,
+  vertexColors: true, // 頂点カラーを有効にする
+});
+
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
+```
+
+## パーティクルにアニメーションを付与
+
+パーティクル全体にアニメーションを付与する
+
+こんなことや
+
+[![Image from Gyazo](https://i.gyazo.com/0b60e517a0d0070c5b3cee57acb84b82.gif)](https://gyazo.com/0b60e517a0d0070c5b3cee57acb84b82)
+
+```js
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+
+  // パーティクルアニメーション
+  particles.rotation.y = elapsedTime * 0.2; // 左向きに回転
+
+  particlesGeometry.attributes.position.needsUpdate = true;
+  // Update controls
+  controls.update();
+
+  // Render
+  renderer.render(scene, camera);
+
+  // Call tick again on the next frame
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+こんなことも
+
+[![Image from Gyazo](https://i.gyazo.com/de199906accb9d883e10adea6a4ffe1e.gif)](https://gyazo.com/de199906accb9d883e10adea6a4ffe1e)
+
+```js
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+
+  // パーティクルアニメーション
+  particles.position.y = -elapsedTime * 0.02; // 雪のように落ちる
+
+  particlesGeometry.attributes.position.needsUpdate = true;
+  // Update controls
+  controls.update();
+
+  // Render
+  renderer.render(scene, camera);
+
+  // Call tick again on the next frame
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+個別のパーティクルにアニメーションを付与する
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/bb6f25082e08c7259cfa17585f85cc11.gif)](https://gyazo.com/bb6f25082e08c7259cfa17585f85cc11)
+
+```js
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+
+  // パーティクルアニメーション
+
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3; // 頂点配列内の現在の頂点のインデックスを計算 (各頂点は 3 つの値を持つため)
+    const offsetX = particlesGeometry.attributes.position.array[i3]; // X座標を取得
+
+    // Y座標をサイン波に基づいて変更
+    particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(
+      elapsedTime + offsetX
+    );
+  }
+
+  // ジオメトリの位置属性が更新されたことを Three.js に通知
+  particlesGeometry.attributes.position.needsUpdate = true;
+  // Update controls
+  controls.update();
+
+  // Render
+  renderer.render(scene, camera);
+
+  // Call tick again on the next frame
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
