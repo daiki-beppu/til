@@ -3,6 +3,11 @@
 - [スクロールに応じたアニメーション](#スクロールに応じたアニメーション)
   - [背景色の変更](#背景色の変更)
   - [オブジェクトを追加](#オブジェクトを追加)
+  - [デバッグ UI での色の変更](#デバッグ-ui-での色の変更)
+  - [オブジェクトの位置を調整](#オブジェクトの位置を調整)
+  - [アニメーションの追加](#アニメーションの追加)
+  - [スクロールに合わせてカメラを動かす](#スクロールに合わせてカメラを動かす)
+  - [視差効果の適用](#視差効果の適用)
 
 ## 背景色の変更
 
@@ -110,3 +115,166 @@ scene.add(directionalLight);
 これで意図した表示になります！
 
 [![Image from Gyazo](https://i.gyazo.com/34180f3ccae355d8fd8d8b4fa403e369.png)](https://gyazo.com/34180f3ccae355d8fd8d8b4fa403e369)
+
+## デバッグ UI での色の変更
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/d98dac67dea453c3cde25e7505d793d5.gif)](https://gyazo.com/d98dac67dea453c3cde25e7505d793d5)
+
+```js
+// デバッグ UI
+const gui = new GUI();
+
+const guiParams = {
+  materialColor: "#ffeded",
+};
+
+gui.addColor(guiParams, "materialColor").onChange(() => {
+  material.color.set(guiParams.materialColor);
+});
+```
+
+```js
+// マテリアル
+const material = new THREE.MeshToonMaterial({
+  color: guiParams.materialColor, // デバッグ UI で設定した色を適用
+});
+```
+
+## オブジェクトの位置を調整
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/6e11198a8825bdac05a6e85e735bf017.png)](https://gyazo.com/6e11198a8825bdac05a6e85e735bf017)
+
+```js
+const objectDistance = 4; // スクロールアニメーションで使用する
+
+torus.position.x = 2;
+torus.position.y = -objectDistance * 0;
+
+cone.position.x = -2;
+cone.position.y = -objectDistance * 1;
+
+torusKnot.position.x = 2;
+torusKnot.position.y = -objectDistance * 2;
+```
+
+## アニメーションの追加
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/b6c096aaa9dc6c4d12faa89718b982e9.gif)](https://gyazo.com/b6c096aaa9dc6c4d12faa89718b982e9)
+
+```js
+// 各メッシュを配列に格納してループ処理
+const sectionMeshes = [torus, cone, torusKnot];
+```
+
+```js
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  // オブジェクトアニメーション
+  for (const Mesh of sectionMeshes) {
+    Mesh.rotation.x = elapsedTime * 0.1;
+    Mesh.rotation.y = elapsedTime * 0.12;
+  }
+  // レンダラーの更新
+  renderer.render(scene, camera);
+
+  // 次のフレームを呼び出し
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+## スクロールに合わせてカメラを動かす
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/8993f3bd4866f03d6708b6bc91ef1ac9.gif)](https://gyazo.com/8993f3bd4866f03d6708b6bc91ef1ac9)
+
+```js
+// スクロール
+let scrollY = window.scrollY;
+
+// ウィンドウのスクロールが発生するたびに以下の処理を実行
+window.addEventListener("scroll", () => {
+  // スクロールの位置を最新の位置で更新
+  scrollY = window.scrollY; // window.scrollY は現在のスクロール位置(ピクセル数)を返す
+});
+```
+
+## 視差効果の適用
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/b41a8ead513dae84733d36d68ccbe3dd.gif)](https://gyazo.com/b41a8ead513dae84733d36d68ccbe3dd)
+
+**視差とは**、視点の位置によって見えるものがずれて見える現象のこと。
+例えば電車の窓から見える景色では近くの景色ほど早く流れ、遠くの景色はゆっくり流れます。
+
+**視差効果とは**、視差の原理を利用して、平面的な画面に奥行きや立体感、動きを与える表現技法。
+
+**視差効果をのメリット**
+
+- 没入感の向上
+- 視覚的な面白さ
+- 情報の整理
+
+今回は、より没入感のある体験を実現するために、マウスの動きに合わせてカメラを動かすことで視差効果を適用します
+
+```js
+// カーソルの位置情報を保持するオブジェクト
+const cursor = {
+  x: 0,
+  y: 0,
+};
+
+// マウスの動きを検知し、カーソル位置情報を更新
+window.addEventListener("mousemove", (event) => {
+  // マウスイベントからカーソルのX座標とY座標を取得
+  cursor.x = event.clientX / sizes.width - 0.5; // 0を中心として -0.5(左端) から 0.5(右端) の範囲を取得
+  cursor.y = event.clientY / sizes.height - 0.5; // 0を中心として -0.5(下端) から 0.5(上端) の範囲を取得
+});
+```
+
+```js
+// アニメーション
+const clock = new THREE.Clock();
+let praviousTime = 0; // 前回のフレームの経過時間を保持
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  const deltaTime = elapsedTime - praviousTime; // 前回からの経過時間
+  praviousTime = elapsedTime;
+  // オブジェクトアニメーション
+  for (const Mesh of sectionMeshes) {
+    Mesh.rotation.x = elapsedTime * 0.1;
+    Mesh.rotation.y = elapsedTime * 0.12;
+  }
+
+  // スクロールアニメーション
+  camera.position.y = (-scrollY / sizes.height) * objectDistance;
+
+  const parallaxX = cursor.x * 0.5; // カーソルの X 位置からの視差効果を計算
+  const parallaxY = -cursor.y * 0.5; // カーソルの Y 位置からの視差効果を計算
+  cameraGroup.position.x +=
+    (parallaxX - cameraGroup.position.x) * 5 * deltaTime; // 水平方向に視差効果の適用
+  cameraGroup.position.y +=
+    (parallaxY - cameraGroup.position.y) * 5 * deltaTime; // 垂直方向に視差効果を適用
+
+  // レンダラーの更新
+  renderer.render(scene, camera);
+
+  // 次のフレームを呼び出し
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
