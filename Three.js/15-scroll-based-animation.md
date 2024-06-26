@@ -373,9 +373,36 @@ window.addEventListener("scroll", () => {
 
 ```js
 // elapsedTime ではなく 前回の経過時間に基づいて回転を設定
-// オブジェクトアニメーション
-for (const Mesh of sectionMeshes) {
-  Mesh.rotation.x += deltaTime * 0.1;
-  Mesh.rotation.y += deltaTime * 0.12;
-}
+// * アニメーション
+const clock = new THREE.Clock();
+let praviousTime = 0; // 前回のフレームの経過時間を保持
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  const deltaTime = elapsedTime - praviousTime; // 前回からの経過時間
+  praviousTime = elapsedTime;
+  // オブジェクトアニメーション
+  for (const Mesh of sectionMeshes) {
+    Mesh.rotation.x += deltaTime * 0.1;
+    Mesh.rotation.y += deltaTime * 0.12;
+  }
+
+  // スクロールアニメーション
+  camera.position.y = (-scrollY / sizes.height) * objectDistance;
+
+  const parallaxX = cursor.x * 0.5; // カーソルの X 位置からの視差効果を計算
+  const parallaxY = -cursor.y * 0.5; // カーソルの Y 位置からの視差効果を計算
+  cameraGroup.position.x +=
+    (parallaxX - cameraGroup.position.x) * 5 * deltaTime; // 水平方向に視差効果の適用
+  cameraGroup.position.y +=
+    (parallaxY - cameraGroup.position.y) * 5 * deltaTime; // 垂直方向に視差効果を適用
+
+  // レンダラーの更新
+  renderer.render(scene, camera);
+
+  // 次のフレームを呼び出し
+  window.requestAnimationFrame(tick);
+};
+
+tick();
 ```
