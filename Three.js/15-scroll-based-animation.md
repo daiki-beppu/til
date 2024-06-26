@@ -1,6 +1,6 @@
-# スクロールに応じたアニメーション
+# スクロールに基づいたアニメーション
 
-- [スクロールに応じたアニメーション](#スクロールに応じたアニメーション)
+- [スクロールに基づいたアニメーション](#スクロールに基づいたアニメーション)
   - [背景色の変更](#背景色の変更)
   - [オブジェクトを追加](#オブジェクトを追加)
   - [デバッグ UI での色の変更](#デバッグ-ui-での色の変更)
@@ -8,6 +8,8 @@
   - [アニメーションの追加](#アニメーションの追加)
   - [スクロールに合わせてカメラを動かす](#スクロールに合わせてカメラを動かす)
   - [視差効果の適用](#視差効果の適用)
+  - [パーティクルの追加](#パーティクルの追加)
+  - [スクロール位置に基づいてアニメーションを適用](#スクロール位置に基づいてアニメーションを適用)
 
 ## 背景色の変更
 
@@ -277,4 +279,103 @@ const tick = () => {
 };
 
 tick();
+```
+
+## パーティクルの追加
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/68e082beb62ea447015b3658de2e786c.gif)](https://gyazo.com/68e082beb62ea447015b3658de2e786c)
+
+```js
+// * パーティクル
+
+// ジオメトリ
+const particlesGeometry = new THREE.BufferGeometry();
+const particlesCount = 200; // パーティクルの数
+const vertices = 3; // 頂点の数
+
+// パーティクルの位置を格納する配列を作成
+const positions = new Float32Array(particlesCount * vertices);
+
+for (let i = 0; i < particlesCount; i++) {
+  // 各座標にアクセスするためのインデックスを定義
+  const positionIndex = i * vertices;
+
+  // X 座標をランダムに設定 (-5 から 5 の範囲)
+  positions[positionIndex] = (Math.random() - 0.5) * 10;
+
+  // Y 座標をランダムに設定 (オブジェクトの高さの範囲内に分散)
+  positions[positionIndex + 1] =
+    objectDistance * 0.4 - // オブジェクトの中心よりやや上に配置
+    Math.random() * objectDistance * sectionMeshes.length; // 各セクションメッシュの間に分散
+
+  // Z 座標をランダムに設定 (-5 から 5 の範囲)
+  positions[positionIndex + 2] = (Math.random() - 0.5) * 10;
+}
+
+particlesGeometry.setAttribute(
+  "position", // position をジオメトリに設定
+  new THREE.BufferAttribute(
+    positions, // 属性に使用するデータを設定
+    vertices // 各頂点のデータ数を設定
+  )
+);
+
+particlesGeometry.setAttribute;
+```
+
+## スクロール位置に基づいてアニメーションを適用
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/72e936475d58831ae1fd86d7e7a560f9.gif)](https://gyazo.com/72e936475d58831ae1fd86d7e7a560f9)
+
+```shell
+# gsap のインストール
+bun add gsap@3.5.1
+```
+
+```js
+// GSAP のインポート
+import gsap from "gsap";
+```
+
+```js
+// スクロール位置に基づいてアニメーションを適用
+
+// * スクロール
+let scrollY = window.scrollY;
+let currentSection = 0; // 現在のセクション (初期値は 0)
+
+// ウィンドウのスクロールが発生するたびに以下の処理を実行
+window.addEventListener("scroll", () => {
+  // スクロールの位置を最新の位置で更新
+  scrollY = window.scrollY; // window.scrollY は現在のスクロール位置(ピクセル数)を返す
+
+  // 現在のセクションを計算
+  const newSection = Math.round(scrollY / sizes.height);
+
+  // セクションが切り替わった場合の処理
+  if (newSection !== currentSection) {
+    currentSection = newSection; // 現在のセクションを更新
+
+    gsap.to(sectionMeshes[currentSection].rotation, {
+      duration: 1.5,
+      ease: "power2.inOut",
+      x: "+=6",
+      y: "+=3",
+      z: "+=1.5",
+    });
+  }
+});
+```
+
+```js
+// elapsedTime ではなく 前回の経過時間に基づいて回転を設定
+// オブジェクトアニメーション
+for (const Mesh of sectionMeshes) {
+  Mesh.rotation.x += deltaTime * 0.1;
+  Mesh.rotation.y += deltaTime * 0.12;
+}
 ```
