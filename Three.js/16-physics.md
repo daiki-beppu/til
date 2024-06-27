@@ -9,6 +9,7 @@
   - [オブジェクトの作成を関数にまとめる](#オブジェクトの作成を関数にまとめる)
   - [デバッグ UI でオブジェクトを追加](#デバッグ-ui-でオブジェクトを追加)
   - [ボックスの追加](#ボックスの追加)
+  - [パフォーマンスの最適化](#パフォーマンスの最適化)
 
 ## 物理世界の設定
 
@@ -221,25 +222,40 @@ sphereBody.applyForce(
 ## オブジェクトの作成を関数にまとめる
 
 1 つの関数で `Three.js` と `Cannon.js` の 2 つのオブジェクトを作成する
+ついでにランダム色を割り当てる設定も追加
 
 ```js
+// * オブジェクトを作成する関数
+// 更新対象のオブジェクトを格納する配列を作成
+const objectToUpdate = [];
+
+// ボール
 const sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
-const sphereMaterial = new THREE.MeshStandardMaterial({
-  metalness: 0.3,
-  roughness: 0.4,
-  envMap: environmentMapTexture,
-});
 
 // ボールのオブジェクトを作成する関数
 const createSphere = (radius, position) => {
-  // Three.js のオブジェクト
+  //ランダムな色を生成
+  const rgb = {
+    r: Math.random(),
+    g: Math.random(),
+    b: Math.random(),
+  };
+
+  // Three.js メッシュ
+  const sphereMaterial = new THREE.MeshStandardMaterial({
+    color: new THREE.Color(rgb.r, rgb.g, rgb.b),
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+  });
+
   const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
   mesh.scale.setScalar(radius); // スケールを radius に合わせる
   mesh.castShadow = true;
   mesh.position.copy(position);
   scene.add(mesh);
 
-  // Cannon.js のオブジェクト
+  // Cannon.js オブジェクト
   const shape = new CANNON.Sphere(radius);
   const body = new CANNON.Body({
     mass: 1,
@@ -278,8 +294,7 @@ const tick = () => {
 ## デバッグ UI でオブジェクトを追加
 
 完成イメージ
-
-[![Image from Gyazo](https://i.gyazo.com/42e47c3c686dcee47ffbf825e22fff1d.gif)](https://gyazo.com/42e47c3c686dcee47ffbf825e22fff1d)
+[![Image from Gyazo](https://i.gyazo.com/c463ff85a6787b0b2343c55d4547a457.gif)](https://gyazo.com/c463ff85a6787b0b2343c55d4547a457)
 
 ```shell
 # lil-gui のインストール
@@ -307,20 +322,28 @@ gui.add(debugObject, "createSphere");
 
 ## ボックスの追加
 
-[![Image from Gyazo](https://i.gyazo.com/96b7f9318e7a42d15072ca6d7f2d2ade.gif)](https://gyazo.com/96b7f9318e7a42d15072ca6d7f2d2ade)
+
 
 ```js
 // ボックス
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-const boxMaterial = new THREE.MeshStandardMaterial({
-  metalness: 0.3,
-  roughness: 0.4,
-  envMap: environmentMapTexture,
-});
 
 // ボックスのオブジェクトを作成する関数
 const createBox = (width, height, depth, position) => {
+  //ランダムな色を生成
+  const rgb = {
+    r: Math.random(),
+    g: Math.random(),
+    b: Math.random(),
+  };
   // Three.js メッシュ
+
+  const boxMaterial = new THREE.MeshStandardMaterial({
+    color: new THREE.Color(rgb.r, rgb.g, rgb.b),
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+  });
   const mesh = new THREE.Mesh(boxGeometry, boxMaterial);
   mesh.scale.set(width, height, depth);
   mesh.castShadow = true;
@@ -348,7 +371,6 @@ const createBox = (width, height, depth, position) => {
     body,
   });
 };
-
 createBox(1, 1, 1, { x: 2, y: 3, z: 0 });
 ```
 
@@ -359,4 +381,30 @@ for (const object of objectToUpdate) {
   object.mesh.quaternion.copy(object.body.quaternion);
   // 回転を同期 (rotation ではなく quaternion を使用)
 }
+```
+
+## パフォーマンスの最適化
+
+今回は 2 つの設定を行います
+
+1. ブロードフェーズを設定
+   多数のオブジェクトから、実際に衝突する可能性のあるペアを絞り込みます。
+   これにより不要な計算を大幅に削減することができます。
+
+2. スリープ機能を有効にする
+   静止したオブジェクトは、物理演算の対象から外すことができます。
+   これにより静止したオブジェクトの計算を省略しパフォーマンスを大きく向上させます。
+   他のオブジェクトが衝突したり、外部から力を加えられたりすると、自動的にスリープ状態が解除されます。
+
+```js
+// パフォーマンス設定
+
+// ブロードフェーズを設定
+world.broadphase = new CANNON.SAPBroadphase(world);
+// 多数のオブジェクトから、衝突する可能性のあるペアを絞り込む
+
+// スリープ機能を有効にする
+world.allowSleep = true;
+// 静止したオブジェクトを計算の対象から外す
+// 他のオブジェクトと衝突するかコードで力を加えると自動でスリープが解除
 ```
