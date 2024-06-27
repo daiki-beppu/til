@@ -8,6 +8,7 @@
   - [オブジェクトに力を加える](#オブジェクトに力を加える)
   - [オブジェクトの作成を関数にまとめる](#オブジェクトの作成を関数にまとめる)
   - [デバッグ UI でオブジェクトを追加](#デバッグ-ui-でオブジェクトを追加)
+  - [ボックスの追加](#ボックスの追加)
 
 ## 物理世界の設定
 
@@ -302,4 +303,60 @@ const debugObject = {
   },
 };
 gui.add(debugObject, "createSphere");
+```
+
+## ボックスの追加
+
+[![Image from Gyazo](https://i.gyazo.com/96b7f9318e7a42d15072ca6d7f2d2ade.gif)](https://gyazo.com/96b7f9318e7a42d15072ca6d7f2d2ade)
+
+```js
+// ボックス
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+const boxMaterial = new THREE.MeshStandardMaterial({
+  metalness: 0.3,
+  roughness: 0.4,
+  envMap: environmentMapTexture,
+});
+
+// ボックスのオブジェクトを作成する関数
+const createBox = (width, height, depth, position) => {
+  // Three.js メッシュ
+  const mesh = new THREE.Mesh(boxGeometry, boxMaterial);
+  mesh.scale.set(width, height, depth);
+  mesh.castShadow = true;
+  mesh.position.copy(position);
+  scene.add(mesh);
+
+  // Cannon.js オブジェクト
+  const shape = new CANNON.Box(
+    new CANNON.Vec3(width / 2, height / 2, depth / 2)
+    // 引数は Vec3 halfExtents (中心から各辺までの距離)を表すため、半分に割った値にする必要がある
+  );
+  const body = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 3, 0),
+    shape: shape,
+    material: defaultMaterial,
+  });
+
+  body.position.copy(position);
+  world.addBody(body);
+
+  // 作成したオブジェクトを配列に格納
+  objectToUpdate.push({
+    mesh,
+    body,
+  });
+};
+
+createBox(1, 1, 1, { x: 2, y: 3, z: 0 });
+```
+
+```js
+// ループでCannon.js の剛体の位置を Three.js のメッシュにコピー
+for (const object of objectToUpdate) {
+  object.mesh.position.copy(object.body.position); // 位置を同期
+  object.mesh.quaternion.copy(object.body.quaternion);
+  // 回転を同期 (rotation ではなく quaternion を使用)
+}
 ```
