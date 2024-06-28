@@ -10,18 +10,20 @@
   - [デバッグ UI でオブジェクトを追加](#デバッグ-ui-でオブジェクトを追加)
   - [ボックスの追加](#ボックスの追加)
   - [パフォーマンスの最適化](#パフォーマンスの最適化)
+  - [オブジェクトが衝突したときに音を鳴らす](#オブジェクトが衝突したときに音を鳴らす)
+  - [デバッグ UI で オブジェクトをリセット](#デバッグ-ui-で-オブジェクトをリセット)
 
 ## 物理世界の設定
 
 物理世界の設定は以下の手順で行う
 
-1. `cannon.js` のインストール及びインポート
+1. `Cannon.js` のインストール及びインポート
 2. 物理世界を作成
 3. 物理世界に重力を設定
 
 > [!NOTE]
 > 2D 物理ライブラリや 3D 物理ライブラリはたくさんありますが、今回は
-> `cannon.js` を使用します。
+> `Cannon.js` を使用します。
 
 ```shell
 # cannon.jsのインストール
@@ -30,7 +32,7 @@ bun add cannon
 
 ```js
 // cannon.js のインポート
-import CANNON from "cannon";
+import * as CANNON from "cannon";
 ```
 
 ```js
@@ -322,8 +324,6 @@ gui.add(debugObject, "createSphere");
 
 ## ボックスの追加
 
-
-
 ```js
 // ボックス
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -407,4 +407,57 @@ world.broadphase = new CANNON.SAPBroadphase(world);
 world.allowSleep = true;
 // 静止したオブジェクトを計算の対象から外す
 // 他のオブジェクトと衝突するかコードで力を加えると自動でスリープが解除
+```
+
+## オブジェクトが衝突したときに音を鳴らす
+
+[![Image from Gyazo](https://i.gyazo.com/26789e819d8908db1d981fb8d66bedb2.gif)](https://gyazo.com/26789e819d8908db1d981fb8d66bedb2)
+
+```js
+// *  サウンド
+const hitSound = new Audio("/sounds/hit.mp3");
+const playHitSound = (collision) => {
+  // 衝突の強さを取得
+  const impactStrenght = collision.contact.getImpactVelocityAlongNormal();
+
+  // 衝突が一定以上の強さの場合衝突音を再生 (音量はランダム)
+  if (impactStrenght > 1.5) {
+    hitSound.volume = Math.random();
+    hitSound.currentTime = 0; // 再生位置をリセット 再生中に呼び出しても音がなる
+    hitSound.play();
+  }
+};
+```
+
+```js
+// 衝突イベント発生時に、playHitSound を呼び出す
+const createBox = (width, height, depth, position) => {
+  // ...
+  body.addEventListener("collide", playHitSound); // 衝突イベントリスナーを設定
+  // ...
+};
+```
+
+## デバッグ UI で オブジェクトをリセット
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/442e94e2ce46bdae76746393d5390da4.gif)](https://gyazo.com/442e94e2ce46bdae76746393d5390da4)
+
+```js
+const debugObject = {
+  reset: () => {
+    // シーン内のオブジェクトをリセット
+    for (const object of objectsToUpdate) {
+      // Cannon.js のオブジェクト(body) を削除
+      object.body.removeEventListener("collide", playHitSound); // 衝突イベントリスナーを削除
+      world.removeBody(object.body);
+
+      // Three.js のオブジェクト(mesh) を削除
+      scene.remove(object.mesh);
+    }
+    // オブジェクトを管理する配列を空にする
+    objectsToUpdate.splice(0, objectsToUpdate.length);
+  },
+};
 ```
