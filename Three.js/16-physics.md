@@ -32,7 +32,7 @@ bun add cannon
 
 ```js
 // cannon.js のインポート
-import * as CANNON from "cannon";
+import CANNON from "cannon";
 ```
 
 ```js
