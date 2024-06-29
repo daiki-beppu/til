@@ -103,9 +103,7 @@ https://github.com/KhronosGroup/glTF-Sample-Models
 
 完成イメージ
 
-[![Image from Gyazo](https://i.gyazo.com/b94b4978d6dd8c8221c9d6321c99f3a9.png)](https://gyazo.com/b94b4978d6dd8c8221c9d6321c99f3a9)
-
-[![Image from Gyazo](https://i.gyazo.com/a68dc45c20f0decde6011e2263638ea3.png)](https://gyazo.com/a68dc45c20f0decde6011e2263638ea3)
+[![Image from Gyazo](https://i.gyazo.com/8e48b0c2ad5b551c381a708427529159.png)](https://gyazo.com/8e48b0c2ad5b551c381a708427529159)
 
 3D モデルのロードは以下の手順で行う
 
@@ -124,17 +122,22 @@ const gltfLoader = new GLTFLoader();
 ```
 
 ```js
-// アヒルのインポート
-// 任意のパスを指定
-gltfLoader.load("/models/Duck/glTF/Duck.gltf", (gltf) => {
-  scene.add(gltf.scene.children[0]);
+// アヒルのインポート (モデルは任意のパスを指定)
+gltfLoader.load("./models/Duck/glTF/Duck.gltf", (gltf) => {
+  // モデルの位置を調整
+  gltf.scene.position.set(2, 0, 0);
+
+  // モデルの向きを調整
+  gltf.scene.rotation.y = -Math.PI / 2;
+  scene.add(gltf.scene);
 });
 ```
 
 ```js
-// フライトヘルメットをインポート
-// 任意のパスを指定
+// フライトヘルメットをインポート (モデルのは任意のパスを指定)
 gltfLoader.load("/models/FlightHelmet/glTF/FlightHelmet.gltf", (gltf) => {
+  // モデルのサイズを調整
+  gltf.scene.scale.setScalar(3);
   scene.add(gltf.scene);
 });
 ```
