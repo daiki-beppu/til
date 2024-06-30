@@ -3,10 +3,13 @@
 - [レイキャスターとマウスイベント](#レイキャスターとマウスイベント)
   - [レイキャスターとは](#レイキャスターとは)
   - [レイキャスターの作成](#レイキャスターの作成)
-  - [光線が交差しているオブジェクトの情報を取得](#光線が交差しているオブジェクトの情報を取得)
+  - [レイキャスターが交差しているオブジェクトの情報を取得](#レイキャスターが交差しているオブジェクトの情報を取得)
   - [レイキャスターが交差したときに色を変える](#レイキャスターが交差したときに色を変える)
   - [レイキャスターを可視化する](#レイキャスターを可視化する)
   - [マウスホバーでレイキャスターを使用する](#マウスホバーでレイキャスターを使用する)
+  - [マウスの進入、離脱イベント](#マウスの進入離脱イベント)
+  - [マウスクリックイベント](#マウスクリックイベント)
+  - [モデルにレイキャスターを使用する](#モデルにレイキャスターを使用する)
 
 ## レイキャスターとは
 
@@ -21,14 +24,14 @@ const raycaster = new THREE.Raycaster();
 ```
 
 ```js
-// 光線の原点と始点を定義
+// レイキャスターの原点と始点を定義
 const rayOriginVector3 = { x: -3, y: 0, z: 0 };
 const rayDirectionVector3 = { x: 1, y: 0, z: 0 };
 
-// 光線の始点を設定 THREE.Vector3 インスタンスを作成し、コピー
+// レイキャスターの始点を設定 THREE.Vector3 インスタンスを作成し、コピー
 const rayOrigin = new THREE.Vector3().copy(rayOriginVector3);
 
-// 光線の原点からのベクトルを設定 THREE.Vector3 インスタンスを作成し、コピー
+// レイキャスターの原点からのベクトルを設定 THREE.Vector3 インスタンスを作成し、コピー
 const rayDirection = new THREE.Vector3().copy(rayDirectionVector3);
 
 // 方向ベクトルの値を正規化して単位ベクトルにする (長さを 1 にする)
@@ -38,7 +41,7 @@ rayDirection.normalize();
 raycaster.set(rayOrigin, rayDirection);
 ```
 
-## 光線が交差しているオブジェクトの情報を取得
+## レイキャスターが交差しているオブジェクトの情報を取得
 
 ```js
 // 単一のオブジェクトと交差している場合の情報を取得
@@ -87,14 +90,14 @@ const tick = () => {
     );
   });
 
-  // 光線の原点と始点を定義
+  // レイキャスターの原点と始点を定義
   const rayOriginVector3 = { x: -3, y: 0, z: 0 };
   const rayDirectionVector3 = { x: 1, y: 0, z: 0 };
 
-  // 光線の始点を設定 THREE.Vector3 インスタンスを作成し、コピー
+  // レイキャスターの始点を設定 THREE.Vector3 インスタンスを作成し、コピー
   const rayOrigin = new THREE.Vector3().copy(rayOriginVector3);
 
-  // 光線の原点からのベクトルを設定 THREE.Vector3 インスタンスを作成し、コピー
+  // レイキャスターの原点からのベクトルを設定 THREE.Vector3 インスタンスを作成し、コピー
   const rayDirection = new THREE.Vector3().copy(rayDirectionVector3);
 
   // 方向ベクトルの値を正規化して単位ベクトルにする (長さを 1 にする)
@@ -103,7 +106,7 @@ const tick = () => {
   // レイキャスターの始点と方向ベクトルを設定
   raycaster.set(rayOrigin, rayDirection);
 
-  // 光線が交差しているオブジェクトの上方を取得
+  // レイキャスターが交差しているオブジェクトの上方を取得
   const intersects = raycaster.intersectObjects(objects);
 
   // すべてオブジェクトに赤色を設定
@@ -111,7 +114,7 @@ const tick = () => {
     object.material.color.set("#f00");
   }
 
-  // 光線が交差しているオブジェクトに青色を設定
+  // レイキャスターが交差しているオブジェクトに青色を設定
   for (const intersect of intersects) {
     intersect.object.material.color.set("#00f");
   }
@@ -145,14 +148,14 @@ scene.add(arrowHelper);
 const tick = () => {
   // ...
 
-  // 光線の原点と始点を定義
+  // レイキャスターの原点と始点を定義
   const rayOriginVector3 = { x: -3, y: 0, z: 0 };
   const rayDirectionVector3 = { x: 1, y: 0, z: 0 };
 
-  // 光線の始点を設定 THREE.Vector3 インスタンスを作成し、コピー
+  // レイキャスターの始点を設定 THREE.Vector3 インスタンスを作成し、コピー
   const rayOrigin = new THREE.Vector3().copy(rayOriginVector3);
 
-  // 光線の原点からのベクトルを設定 THREE.Vector3 インスタンスを作成し、コピー
+  // レイキャスターの原点からのベクトルを設定 THREE.Vector3 インスタンスを作成し、コピー
   const rayDirection = new THREE.Vector3().copy(rayDirectionVector3);
 
   // 方向ベクトルの値を正規化して単位ベクトルにする (長さを 1 にする)
@@ -197,10 +200,10 @@ window.addEventListener("mousemove", (event) => {
 const tick = () => {
   // ...
 
-  // マウスとカメラの位置を基に光線を放つ
+  // マウスとカメラの位置を基にレイキャスターを放つ
   raycaster.setFromCamera(mouse, camera);
 
-  // 光線が交差しているオブジェクトの情報を取得
+  // レイキャスターが交差しているオブジェクトの情報を取得
   const intersects = raycaster.intersectObjects(objects);
 
   // すべてオブジェクトに赤色を設定
@@ -208,11 +211,173 @@ const tick = () => {
     object.material.color.set("#f00");
   }
 
-  // 光線が交差しているオブジェクトに青色を設定
+  // レイキャスターが交差しているオブジェクトに青色を設定
   for (const intersect of intersects) {
     intersect.object.material.color.set("#00f");
   }
 
   // ...
 };
+```
+
+## マウスの進入、離脱イベント
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/cc0aa16f05b09dc331a37268258331f6.gif)](https://gyazo.com/cc0aa16f05b09dc331a37268258331f6)
+
+```js
+// レイキャスターとオブジェクトとの交差状態を保持する変数
+let currentIntersect = null;
+
+const tick = () => {
+  // ...
+
+  // オブジェクトとの交差判定
+  if (intersects.length) {
+    // オブジェクトが交差している場合の処理
+    if (currentIntersect === null) {
+      console.log("マウスがオブジェクトに入った！");
+    }
+
+    // 交差しているオブジェクトを記録
+    currentIntersect = intersects[0];
+  } else {
+    // オブジェクトが交差していない場合の処理
+    if (currentIntersect) {
+      console.log("マウスがオブジェクトから離れた！");
+    }
+    // 交差状態をリセット
+    currentIntersect = null;
+  }
+
+  // ...
+};
+
+tick();
+```
+
+## マウスクリックイベント
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/5e607d5a5217402ae5738be836fe6f67.gif)](https://gyazo.com/5e607d5a5217402ae5738be836fe6f67)
+
+```js
+window.addEventListener("click", () => {
+  if (currentIntersect) {
+    switch (currentIntersect.object) {
+      case object1:
+        console.log("ボール1をクリック");
+        break;
+      case object2:
+        console.log("ボール2をクリック");
+        break;
+      case object3:
+        console.log("ボール3をクリック");
+        break;
+    }
+  }
+});
+```
+
+if 文の場合
+
+```js
+window.addEventListener("click", () => {
+  if (currentIntersect) {
+    if (currentIntersect.object === object1) {
+      console.log("ボール1をクリック");
+    } else if (currentIntersect.object === object2) {
+      console.log("ボール2をクリック");
+    } else if (currentIntersect.object === object3) {
+      console.log("ボール3をクリック");
+    }
+  }
+});
+```
+
+## モデルにレイキャスターを使用する
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/6ac36a031cc4b79aefb4410ab3d144fc.gif)](https://gyazo.com/6ac36a031cc4b79aefb4410ab3d144fc)
+
+```js
+// モデルの追加
+
+// GLTFLoader のインポート
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+// モデルのパラメータをオブジェクトで定義
+const modelParams = {
+  position: { x: 0, y: -1.2, z: 0 },
+};
+
+// モデルを初期化 (グローバルスコープで使用できるように)
+let model = null;
+
+// モデルのロード (任意のパスを使用)
+const gltfLoader = new GLTFLoader();
+gltfLoader.load("./models/Duck/glTF-Binary/Duck.glb", (gltf) => {
+  model = gltf.scene;
+  model.position.y = modelPrams.position.y; // モデルの位置を調整
+  model.rotation.y = -Math.PI / 3; // モデルの向きを調整
+  scene.add(model); // シーンに追加
+});
+
+// ライト
+const ambientLightParams = {
+  color: 0xffffff,
+  intensity: 0.9,
+};
+
+const ambientLight = new THREE.AmbientLight(
+  ambientLightParams.color,
+  ambientLightParams.intensity
+);
+
+const directionalLightParams = {
+  color: 0xffffff,
+  intensity: 2.1,
+  position: { x: 1, y: 2, z: 3 },
+};
+const directionalLight = new THREE.DirectionalLight(
+  directionalLightParams.color,
+  directionalLightParams.intensity
+);
+
+directionalLight.position.set(
+  directionalLightParams.position.x,
+  directionalLightParams.position.y,
+  directionalLightParams.position.z
+);
+scene.add(ambientLight, directionalLight);
+```
+
+```js
+const tick = () => {
+  // ...
+
+  // レイキャスターとモデルとの交差判定
+  if (model) {
+    const modelIntersects = raycaster.intersectObject(model);
+
+    const modelDefaultScale = 1; // デフォルトのサイズ
+    const modelIntersectsScale = 1.2; // 交差時のサイズ
+
+    // モデルが交差している場合の処理
+    if (modelIntersects.length) {
+      model.scale.setScalar(modelIntersectsScale);
+
+      // モデルが交差していない場合の処理
+    } else {
+      model.scale.setScalar(modelDefaultScale);
+    }
+  }
+
+  // ...
+};
+
+tick();
 ```
