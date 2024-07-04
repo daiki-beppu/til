@@ -517,7 +517,7 @@ Properties からモディファイアー(レンチのアイコン)を選択 →
 
 完成イメージ
 
-[![Image from Gyazo](https://i.gyazo.com/2da5205eaed2550bc1d59595645d23e0.png)](https://gyazo.com/2da5205eaed2550bc1d59595645d23e0)
+[![Image from Gyazo](https://i.gyazo.com/490a319df88c80283cb2d82a20efeb57.png)](https://gyazo.com/490a319df88c80283cb2d82a20efeb57)
 
 ### ファイルの保存
 
@@ -543,7 +543,7 @@ Properties からモディファイアー(レンチのアイコン)を選択 →
 
 `⇧ (shift) + A` でメニューから平面を追加 → `Tab`で編集モードに変更 → `S`でサイズの調整 → `G → Z`で位置を調整
 
-<<a href="https://gyazo.com/ac1911dd7d68bcf7c196dcc48cabc27e"><img src="https://i.gyazo.com/ac1911dd7d68bcf7c196dcc48cabc27e.gif" alt="Image from Gyazo" width="1000"/></a>
+<a href="https://gyazo.com/ac1911dd7d68bcf7c196dcc48cabc27e"><img src="https://i.gyazo.com/ac1911dd7d68bcf7c196dcc48cabc27e.gif" alt="Image from Gyazo" width="1000"/></a>
 
 平面を選択して`右クリック` → メニューから`細分化`を選択 → 分割数を `15` にする
 
