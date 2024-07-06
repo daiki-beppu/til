@@ -9,6 +9,8 @@
   - [HDRI 正距円筒図法環境マップの表示](#hdri-正距円筒図法環境マップの表示)
     - [テクスチャの読み込みと環境マップの表示](#テクスチャの読み込みと環境マップの表示)
   - [キューブテクスチャ環境マップと HDRI 正距円筒図法環境マップの違い](#キューブテクスチャ環境マップと-hdri-正距円筒図法環境マップの違い)
+  - [blender で環境マップの作成](#blender-で環境マップの作成)
+    - [ライトの作成](#ライトの作成)
 
 ## キューブテクスチャ環境マップの表示
 
@@ -186,6 +188,17 @@ rgbeLoader.load("/environmentMaps/0/2k.hdr", (environmentMap) => {
 | レンダリング効率 | 高効率                         | 高負荷                             |
 | 使用例           | 反射や屈折のシミュレーション   | 高品質なビジュアライゼーション     |
 
+## blender で環境マップの作成
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/ff11f9f3422a3e588ed1c962fbdc16dc.png)](https://gyazo.com/ff11f9f3422a3e588ed1c962fbdc16dc)
+
+[![Image from Gyazo](https://i.gyazo.com/9af91a906ecc722f567105c3d6404b0b.png)](https://gyazo.com/9af91a906ecc722f567105c3d6404b0b)
+
+### ライトの作成
+
+`A → A`で全選択 → `X`で削除してなにもない状態をつくる → `⇧ (shift) + A`のメニューから`ライト` → `エリアライト`を選択
 
 
 
