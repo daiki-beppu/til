@@ -10,6 +10,7 @@
     - [テクスチャの読み込みと環境マップの表示](#テクスチャの読み込みと環境マップの表示)
   - [キューブテクスチャ環境マップと HDRI 正距円筒図法環境マップの違い](#キューブテクスチャ環境マップと-hdri-正距円筒図法環境マップの違い)
   - [blender で環境マップの作成](#blender-で環境マップの作成)
+    - [プロジェクトの設定](#プロジェクトの設定)
     - [ライトの作成](#ライトの作成)
 
 ## キューブテクスチャ環境マップの表示
@@ -180,7 +181,7 @@ rgbeLoader.load("/environmentMaps/0/2k.hdr", (environmentMap) => {
 
 以下にキューブテクスチャ環境マップと HDRI 正距円筒図法環境マップの違いを表にまとめました：
 
-|特徴 | キューブテクスチャ環境マップ   | HDRI 正距円筒図法環境マップ        |
+| 特徴             | キューブテクスチャ環境マップ   | HDRI 正距円筒図法環境マップ        |
 | ---------------- | ------------------------------ | ---------------------------------- |
 | 画像形式         | 6 つの正方形画像               | 1 つの長方形画像                   |
 | マッピング方法   | Cube Mapping                   | Equirectangular Mapping            |
@@ -196,9 +197,40 @@ rgbeLoader.load("/environmentMaps/0/2k.hdr", (environmentMap) => {
 
 [![Image from Gyazo](https://i.gyazo.com/9af91a906ecc722f567105c3d6404b0b.png)](https://gyazo.com/9af91a906ecc722f567105c3d6404b0b)
 
+### プロジェクトの設定
+
+`A → A`で全選択 → `X`で削除してなにもない状態をつくる → レンダープロパティからレンダーエンジンを `Cycles`に変更 → サンプリングの最大サンプル数を `256`に変更 → レンダーの最大サンプル数を `256`に変更
+
+[![Image from Gyazo](https://i.gyazo.com/d806fbd3eedf78554b516cd783773d35.png)](https://gyazo.com/d806fbd3eedf78554b516cd783773d35)
+
+ワールドプロパティからサーフェスの`カラーを完全に黒(アルファ値を 1)`に設定
+
+[![Image from Gyazo](https://i.gyazo.com/a9104ab3a5df2e04a434615da221cdea.png)](https://gyazo.com/a9104ab3a5df2e04a434615da221cdea)
+
+出力プロパティからフォーマットの解像度 X を`2048px`に → フォーマット解像度 Y を`1024px`も変更
+※ 2 の累乗の値を設定する
+
+[![Image from Gyazo](https://i.gyazo.com/bc7073c039f6c45f0670307d3f3d29db.png)](https://gyazo.com/bc7073c039f6c45f0670307d3f3d29db)
+
 ### ライトの作成
 
-`A → A`で全選択 → `X`で削除してなにもない状態をつくる → `⇧ (shift) + A`のメニューから`ライト` → `エリアライト`を選択
+`⇧ (shift) + A`のメニューから`ライト` → `エリアライト`を選択
 
+[![Image from Gyazo](https://i.gyazo.com/45d0064fc3a6beeeab39be2500ad3b2e.png)](https://gyazo.com/45d0064fc3a6beeeab39be2500ad3b2e)
 
+`G`で移動 → `R`でライトが中心から当たるように回転 → `S`でサイズを調整
+
+<a href="https://gyazo.com/3b12d4c29eaa8e7e0b245c0bf582436f"><img src="https://i.gyazo.com/3b12d4c29eaa8e7e0b245c0bf582436f.gif" alt="Image from Gyazo" width="1000"/></a>
+
+`⇧ (shift) + D`で複製して残り 2 つも位置と向きを調整
+
+データプロパティから 1 つ目のライトのカラーを`白`、2 つ目のライトのカラーを`青`、3 つ目のライトのカラーを`赤`に設定
+
+データプロパティからすべてのライトの`パワーを 1000 W `に変更
+
+[![Image from Gyazo](https://i.gyazo.com/2c7c49273dbac4d49af5bcc334cad750.png)](https://gyazo.com/2c7c49273dbac4d49af5bcc334cad750)
+
+[![Image from Gyazo](https://i.gyazo.com/b80b8be75e9003ad901f7e0e7877fd09.png)](https://gyazo.com/b80b8be75e9003ad901f7e0e7877fd09)
+
+[![Image from Gyazo](https://i.gyazo.com/15cdd68dfe84ac431662660137215a6b.png)](https://gyazo.com/15cdd68dfe84ac431662660137215a6b)
 
