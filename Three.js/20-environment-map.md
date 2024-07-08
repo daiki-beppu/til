@@ -14,7 +14,10 @@
     - [ライトの作成](#ライトの作成)
     - [カメラの作成](#カメラの作成)
     - [レンダリングを確認後、HDR として保存](#レンダリングを確認後hdr-として保存)
-  - [作成した環境マップをThree.js で表示](#作成した環境マップをthreejs-で表示)
+    - [作成した環境マップを Three.js で表示](#作成した環境マップを-threejs-で表示)
+  - [BlockadeLabs を使用した 生成 AI での環境マップ作成](#blockadelabs-を使用した-生成-ai-での環境マップ作成)
+  - [地上投影環境マップ](#地上投影環境マップ)
+    - [地上投影環境マップの表示](#地上投影環境マップの表示)
 
 ## キューブテクスチャ環境マップの表示
 
@@ -275,9 +278,7 @@ rgbeLoader.load("/environmentMaps/0/2k.hdr", (environmentMap) => {
 
 [![Image from Gyazo](https://i.gyazo.com/b3f9d3efbf4ea2565bf41e7912b1072f.png)](https://gyazo.com/b3f9d3efbf4ea2565bf41e7912b1072f)
 
-## 作成した環境マップをThree.js で表示
-
-
+### 作成した環境マップを Three.js で表示
 
 ```js
 // RGBELoader のインポート
@@ -302,4 +303,59 @@ rgbeLoader.load("/environmentMaps/blender-2k.hdr", (environmentMap) => {
   // シーン全体に環境マップの環境を適用
   scene.environment = environmentMap;
 });
+```
+
+## BlockadeLabs を使用した 生成 AI での環境マップ作成
+
+## 地上投影環境マップ
+
+環境マップを背景として使用したときに、オブジェクトが空を飛んでいるように見えてしまう。
+これは、環境マップが無限に遠くあるという事実に起因します。
+
+無限に遠くにあるというのはどこから見ても変わらない景色やモノのこと
+オブジェクトの周りの景色がどこから見ても変わらないように設定されている
+
+### 地上投影環境マップの表示
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/e6051cb00e9d2fcacaff1af1b088d2a0.png)](https://gyazo.com/e6051cb00e9d2fcacaff1af1b088d2a0)
+
+```js
+// GroundedSkybox のインポート
+import { GroundedSkybox } from "three/addons/objects/GroundedSkybox.js";
+```
+
+```js
+// 地上投影環境マップ
+rgbeLoader.load("./environmentMaps/2/2k.hdr", (environmentMap) => {
+  // 環境マップの反射マッピングを設定
+  environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+
+  // シーン全体に環境マップの環境を適用
+  scene.environment = environmentMap;
+
+  // スカイボックスをサイズを定義
+  const skyBoxHeight = 15;
+  const skyBoxRadius = 70;
+
+  // スカイボックスをインスタンスを作成
+  const skyBox = new GroundedSkybox(
+    environmentMap, // 使用する環境マップ
+    skyBoxHeight, // スカイボックスの高さ
+    skyBoxRadius // スカイボックスの半径
+  );
+
+  // スカイボックスを位置を調整 (オブジェクトが地面に接するように)
+  skyBox.position.y = 15;
+  scene.add(skyBox);
+});
+```
+
+ワイヤーフレームを適用し視覚的に地面に押しつぶされた球体を確認できる
+
+[![Image from Gyazo](https://i.gyazo.com/6d31eb6b4928680f1ca4c37f38f3ccc2.png)](https://gyazo.com/6d31eb6b4928680f1ca4c37f38f3ccc2)
+
+```js
+skyBox.material.wireframe = true;
 ```
