@@ -109,17 +109,17 @@ const directionalLightParams = {
   color: 0xffffff,
   intensity: 6,
   position: { x: -4, y: 6.5, z: 2.5 },
+  targetPosition: { x: 0, y: 4, z: 0 },
+  shadowCamera: {
+    far: 15,
+  },
+  shadowMapSize: { x: 1024, y: 1024 },
 };
-const directionalLight = new THREE.DirectionalLight(
-  directionalLightParams.color,
-  directionalLightParams.intensity
-);
 
-directionalLight.position.set(
-  directionalLightParams.position.x,
-  directionalLightParams.position.y,
-  directionalLightParams.position.z
-);
+const { color, intensity, position } = directionalLightParams;
+const directionalLight = new THREE.DirectionalLight(color, intensity);
+
+directionalLight.position.set(position.x, position.y, position.z);
 ```
 
 ```js
@@ -130,14 +130,17 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 ```js
 // ライトの影を設定
+const { shadowCamera, shadowMapSize, targetPosition } = directionalLightParams;
 directionalLight.castShadow = true;
-directionalLight.shadow.camera.far = 15;
-directionalLight.shadow.mapSize.setScalar(1024);
+directionalLight.shadow.camera.far = shadowCamera.far;
+directionalLight.shadow.mapSize.set(shadowMapSize.x, shadowMapSize.y);
 
-directionalLight.target.position.set(0, 4, 0);
+directionalLight.target.position.set(
+  targetPosition.x,
+  targetPosition.y,
+  targetPosition.z
+);
 directionalLight.target.updateWorldMatrix();
-
-scene.add(directionalLight);
 ```
 
 必要であればカメラヘルパーを追加して位置や影の投影範囲を設定
@@ -176,4 +179,19 @@ gui
   .step(0.001)
   .name("lightPositionZ");
 gui.add(directionalLight, "castShadow");
+```
+
+```js
+// シーン内すべてのメッシュオブジェクトに影の設定を適用
+const updateAllMaterials = () => {
+  // シーン内すべてのオブジェクトとその子孫に対してコールバックを実行
+  scene.traverse((child) => {
+    // child オブジェクトがメッシュであるか確認し影の設定を適用
+    if (child.isMesh) {
+      // Activate shadow here
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+};
 ```
