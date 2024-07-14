@@ -449,7 +449,7 @@ tick();
 
 完成イメージ
 
-<a href="https://gyazo.com/3607616583debce24207ec79c07a6889"><img src="https://i.gyazo.com/3607616583debce24207ec79c07a6889.gif" alt="Image from Gyazo" width="1000"/></a>
+<a href="https://gyazo.com/3607616583debce24207ec79c07a6889"><img src="https://i.gyazo.com/3607616583debce24207ec79c07a6889.gif" alt="Image from Gyazo" width="800"/></a>
 
 ```js
 // キューブレンダーターゲット
