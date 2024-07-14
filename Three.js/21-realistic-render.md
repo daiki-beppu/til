@@ -217,46 +217,43 @@ const updateAllMaterials = () => {
 
 ```js
 // 床
+const FLOOR_TEXTURE_PATHS = {
+  diff: "./textures/wood_cabinet_worn_long/wood_cabinet_worn_long_diff_1k.jpg",
+  norGl:
+    "./textures/wood_cabinet_worn_long/wood_cabinet_worn_long_nor_gl_1k.png",
+  arm: "./textures/wood_cabinet_worn_long/wood_cabinet_worn_long_arm_1k.jpg",
+};
+
 const floorParams = {
   width: 8,
   height: 8,
   rotation: { x: -Math.PI / 2 },
+  textures: {
+    map: textureLoader.load(FLOOR_TEXTURE_PATHS.diff),
+    normalMap: textureLoader.load(FLOOR_TEXTURE_PATHS.norGl),
+    aoMap: textureLoader.load(FLOOR_TEXTURE_PATHS.arm),
+    roughnessMap: textureLoader.load(FLOOR_TEXTURE_PATHS.arm),
+    metalnessMap: textureLoader.load(FLOOR_TEXTURE_PATHS.arm),
+  },
 };
 
-const floorColorTexture = textureLoader.load(
-  "./textures/wood_cabinet_worn_long/wood_cabinet_worn_long_diff_1k.jpg"
-);
-
-// SRGBカラースペースを適用
-floorColorTexture.colorSpace = THREE.SRGBColorSpace;
-
-const floorNormalTexture = textureLoader.load(
-  "./textures/wood_cabinet_worn_long/wood_cabinet_worn_long_nor_gl_1k.png"
-);
-const floorAmbientOcclusionTexture = textureLoader.load(
-  "./textures/wood_cabinet_worn_long/wood_cabinet_worn_long_arm_1k.jpg"
-);
-const floorRoughnessTexture = textureLoader.load(
-  "./textures/wood_cabinet_worn_long/wood_cabinet_worn_long_arm_1k.jpg"
-);
-const floorMetalnessTexture = textureLoader.load(
-  "./textures/wood_cabinet_worn_long/wood_cabinet_worn_long_arm_1k.jpg"
-);
+floorParams.textures.map.colorSpace = THREE.SRGBColorSpace;
 
 // 床と壁のパラメータで名前衝突を避けるため分割代入(デストラクチャリング)で別名を指定
 const {
   width: floorWidth,
   height: floorHeight,
   rotation: floorRotation,
+  textures: floorTexture,
 } = floorParams;
 
 const floorGeometry = new THREE.PlaneGeometry(floorWidth, floorHeight);
 const floorMaterial = new THREE.MeshStandardMaterial({
-  map: floorColorTexture,
-  normalMap: floorNormalTexture,
-  aoMap: floorAmbientOcclusionTexture,
-  roughnessMap: floorRoughnessTexture,
-  metalnessMap: floorMetalnessTexture,
+  map: floorTexture.map,
+  normalMap: floorTexture.normalMap,
+  aoMap: floorTexture.aoMap,
+  roughnessMap: floorTexture.roughnessMap,
+  metalnessMap: floorTexture.metalnessMap,
 });
 
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -272,53 +269,50 @@ scene.add(floor);
 
 ```js
 // 壁
+const WALL_TEXTURE_PATHS = {
+  diff: "./textures/castle_brick_broken_06/castle_brick_broken_06_diff_1k.jpg",
+  norGl:
+    "./textures/castle_brick_broken_06/castle_brick_broken_06_nor_gl_1k.png",
+  arm: "./textures/castle_brick_broken_06/castle_brick_broken_06_arm_1k.jpg",
+};
+
 const wallParams = {
   width: 8,
   height: 8,
+  textures: {
+    map: textureLoader.load(WALL_TEXTURE_PATHS.diff),
+    normalMap: textureLoader.load(WALL_TEXTURE_PATHS.norGl),
+    aoMap: textureLoader.load(WALL_TEXTURE_PATHS.arm),
+    roughnessMap: textureLoader.load(WALL_TEXTURE_PATHS.arm),
+    metalnessMap: textureLoader.load(WALL_TEXTURE_PATHS.arm),
+  },
 };
 
-// wallParamsの調整だけで済むようにあとからpositionを追加
+wallParams.textures.map.colorSpace = THREE.SRGBColorSpace;
+
 wallParams.position = {
   x: 0,
   y: wallParams.width / 2,
   z: -wallParams.height / 2,
 };
 
-const wallColorTexture = textureLoader.load(
-  "./textures/castle_brick_broken_06/castle_brick_broken_06_diff_1k.jpg"
-);
-wallColorTexture.colorSpace = THREE.SRGBColorSpace;
-
-const wallAmbientOcclusionTexture = textureLoader.load(
-  "./textures/castle_brick_broken_06/castle_brick_broken_06_arm_1k.jpg"
-);
-const wallRoughnessTexture = textureLoader.load(
-  "./textures/castle_brick_broken_06/castle_brick_broken_06_arm_1k.jpg"
-);
-const wallMetalnessTexture = textureLoader.load(
-  "./textures/castle_brick_broken_06/castle_brick_broken_06_arm_1k.jpg"
-);
-const wallNormalTexture = textureLoader.load(
-  "./textures/castle_brick_broken_06/castle_brick_broken_06_nor_gl_1k.png"
-);
-
 const {
   width: wallWidth,
   height: wallHeight,
   position: wallPosition,
+  textures: wallTexture,
 } = wallParams;
 const wallGeometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
 const wallMaterial = new THREE.MeshStandardMaterial({
-  map: wallColorTexture,
-  aoMap: wallAmbientOcclusionTexture,
-  roughnessMap: wallRoughnessTexture,
-  metalnessMap: wallMetalnessTexture,
-  normalMap: wallNormalTexture,
+  map: wallTexture.map,
+  normalMap: wallTexture.normalMap,
+  aoMap: wallTexture.aoMap,
+  roughnessMap: wallTexture.roughnessMap,
+  metalnessMap: wallTexture.metalnessMap,
 });
 
 const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-wall.position.y = wallPosition.y;
-wall.position.z = wallPosition.z;
+wall.position.set(wallPosition.x, wallPosition.y, wallPosition.z);
 scene.add(wall);
 ```
 
