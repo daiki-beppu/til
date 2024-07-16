@@ -16,6 +16,13 @@
     - [クラスの継承](#クラスの継承)
   - [クラスとモジュールを組み合わせる](#クラスとモジュールを組み合わせる)
     - [コードの分割](#コードの分割)
+  - [実際のプロジェクトを構造化する](#実際のプロジェクトを構造化する)
+    - [クラスを作成してインスタンス化](#クラスを作成してインスタンス化)
+    - [canvas 要素の設定](#canvas-要素の設定)
+    - [Experience のサイズを処理するクラスを作成](#experience-のサイズを処理するクラスを作成)
+    - [イベントをトリガーできるクラスを作成](#イベントをトリガーできるクラスを作成)
+    - [時間を処理するクラスを作成](#時間を処理するクラスを作成)
+    - [シーンのセットアップ](#シーンのセットアップ)
 
 ## モジュールを使用した構造化
 
@@ -322,3 +329,318 @@ astroBoy.land();
 **コードの分割後**
 
 [![Image from Gyazo](https://i.gyazo.com/5c81ad5f9d8d4514ce8f2b3e0b9ab4c1.png)](https://gyazo.com/5c81ad5f9d8d4514ce8f2b3e0b9ab4c1)
+
+## 実際のプロジェクトを構造化する
+
+良い慣習としてメインクラス内にすべての機能を集約することです。
+こうすることで、メインクラスが他のすべての要素を管理し生成する。
+特に HTML コンテンツや他のページ要素と共存する場合に効果的です。
+
+Three.js の体験に関連するコードを他のコードから明確に分離することができる
+また、クラスが提供するメソッドやプロパティを通じて必要な機能に簡単にアクセスできます。
+
+今回はクラスの命名については `Experience` としてますが
+プロジェクトに応じて適切なクラス名に変更してください。
+
+### クラスを作成してインスタンス化
+
+```js
+// Experience.js に記述
+
+export default class Experience {
+  constructor() {
+    // コンソールから直接、Experience クラスにアクセスできるようにする
+    window.experience = this;
+  }
+}
+```
+
+### canvas 要素の設定
+
+```js
+// script.js に記述
+const experience = new Experience(document.querySelector('canvas.Webgl'));
+```
+
+```js
+export default class Experience {
+  constructor(canvas) {
+    // ...
+
+    // レンダリングする HTML canvas 要素を保持
+    this.canvas = canvas;
+  }
+}
+```
+
+### Experience のサイズを処理するクラスを作成
+
+```js
+// Sizes クラスに記述
+import EventEmitter from './EventEmitter.js';
+export default class Sizes extends EventEmitter {
+  constructor() {
+    super();
+    // セットアップ
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.pixelRatio = Math.min(window.devicePixelRatio, 2);
+
+    // リサイズイベント
+    window.addEventListener('resize', () => {
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
+      this.pixelRatio = Math.min(window.devicePixelRatio, 2);
+
+      this.trigger('resize');
+    });
+  }
+}
+```
+
+### イベントをトリガーできるクラスを作成
+
+> [TIP]
+> Three.js Jouney の Bruno Simon さんが作成したクラスです。
+
+```js
+export default class EventEmitter {
+  constructor() {
+    this.callbacks = {};
+    this.callbacks.base = {};
+  }
+
+  on(_names, callback) {
+    // Errors
+    if (typeof _names === 'undefined' || _names === '') {
+      console.warn('wrong names');
+      return false;
+    }
+
+    if (typeof callback === 'undefined') {
+      console.warn('wrong callback');
+      return false;
+    }
+
+    // Resolve names
+    const names = this.resolveNames(_names);
+
+    // Each name
+    names.forEach((_name) => {
+      // Resolve name
+      const name = this.resolveName(_name);
+
+      // Create namespace if not exist
+      if (!(this.callbacks[name.namespace] instanceof Object)) this.callbacks[name.namespace] = {};
+
+      // Create callback if not exist
+      if (!(this.callbacks[name.namespace][name.value] instanceof Array))
+        this.callbacks[name.namespace][name.value] = [];
+
+      // Add callback
+      this.callbacks[name.namespace][name.value].push(callback);
+    });
+
+    return this;
+  }
+
+  off(_names) {
+    // Errors
+    if (typeof _names === 'undefined' || _names === '') {
+      console.warn('wrong name');
+      return false;
+    }
+
+    // Resolve names
+    const names = this.resolveNames(_names);
+
+    // Each name
+    names.forEach((_name) => {
+      // Resolve name
+      const name = this.resolveName(_name);
+
+      // Remove namespace
+      if (name.namespace !== 'base' && name.value === '') {
+        delete this.callbacks[name.namespace];
+      }
+
+      // Remove specific callback in namespace
+      else {
+        // Default
+        if (name.namespace === 'base') {
+          // Try to remove from each namespace
+          for (const namespace in this.callbacks) {
+            if (
+              this.callbacks[namespace] instanceof Object &&
+              this.callbacks[namespace][name.value] instanceof Array
+            ) {
+              delete this.callbacks[namespace][name.value];
+
+              // Remove namespace if empty
+              if (Object.keys(this.callbacks[namespace]).length === 0)
+                delete this.callbacks[namespace];
+            }
+          }
+        }
+
+        // Specified namespace
+        else if (
+          this.callbacks[name.namespace] instanceof Object &&
+          this.callbacks[name.namespace][name.value] instanceof Array
+        ) {
+          delete this.callbacks[name.namespace][name.value];
+
+          // Remove namespace if empty
+          if (Object.keys(this.callbacks[name.namespace]).length === 0)
+            delete this.callbacks[name.namespace];
+        }
+      }
+    });
+
+    return this;
+  }
+
+  trigger(_name, _args) {
+    // Errors
+    if (typeof _name === 'undefined' || _name === '') {
+      console.warn('wrong name');
+      return false;
+    }
+
+    let finalResult = null;
+    let result = null;
+
+    // Default args
+    const args = !(_args instanceof Array) ? [] : _args;
+
+    // Resolve names (should on have one event)
+    let name = this.resolveNames(_name);
+
+    // Resolve name
+    name = this.resolveName(name[0]);
+
+    // Default namespace
+    if (name.namespace === 'base') {
+      // Try to find callback in each namespace
+      for (const namespace in this.callbacks) {
+        if (
+          this.callbacks[namespace] instanceof Object &&
+          this.callbacks[namespace][name.value] instanceof Array
+        ) {
+          this.callbacks[namespace][name.value].forEach(function (callback) {
+            result = callback.apply(this, args);
+
+            if (typeof finalResult === 'undefined') {
+              finalResult = result;
+            }
+          });
+        }
+      }
+    }
+
+    // Specified namespace
+    else if (this.callbacks[name.namespace] instanceof Object) {
+      if (name.value === '') {
+        console.warn('wrong name');
+        return this;
+      }
+
+      this.callbacks[name.namespace][name.value].forEach(function (callback) {
+        result = callback.apply(this, args);
+
+        if (typeof finalResult === 'undefined') finalResult = result;
+      });
+    }
+
+    return finalResult;
+  }
+
+  resolveNames(_names) {
+    let names = _names;
+    names = names.replace(/[^a-zA-Z0-9 ,/.]/g, '');
+    names = names.replace(/[,/]+/g, ' ');
+    names = names.split(' ');
+
+    return names;
+  }
+
+  resolveName(name) {
+    const newName = {};
+    const parts = name.split('.');
+
+    newName.original = name;
+    newName.value = parts[0];
+    newName.namespace = 'base'; // Base namespace
+
+    // Specified namespace
+    if (parts.length > 1 && parts[1] !== '') {
+      newName.namespace = parts[1];
+    }
+
+    return newName;
+  }
+}
+```
+
+### 時間を処理するクラスを作成
+
+このクラスで以下の情報を更新できるようにする
+`clock`: 現在の時間
+`elapsedTime`: 経過時間
+`deltaTime`: 現在のフレームと前のフレームとの差分時間
+
+```js
+// Time.js に記述
+import EventEmitter from './EventEmitter.js';
+
+export default class Time extends EventEmitter {
+  constructor() {
+    super();
+
+    this.start = Date.now();
+    this.current = this.start;
+    this.elapsed = 0;
+    this.delta = 16;
+
+    window.requestAnimationFrame(() => {
+      this.tick();
+    });
+  }
+
+  tick() {
+    const currentTime = Date.now();
+    this.delta = currentTime - this.current;
+    this.current = currentTime;
+    this.elapsed = this.current - this.start;
+
+    this.trigger('tick');
+
+    window.requestAnimationFrame(() => {
+      this.tick();
+    });
+  }
+}
+```
+
+### シーンのセットアップ
+
+```js
+//  Experience.js に記述
+
+import * as THREE from 'three';
+
+export default class Experience {
+  constructor(canvas) {
+    // ...
+
+    // セットアップ
+    this.sizes = new Sizes();
+    this.time = new Time();
+    this.scene = new THREE.Scene();
+
+    // ...
+  }
+
+  // ...
+}
+```
