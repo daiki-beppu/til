@@ -23,6 +23,7 @@
     - [イベントをトリガーできるクラスを作成](#イベントをトリガーできるクラスを作成)
     - [時間を処理するクラスを作成](#時間を処理するクラスを作成)
     - [シーンのセットアップ](#シーンのセットアップ)
+    - [カメラのセットアップ](#カメラのセットアップ)
 
 ## モジュールを使用した構造化
 
@@ -600,7 +601,7 @@ export default class Time extends EventEmitter {
     this.start = Date.now();
     this.current = this.start;
     this.elapsed = 0;
-    this.delta = 16;
+    this.delta = 16; // 1 フレームが約 16 ms
 
     window.requestAnimationFrame(() => {
       this.tick();
@@ -640,7 +641,97 @@ export default class Experience {
 
     // ...
   }
+  // ...
+}
+```
+
+### カメラのセットアップ
+
+```js
+// Camera.js で記述
+export default class Camera {
+  constructor() {}
+}
+```
+
+```js
+// Experience.js で記述
+import Camera from './Camera.js';
+
+export default class Experience {
+  constructor(canvas) {
+    // ...
+
+    this.sizes = new Sizes();
+    this.time = new Time();
+    this.scene = new THREE.Scene();
+    this.camera = new Camera();
+
+    // ...
+  }
 
   // ...
 }
 ```
+
+ここで問題が発生。
+`width`, `height`, `<canvas>`などの情報が必要になり
+`Experience`クラス内にあるプロパティにアクセスする必要があります。
+
+`Camera`クラスから`Experience`クラスにアクセスする方法は 3 つあります。
+
+- グローバル変数からアクセスする
+- パラメータからアクセスする
+- シングルトンを使用してアクセスする
+
+**グローバル変数からアクセスする方法**
+
+```js
+// Camera.js に記述
+export default class Camera {
+  constructor() {
+    this.experience = window.experience;
+  }
+}
+```
+
+[!WARNING]
+
+> - experience プロパティを更新するコードがないことが前提になる
+> - window にグローバルプロパティを追加することは非推奨
+
+**パラメータからアクセスする方法**
+
+```js
+// パラメータからアクセスする方法
+
+// Experience.js に記述
+export default class Experience {
+  constructor(canvas) {
+    // ...
+
+    this.camera = new Camera(this);
+
+    // ...
+  }
+
+  // ...
+}
+```
+
+```js
+// Camera.js に記述
+export default class Camera {
+  constructor(experience) {
+    this.experience = experience;
+  }
+}
+```
+
+> [!WARNING]
+>
+> - 各クラスが Experience クラスにアクセスできるうにする必要がある
+> - 階層構造を保つ場合、子クラスだけでなくその親クラスも Experience クラスにアクセうできるようにする必要がある
+
+**シングルトンを使用してアクセスする方法(今回はこちらで記述)**
+
