@@ -24,6 +24,8 @@
     - [時間を処理するクラスを作成](#時間を処理するクラスを作成)
     - [シーンのセットアップ](#シーンのセットアップ)
     - [カメラのセットアップ](#カメラのセットアップ)
+    - [レンダラーのセットアップ](#レンダラーのセットアップ)
+    - [ワールドをセットアップ](#ワールドをセットアップ)
 
 ## モジュールを使用した構造化
 
@@ -882,5 +884,251 @@ export default class Experience {
   update() {
     this.camera.update();
   }
+}
+```
+
+### レンダラーのセットアップ
+
+```js
+// Renderer.js に記述
+import Experience from './Experience.js';
+import * as THREE from 'three';
+
+export default class Renderer {
+  constructor() {
+    this.experience = new Experience();
+    this.canvas = this.experience.canvas;
+    this.sizes = this.experience.sizes;
+    this.scean = this.experience.scene;
+    this.camera = this.experience.camera;
+
+    this.setInstance();
+  }
+
+  setInstance() {
+    this.instance = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+      antialias: true,
+    });
+    this.instance.toneMapping = THREE.CineonToneMapping;
+    this.instance.toneMappingExposure = 1.75;
+    this.instance.shadowMap.enabled = true;
+    this.instance.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.instance.setClearColor('#211d20');
+    this.instance.setSize(this.sizes.width, this.sizes.height);
+    this.instance.setPixelRatio(this.sizes.devicePixelRatio);
+  }
+
+  resize() {
+    this.instance.setSize(this.sizes.width, this.sizes.height);
+    this.instance.setPixelRatio(this.sizes.devicePixelRatio);
+  }
+  update() {
+    this.instance.render(this.scean, this.camera.instance);
+  }
+}
+```
+
+```js
+// Experience.js に記述
+export default class Experience {
+  // ...
+
+  resize() {
+    this.camera.resize();
+    this.renderer.resize();
+  }
+
+  update() {
+    this.instance.render(this.scene, this.camera.instance);
+  }
+}
+```
+
+### ワールドをセットアップ
+
+シーン内に表示するオブジェクトを追加する
+
+`World`フォルダを作成して、その中に`World`クラスを作成する
+
+```js
+// World.js に記述
+import * as THREE from 'three';
+import Environment from './Environment.js';
+import Experience from '../Experience.js';
+
+export default class World {
+  constructor() {
+    this.expreience = new Experience();
+    this.scene = this.expreience.scene;
+
+    const testMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshStandardMaterial({})
+    );
+    this.scene.add(testMesh);
+  }
+}
+```
+
+[![Image from Gyazo](https://i.gyazo.com/3aba275357e68b13def97de682397ac6.png)](https://gyazo.com/3aba275357e68b13def97de682397ac6)
+
+ライトがないので真っ黒なのでライトを追加していく
+
+`World`フォルダに`Environment`クラスを作成する
+
+```js
+// Environment.js に記述
+import Experience from '../Experience.js';
+import * as THREE from 'three';
+
+export default class Environment {
+  constructor() {
+    this.experience = new Experience();
+    this.scean = this.experience.scene;
+
+    this.setSunLight();
+  }
+
+  setSunLight() {
+    this.sunLightPrams = {
+      color: 0xffffff,
+      intensity: 4,
+      position: { x: 3.5, y: 2, z: -1.25 },
+      shadowCamera: { far: 15 },
+      shadowMapSize: 1024,
+      shadowNormalBias: 0.05,
+    };
+
+    const { intensity, color, position, shadowCamera, shadowMapSize, shadowNormalBias } =
+      this.sunLightPrams;
+
+    const sunLight = new THREE.DirectionalLight(color, intensity);
+
+    sunLight.castShadow = true;
+    sunLight.shadow.camera.far = shadowCamera.far;
+    sunLight.shadow.mapSize.setScalar(shadowMapSize);
+    sunLight.shadow.normalBias = shadowNormalBias;
+
+    sunLight.position.set(position.x, position.y, position.z);
+    this.scean.add(sunLight);
+  }
+}
+```
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/b1fb3e135ba90ac39a8a6a87ce78e4c6.png)](https://gyazo.com/b1fb3e135ba90ac39a8a6a87ce78e4c6)
+
+次にアセットの読み込みを専用のクラスに集中させるため
+
+`Utils`フォルダ内に`Resources`クラスを作成する
+
+```js
+// Resources.js に記述
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/Addons.js';
+import EventEmitter from './EventEmitter.js';
+
+export default class Resources extends EventEmitter {
+  constructor(sources) {
+    super();
+
+    // アセットの情報を保持
+    this.sources = sources;
+
+    // ロードしたアセットを保持するオブジェクト
+    this.items = {};
+
+    // ロードするべきアセットの総数
+    this.toLoad = this.sources.length;
+
+    // ロード済みのアセット数
+    this.loaded = 0;
+
+    this.setLoaders();
+    this.startLoading();
+  }
+
+  // 各ローダーの設定
+  setLoaders() {
+    this.loaders = {
+      gltfLoader: new GLTFLoader(),
+      textuerLoader: new THREE.TextureLoader(),
+      cubeTextureLoader: new THREE.CubeTextureLoader(),
+    };
+  }
+
+  // アセットのロード処理を開始
+  startLoading() {
+    for (const source of this.sources) {
+      if (source.type === 'gltfModel') {
+        this.loaders.gltfLoader.load(source.path, (file) => {
+          this.sourceLoaded(source, file);
+        });
+      } else if (source.type === 'texture') {
+        this.loaders.textuerLoader.load(source.path, (file) => {
+          this.sourceLoaded(source, file);
+        });
+      } else if (source.type === 'cubeTexture') {
+        this.loaders.cubeTextureLoader.load(source.path, (file) => {
+          this.sourceLoaded(source, file);
+        });
+      }
+    }
+  }
+
+  // 単一のアセットがロードされたときの処理
+  sourceLoaded(source, file) {
+    // ロードされたアセットを保持
+    this.items[source.name] = file;
+
+    // ロード済みのカウントを増やす
+    this.loaded++;
+
+    // すべてのロードが完了したかをチェック
+    if (this.loaded === this.toLoad) {
+      this.trigger('ready');
+    }
+  }
+}
+```
+
+読み込むアセットは配列で保持する、配列が大きなることを想定して別ファイルに切り出して記述する
+
+`Expreiensce`フォルダに`sources.js`を作成
+
+```js
+export default [
+  {
+    name: 'environmentMapTexture',
+    type: 'cubeTexture',
+    path: [
+      'textures/environmentMap/px.jpg',
+      'textures/environmentMap/nx.jpg',
+      'textures/environmentMap/py.jpg',
+      'textures/environmentMap/ny.jpg',
+      'textures/environmentMap/pz.jpg',
+      'textures/environmentMap/nz.jpg',
+    ],
+  },
+];
+```
+
+```js
+import sources from './sources.js';
+
+// ...
+
+export default class Experience {
+  constructor(canvas) {
+    // ...
+
+    this.resources = new Resources(sources);
+
+    // ...
+  }
+
+  // ...
 }
 ```
