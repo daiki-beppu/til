@@ -735,3 +735,152 @@ export default class Camera {
 
 **シングルトンを使用してアクセスする方法(今回はこちらで記述)**
 
+シングルトンとは、初めてインスタンス化されるときに通常通りインスタンス化されるクラス。
+ただし、2 回目以降のインスタンス化は最初のインスタンスが返される
+
+インスタンス化は複数実行できるが、実際のインスタンスとなるのは最初のインスタンス化だけ。
+
+クラスの外に`instance`変数を定義して`null`を設定する
+`construcuter`でその変数に何があるかをテストする
+`ture`なら`instance`の中身を返し関数は処理を終える
+`false`なら`this(インスタンス)`を変数に保存して、関数の続きを実行する
+
+```js
+// Experience.js に記述
+let instance = null;
+
+export default class Experience {
+  constructor(canvas) {
+    // シングルトン
+    if (instance) {
+      return instance;
+    }
+    instance = this;
+
+    // ...
+  }
+
+  // ...
+}
+```
+
+```js
+// Camera.js に記述
+import Experience from './Experience.js';
+
+export default class Camera {
+  constructor() {
+    this.experience = new Experience();
+  }
+}
+```
+
+これで`experinece`のプロパティにアクセスできるようになったので
+カメラのインスタンスを作成していく
+
+```js
+// Camera.js に記述
+import Experience from './Experience.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+export default class Camera {
+  constructor() {
+    this.experience = experience;
+    this.experience = new Experience();
+    this.sizes = this.experience.sizes;
+    this.scene = this.experience.scene;
+    this.canvas = this.experience.canvas;
+
+    this.cameraParams = {
+      fov: 35,
+      aspect: this.sizes.width / this.sizes.height,
+      near: 0.1,
+      far: 100,
+      position: { x: 6, y: 4, z: 8 },
+    };
+
+    this.setInstance();
+    this.setControls();
+
+    this.sizes.on('resize', () => {
+      console.log('test');
+    });
+  }
+
+  // カメラのインスタンスを作成し、シーンに追加
+  setInstance() {
+    const { fov, aspect, near, far, position } = this.cameraParams;
+    this.instance = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    this.instance.position.set(position.x, position.y, position.z);
+    this.scene.add(this.instance);
+  }
+
+  // カメラの制御の設定(オービットコントロール)
+  setControls() {
+    this.controls = new OrbitControls(this.instance, this.canvas);
+    this.controls.enableDamping = true;
+  }
+
+  // ウィンドウのリサイズ時にカメラパラメータを更新
+  resize() {
+    this.instance.aspect = this.cameraParams.aspect;
+    this.instance.updateMatrix();
+  }
+
+  // フレームごとのカメラ制御の更新
+  update() {
+    this.controls.update();
+  }
+}
+```
+
+```js
+// Experience.js に記述
+import * as THREE from 'three';
+import Sizes from './Utils/Sizes.js';
+import Time from './Utils/Time.js';
+import Camera from './Camera.js';
+
+let instance = null;
+
+export default class Experience {
+  constructor(canvas) {
+    // シングルトン
+    if (instance) {
+      return instance;
+    }
+    instance = this;
+    // グローバルアクセスを設定
+    window.experience = this;
+
+    // レンダリングする HTML canvas 要素を保持
+    this.canvas = canvas;
+
+    // 基本コンポーネントのセットアップ
+    this.sizes = new Sizes();
+    this.time = new Time();
+    this.scene = new THREE.Scene();
+    this.camera = new Camera(this);
+
+    // リサイズのイベントリスナーを設定
+    this.sizes.on('resize', () => {
+      this.resize();
+    });
+
+    // アニメーションループのためのイベントリスナーを設定
+    this.time.on('tick', () => {
+      this.update();
+    });
+  }
+  // リサイズ時の処理
+  resize() {
+    this.camera.resize();
+  }
+
+  // 毎フレームの更新処理
+  update() {
+    this.camera.update();
+  }
+}
+```
