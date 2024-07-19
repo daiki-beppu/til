@@ -1046,8 +1046,11 @@ export default class Resources extends EventEmitter {
     // ロード済みのアセット数
     this.loaded = 0;
 
-    this.setLoaders();
-    this.startLoading();
+    // テクスチャのロードが完了したら実行
+    this.resources.on('ready', () => {
+      this.setSunLight();
+      this.setEnvironmentMap();
+    });
   }
 
   // 各ローダーの設定
