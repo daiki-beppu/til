@@ -1046,11 +1046,8 @@ export default class Resources extends EventEmitter {
     // ロード済みのアセット数
     this.loaded = 0;
 
-    // テクスチャのロードが完了したら実行
-    this.resources.on('ready', () => {
-      this.setSunLight();
-      this.setEnvironmentMap();
-    });
+    this.setLoaders();
+    this.startLoading();
   }
 
   // 各ローダーの設定
@@ -1134,4 +1131,8 @@ export default class Experience {
 
   // ...
 }
+```
+
+```
+
 ```
