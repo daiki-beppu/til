@@ -26,7 +26,8 @@
     - [カメラのセットアップ](#カメラのセットアップ)
     - [レンダラーのセットアップ](#レンダラーのセットアップ)
     - [ワールドをセットアップ](#ワールドをセットアップ)
-    - [環境マップの作成](#環境マップの作成)
+      - [環境マップの作成](#環境マップの作成)
+      - [床の作成](#床の作成)
 
 ## モジュールを使用した構造化
 
@@ -1134,7 +1135,11 @@ export default class Experience {
 }
 ```
 
-### 環境マップの作成
+#### 環境マップの作成
+
+完成イメージ
+
+[![Image from Gyazo](https://i.gyazo.com/a412abe5da4dce4f1b2a87929e04ca05.png)](https://gyazo.com/a412abe5da4dce4f1b2a87929e04ca05)
 
 ```js
 // Environment.js に記述
@@ -1163,4 +1168,44 @@ export default class Environment {
     this.scene.environment = texture;
   }
 }
+```
+
+これだけだと環境マップがテストメッシュのあとに追加され、キューブマテリアルに更新が必要です。
+
+シーンを走査して必要に応じてマテリアルを更新する`updateMaterials`メソッドを追加して
+シーンに追加した直後に呼び出します
+
+```js
+
+setEnvironmentMap() {
+
+// ...
+
+ this.environmentMap.updateMaterials = () => {
+      // シーン内のすべてのオブジェクトを走査
+      this.scene.traverse((child) => {
+
+        // オブジェクトが THREE.Mesh かつ THREE.MeshStandardMaterial の場合に以下の処理
+        if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+
+          // 環境マップをメッシュのマテリアルに設定
+          child.material.envMap = texture;
+
+          // 環境マップの明るさを設定
+          child.material.envMapIntensity = intensity;
+
+          // マテリアルプロパティの変更をThree.jsに通知
+          child.material.needsUpdate = true;
+        }
+      });
+    };
+    this.environmentMap.updateMaterials();
+  }
+
+```
+
+#### 床の作成
+
+```js
+
 ```
