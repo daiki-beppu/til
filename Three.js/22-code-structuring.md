@@ -1133,6 +1133,23 @@ export default class Experience {
 }
 ```
 
-```
+```js
+// Environment.js に記述
 
+export default class Environment {
+  // ...
+
+  setEnvironmentMap() {
+    this.environmentMap = {
+      intensity: 0.4,
+      texture: this.resources.items.environmentMapTexture,
+      colorSpace: THREE.SRGBColorSpace,
+    };
+
+    const { texture, colorSpace } = this.environmentMap;
+    texture.colorSpace = colorSpace;
+
+    this.scene.environment = texture;
+  }
+}
 ```
