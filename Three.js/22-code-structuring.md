@@ -26,6 +26,7 @@
     - [カメラのセットアップ](#カメラのセットアップ)
     - [レンダラーのセットアップ](#レンダラーのセットアップ)
     - [ワールドをセットアップ](#ワールドをセットアップ)
+    - [環境マップの作成](#環境マップの作成)
 
 ## モジュールを使用した構造化
 
@@ -1133,10 +1134,20 @@ export default class Experience {
 }
 ```
 
+### 環境マップの作成
+
 ```js
 // Environment.js に記述
 
 export default class Environment {
+  constructor() {
+    // ...
+
+    this.resources.on('ready', () => {
+      // ...
+      this.setEnvironmentMap();
+    });
+  }
   // ...
 
   setEnvironmentMap() {
