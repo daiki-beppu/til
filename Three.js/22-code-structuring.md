@@ -1207,5 +1207,92 @@ setEnvironmentMap() {
 #### 床の作成
 
 ```js
+// sources.js 記述
 
+// アルベド(カラー)テクスチャ
+ {
+    name: 'grassColorTexture',
+    type: 'texture',
+    path: 'textures/dirt/color.jpg',
+  },
+ // ノーマルテクスチャ
+  {
+    name: 'grassNormalTexture',
+    type: 'texture',
+    path: 'textures/dirt/normal.jpg',
+  },
+```
+
+`World` フォルダ内に`Floor`クラスを作成
+
+```js
+// Floor.js に記述
+import * as THREE from 'three';
+import Experience from '../Experience.js';
+
+// 設定を一元管理するためのオブジェクト
+const floorParams = {
+  geometry: { radius: 5, segments: 64 },
+  texture: {
+    colorTexture: 'grassColorTexture',
+    normalTexture: 'grassNormalTexture',
+    repeat: { u: 1.5, v: 1.5 },
+    wrapS: THREE.RepeatWrapping,
+    wrapT: THREE.RepeatWrapping,
+    colorSpace: THREE.SRGBColorSpace,
+  },
+  mesh: { rotation: { x: -Math.PI / 2 } },
+};
+
+export default class Floor {
+  constructor() {
+    this.experience = new Experience();
+    this.scene = this.experience.scene;
+    this.resources = this.experience.resources;
+
+    this.setGeometry();
+    this.setTextures();
+    this.setMaterial();
+    this.setMesh();
+  }
+  setGeometry() {
+    const { radius, segments } = floorParams.geometry;
+    this.geometry = new THREE.CircleGeometry(radius, segments);
+  }
+
+  setTextures() {
+    const { colorTexture, normalTexture, repeat, wrapS, wrapT, colorSpace } = floorParams.texture;
+
+    // テクスチャのプロパティと変数名を一致させるため
+    this.textures = {
+      map: this.resources.items[colorTexture],
+      normalMap: this.resources.items[normalTexture],
+    };
+
+    const { map, normalMap } = this.textures;
+
+    map.colorSpace = colorSpace;
+    map.repeat.set(repeat.u, repeat.v);
+    map.wrapS = wrapS;
+    map.wrapT = wrapT;
+
+    normalMap.repeat.set(repeat.u, repeat.v);
+    normalMap.wrapS = wrapS;
+    normalMap.wrapT = wrapT;
+  }
+  setMaterial() {
+    const { map, normalMap } = this.textures;
+    this.material = new THREE.MeshStandardMaterial({
+      map: map,
+      normalMap: normalMap,
+    });
+  }
+  setMesh() {
+    const { rotation } = floorParams.mesh;
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    this.mesh.rotation.x = rotation.x;
+    this.mesh.receiveShadow = true;
+    this.scene.add(this.mesh);
+  }
+}
 ```
