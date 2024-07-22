@@ -28,6 +28,9 @@
     - [ワールドをセットアップ](#ワールドをセットアップ)
       - [環境マップの作成](#環境マップの作成)
       - [床の作成](#床の作成)
+      - [モデルの作成](#モデルの作成)
+    - [デバッグ UI のセットアップ](#デバッグ-ui-のセットアップ)
+    - [クリーンアップ(不要なリソースの開放)](#クリーンアップ不要なリソースの開放)
 
 ## モジュールを使用した構造化
 
@@ -951,7 +954,7 @@ export default class Experience {
 
 シーン内に表示するオブジェクトを追加する
 
-`World`フォルダを作成して、その中に`World`クラスを作成する
+`World`フォルダを作成して、その中に`World.js`ファイルを作成し`World.js`ファイル内に`World`クラスを作成
 
 ```js
 // World.js に記述
@@ -977,7 +980,7 @@ export default class World {
 
 ライトがないので真っ黒なのでライトを追加していく
 
-`World`フォルダに`Environment`クラスを作成する
+`World`フォルダに`Environment.js`ファイルを作成しファイル内に`Environment`クラスを作成する
 
 ```js
 // Environment.js に記述
@@ -1024,7 +1027,7 @@ export default class Environment {
 
 次にアセットの読み込みを専用のクラスに集中させるため
 
-`Utils`フォルダ内に`Resources`クラスを作成する
+`Utils`フォルダ内に`Resources.js`をファイルを作成し`Resources.js`ファイル内に`Resources`クラスを作成する
 
 ```js
 // Resources.js に記述
@@ -1189,10 +1192,10 @@ setEnvironmentMap() {
         if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
 
           // 環境マップをメッシュのマテリアルに設定
-          child.material.envMap = texture;
+          child.material.envMap = this.environmentMap.texture;
 
           // 環境マップの明るさを設定
-          child.material.envMapIntensity = intensity;
+          child.material.envMapIntensity = this.environmentMap.intensity;
 
           // マテリアルプロパティの変更をThree.jsに通知
           child.material.needsUpdate = true;
@@ -1223,7 +1226,7 @@ setEnvironmentMap() {
   },
 ```
 
-`World` フォルダ内に`Floor`クラスを作成
+`World` フォルダ内に`Floor.js`ファイルを作成し`Floor.js`ファイル内に`Fox`クラスを作成
 
 ```js
 // Floor.js に記述
@@ -1293,6 +1296,211 @@ export default class Floor {
     this.mesh.rotation.x = rotation.x;
     this.mesh.receiveShadow = true;
     this.scene.add(this.mesh);
+  }
+}
+```
+
+#### モデルの作成
+
+```js
+// sources.js に記述
+
+export default [
+  // ...
+  // モデルのアセットを追加
+  {
+    name: 'foxModel',
+    type: 'gltfModel',
+    path: 'models/Fox/glTF/Fox.gltf',
+  },
+];
+```
+
+`World` フォルダ内に`Fox.js`ファイルを作成し`Fox.js`内に`Fox`クラスを作成
+
+```js
+// Fox.js に記述
+import * as THREE from 'three';
+import Experience from '../Experience.js';
+
+export default class Fox {
+  constructor() {
+    this.experience = new Experience();
+    this.scene = this.experience.scene;
+    this.resources = this.experience.resources;
+
+    this.resource = this.resources.items.foxModel;
+
+    this.time = this.experience.time;
+
+    this.setModel();
+    this.setAnimation();
+  }
+  setModel() {
+    this.model = this.resource.scene;
+
+    const modelScale = 0.02;
+    this.model.scale.setScalar(modelScale);
+    this.scene.add(this.model);
+
+    this.model.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = true;
+      }
+    });
+  }
+  setAnimation() {
+    this.animation = {};
+    (this.animation.mixer = new THREE.AnimationMixer(this.model)),
+      (this.animation.action = this.animation.mixer.clipAction(this.resource.animations[0]));
+    this.animation.action.play();
+  }
+  update() {
+    this.animation.mixer.update(this.time.delta * 0.001);
+  }
+}
+```
+
+```js
+// World.js に記述
+import * as THREE from 'three';
+import Environment from './Environment.js';
+import Experience from '../Experience.js';
+import Floor from './Floor.js';
+import Fox from './Fox.js';
+
+export default class World {
+  constructor() {
+    this.expreience = new Experience();
+    this.scene = this.expreience.scene;
+    this.resorces = this.expreience.resources;
+
+    this.resorces.on('ready', () => {
+      this.floor = new Floor();
+      this.fox = new Fox(); // Foxクラスのインスタンス化を追加
+      this.environment = new Environment();
+    });
+  }
+
+  // updateメソッドを追加
+  update() {
+    if (this.fox) {
+      this.fox.update();
+    }
+  }
+}
+```
+
+```js
+// Experience.js に記述
+export default class Experience {
+  update() {
+    this.camera.update();
+    this.world.update(); // ワールドの更新を追加
+    this.renderer.update();
+  }
+}
+```
+
+### デバッグ UI のセットアップ
+
+`Utils` フォルダ内に`Debug.js`ファイルを作成し`Debug.js`内に`Debug`クラスを作成
+
+```js
+// Debug.js に記述
+import GUI from 'lil-gui';
+
+export default class Debug {
+  constructor() {
+    // URL/#debug のときにデバック UI を表示
+    this.active = window.location.hash === '#debug';
+
+    if (this.active) {
+      this.ui = new GUI();
+    }
+  }
+}
+```
+
+```js
+// Environment.js に記述
+export default class Environment {
+  constructor() {
+    // ...
+    this.debug = this.experience.debug;
+
+    // デバッグ UI の追加
+    if (this.debug.active) {
+      console.log(this.debug.active);
+      this.debugFolder = this.debug.ui.addFolder('environment');
+    }
+
+    // ...
+  }
+
+  etSunLight() {
+    // ...
+
+    // デバック UI
+    if (this.debug.active) {
+      this.debugFolder.add(sunLight, 'intensity').min(0).max(4).step(0.001);
+      this.debugFolder.add(sunLight.position, 'x').min(-5).max(5).step(0.01);
+      this.debugFolder.add(sunLight.position, 'y').min(-5).max(5).step(0.01);
+      this.debugFolder.add(sunLight.position, 'z').min(-5).max(5).step(0.01);
+    }
+  }
+
+  etEnvironmentMap() {
+    // ...
+
+    // デバッグ UI
+    if (this.debug.active) {
+      this.debugFolder
+        .add(this.environmentMap, 'intensity')
+        .name('envMapItensity')
+        .min(0)
+        .max(4)
+        .step(0.001)
+        .onChange(() => {
+          this.environmentMap.updateMaterials();
+        });
+    }
+  }
+}
+```
+
+### クリーンアップ(不要なリソースの開放)
+
+`Experience`クラスに`destroy`メソッドを追加
+
+```js
+// Experience.js に記述
+export default class Experience {
+  // ...
+
+  destroy() {
+    this.sizes.off('resize'); // リサイズイベントの停止
+    this.time.off('tick'); // tickイベントの停止
+
+    // シーン全体を走査してリソースを開放する
+    this.scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.geometry.dispose();
+        for (const key in child.material) {
+          const value = child.material[key];
+          if (value && typeof value.despose === 'function') {
+            value.dispose();
+          }
+        }
+      }
+    });
+
+    this.camera.controls.dispose();
+    this.renderer.instance.dispose();
+
+    if (this.debug.active) {
+      this.debug.ui.destroy();
+    }
   }
 }
 ```
