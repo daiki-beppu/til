@@ -702,8 +702,8 @@ export default class Camera {
 }
 ```
 
-[!WARNING]
-
+>[!WARNING]
+>
 > - experience プロパティを更新するコードがないことが前提になる
 > - window にグローバルプロパティを追加することは非推奨
 
