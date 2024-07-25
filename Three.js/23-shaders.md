@@ -37,7 +37,24 @@
     - [Precision](#precision)
     - [gl\_FragColor](#gl_fragcolor)
   - [attribute 属性](#attribute-属性)
-  - [varying 変化](#varying-変化)
+    - [コード例](#コード例)
+    - [出力結果](#出力結果)
+  - [varying 可変データ](#varying-可変データ)
+    - [コード例](#コード例-1)
+    - [出力結果](#出力結果-1)
+  - [uniform ユニフォーム](#uniform-ユニフォーム)
+    - [コード例](#コード例-2)
+    - [出力結果](#出力結果-2)
+  - [テクスチャ](#テクスチャ)
+    - [コード例](#コード例-3)
+    - [出力結果](#出力結果-3)
+  - [テクスチャのカラーバリエーションを追加](#テクスチャのカラーバリエーションを追加)
+    - [コード例](#コード例-4)
+    - [出力結果](#出力結果-4)
+  - [ShaderMaterial](#shadermaterial)
+    - [コード例](#コード例-5)
+  - [デバッグ](#デバッグ)
+    - [値のデバッグ](#値のデバッグ)
 
 ## シェーダーについて
 
@@ -472,7 +489,7 @@ void main() {
 
 ### gl_Position
 
-`gl_Position` はあらかじめ設定されている変数なのでこれを割り当てる必要です。
+`gl_Position` はあらかじめ設定されている変数なのでこれを割り当てる必要があります。
 この変数には、画面上の頂点の位置が格納されています。
 
 以下のコードは次のことを行っています。
@@ -534,12 +551,9 @@ uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 ```
 
-`modelMatrix`はメッシュに対するすべての変換を適用する。
-メッシュの拡大縮小、回転、移動行った場合の変換は`modelMatrix`に含まれ、position に適用される。
-
-`viewMatrix`はカメラに対する相対的な変換を適用する。
-
-`projectionMatrix`は最終的な座標をクリップ空間の座標に変換する。
+- `modelMatrix`: メッシュに対するすべての変換(拡大縮小、回転、移動)を適用する。
+- `viewMatrix`: カメラに対する相対的な変換を適用する。
+- `projectionMatrix`: 最終的な座標をクリップ空間の座標に変換する。
 
 結果は変わりませんが
 position をさらに理解し、より細かく制御するためにコードを変更していきます。
@@ -593,7 +607,7 @@ void main()
 平面に波打たせる事もできる
 [![Image from Gyazo](https://i.gyazo.com/8d2b8f0168cec76cec71b0f6d21f1ac7.png)](https://gyazo.com/8d2b8f0168cec76cec71b0f6d21f1ac7)
 
-```
+```glsl
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
@@ -608,9 +622,9 @@ void main() {
   vec4 modelPosition = modelMatrix * vec4(position, 1.0);
   modelPosition.z += sin(modelPosition.x * 10.0) * 0.1;
 
-  vec4 viewMPosition = viewMatrix * modelPosition;
-  vec4 projectedPositon = projectionMatrix * viewMPosition;
-  gl_Position = projectedPositon;
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+  gl_Position = projectedPosition;
 
   vRandom = aRandom;
 }
@@ -640,16 +654,16 @@ precision mediump float;
 
 設定可能な値は以下の通りです。
 
-- `highp`: パフォーマンスが低下する。デバイスによっては動作しなくなる。
-- `midump`: 通常はこちらを使用
-- `lowp`: 精度が不足するとバグは発生する可能性がある
+- `highp`: 高精度だがパフォーマンスが低下する。デバイスによっては動作しなくなる。
+- `mediump`: 中精度、多くの一般的なケースで十分な精度
+- `lowp`: 低精度、精度が不足するとバグは発生する可能性がある
 
 ### gl_FragColor
 
 `gl_FragColor` は `gl_Position`と似ているが
 色に関するものです。
 
-`gl_FragColor`は`vec4(r,g, b, a)`で指定します
+`gl_FragColor`は`vec4(r, g, b, a)`で指定します。
 
 値を変更すると色が変わります。
 
@@ -662,7 +676,7 @@ void main() {
 ```
 
 4 番目の値(a)を変更する場合は
-Three.js の`RawShaderMaterial`の`transparent`を`true`に設定する必要がある
+Three.js の`RawShaderMaterial`の`transparent`を`true`に設定する必要があります。
 
 ```js
 const material = new THREE.RawShaderMaterial({
@@ -675,9 +689,11 @@ const material = new THREE.RawShaderMaterial({
 ## attribute 属性
 
 属性は、各頂点で変化する値です。
-各頂点の座標を表す `vec3`を含む `position` という名前の属性がすでに 1 つ存在する。
+各頂点の座標を表す `vec3`を含む `position` という名前の属性がすでに 1 つ存在します。
 
-各頂点にランダムな値を追加して、その値にしたがって z 軸上で頂点を移動させる。
+各頂点にランダムな値を追加して、その値にしたがって z 軸上で頂点を移動させます。
+
+### コード例
 
 ```js
 // .js に記述
@@ -703,10 +719,6 @@ geometry.setAttribute(
 );
 ```
 
-完成イメージ
-
-[![Image from Gyazo](https://i.gyazo.com/950b030749f0600bde7f89256389097e.png)](https://gyazo.com/950b030749f0600bde7f89256389097e)
-
 ```glsl
 **uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
@@ -714,7 +726,6 @@ uniform mat4 modelMatrix;
 
 attribute vec3 position;
 attribute float aRandom;
-
 
 void main() {
 
@@ -727,16 +738,21 @@ void main() {
 
   vRandom = aRandom;
 }
-
 ```
 
-## varying 変化
+### 出力結果
 
-フラグメントにも`aRandom属性`を使用して色をつけます。
-ですがフラグメントシェーダーで属性を直接使用することはできません。
+[![Image from Gyazo](https://i.gyazo.com/950b030749f0600bde7f89256389097e.png)](https://gyazo.com/950b030749f0600bde7f89256389097e)
+
+## varying 可変データ
+
+フラグメントシェーダーでも`aRandom属性`を使用して色をつけます。
+しかし、フラグメントシェーダーで属性を直接使用することはできません。
 なので`varying`を使用して頂点シェーダーからフラグメントシェーダーにデータを送信します。
 
-`vertex.glsl`と`fragment.glsl`で`varying` を実行する必要があリます。
+`vertex.glsl`と`fragment.glsl`で`varying` を実行する必要があります。
+
+### コード例
 
 ```glsl
 // vertex.glslに記述
@@ -765,7 +781,7 @@ void main() {
 ```
 
 ```glsl
-// fargment.glslに記述
+// fragment.glslに記述
 precision mediump float;
 
 varying float vRandom;
@@ -778,7 +794,426 @@ void main() {
 ついでに平面を回転させて頂点を調整して
 草むらのような見た目を作ってみた
 
-完成イメージ
+### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/f21a9fe045ed030f3b6c6364c2d79c1f.png)](https://gyazo.com/f21a9fe045ed030f3b6c6364c2d79c1f)
+
+## uniform ユニフォーム
+
+`uniform`は JavaScript からシェーダーにデータを送信する方法です。
+同じシェーダーに異なるパラメータを使用したい場合に便利です。
+また。ユーザーの体験中にパラメータを変更することも可能です。
+
+`uniform`は頂点シェーダーフラグメントシェーダーの両方で使用できます。
+データはすべての頂点シェーダーとフラグメントで同じになります。
+
+`uniform`を追加するには`material`の`uniforms`プロパティ設定します。
+
+### コード例
+
+```js
+// マテリアル
+const material = new THREE.RawShaderMaterial({
+  vertexShader: testVertexShader,
+  fragmentShader: testFragmentShader,
+  uniforms: {
+    // 波を制御するユニフォーム
+    uFrequency: { value: new THREE.Vector2(10, 5) },
+
+    // アニメーションを制御するユニフォーム
+    uTime: { value: 0 },
+
+    // 色を制御するユニフォーム
+    uColor: { value: new THREE.Color('orange') },
+  },
+});
+
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+
+  // マテリアルの更新
+  material.uniforms.uTime.value = elapsedTime;
+
+  // コントロールの更新
+  controls.update();
+
+  // レンダラー
+  renderer.render(scene, camera);
+
+  // 次のフレームを呼び出し
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+プロパティ名に`u`のプレフィックスをつけることで`uniform`だとわかりやすくしている
+
+```glsl
+// vertex.js に記述
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform vec2 uFrequency;
+uniform float uTime;
+
+attribute vec3 position;
+
+void main() {
+
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+  modelPosition.z += sin(modelPosition.x * uFrequency.x + uTime) * 0.1;
+  modelPosition.z += sin(modelPosition.y * uFrequency.y+ uTime) * 0.1;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+  gl_Position = projectedPosition;
+}
+
+```
+
+```glsl
+// fragment.glsl に記述
+precision mediump float;
+
+uniform vec3 uColor;
+
+void main() {
+  gl_FragColor = vec4(uColor, 1.0);
+
+}
+```
+
+### 出力結果
+
+<a href="https://gyazo.com/6e1f65b90ee8112eb632d11822caab29"><img src="https://i.gyazo.com/6e1f65b90ee8112eb632d11822caab29.gif" alt="Image from Gyazo" width="1000"/></a>
+
+## テクスチャ
+
+シェーダーでテクスチャを扱うには以下の手順で行います。
+
+**JavaScript で行うこと**
+
+1. テクスチャを読み込み
+2. `uniforms`プロパティにテクスチャの設定を追加
+
+**GLSL で行うこと**
+
+1. 頂点シェーダーでジオメトリの uv 座標を取得
+2. uv 座標を`varying`を使用してフラグメントシェーダーに送信
+3. フラグメントシェーダーでテクスチャの色を適用
+
+### コード例
+
+```js
+// テクスチャ
+const textureLoader = new THREE.TextureLoader();
+const fragTexture = textureLoader.load('./textures/ももちこアイコン.JPG'); // 任意のパスを指定
+
+// マテリアル
+const material = new THREE.RawShaderMaterial({
+  vertexShader: testVertexShader,
+  fragmentShader: testFragmentShader,
+  uniforms: {
+    uFrequency: { value: new THREE.Vector2(10, 5) },
+    uTime: { value: 0 },
+    uColor: { value: new THREE.Color('orange') },
+    uTexture: { value: fragTexture },
+  },
+});
+```
+
+```glsl
+// vertex.glsl に記述
+
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform vec2 uFrequency;
+uniform float uTime;
+
+attribute vec3 position;
+attribute vec2 uv; // ジオメトリの uv座標を定義
+
+varying vec2 vUv; // フラグメントシェーダーに送信するための可変データを定義
+
+void main() {
+
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+  modelPosition.z += sin(modelPosition.x * uFrequency.x + uTime) * 0.1;
+  modelPosition.z += sin(modelPosition.y * uFrequency.y+ uTime) * 0.1;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+  gl_Position = projectedPosition;
+
+  vUv = uv; // ジオメトリの uv座標を可変データに代入
+}
+```
+
+```glsl
+// fragment.glsl に記述
+
+precision mediump float;
+
+uniform vec3 uColor;
+uniform sampler2D uTexture; // sampler2D はテクスチャの型
+
+varying vec2 vUv; // 可変データを読み込み
+
+void main() {
+  vec4 textureColor = texture2D(
+    uTexture, // 適用するテクスチャ
+    vUv // ジオメトリの uv座標 (独自のuv座標でも可能)
+    );
+  gl_FragColor = textureColor;
+}
+
+
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/da846d735971e0f38e18bdcb9eb1c487.png)](https://gyazo.com/da846d735971e0f38e18bdcb9eb1c487)
+
+## テクスチャのカラーバリエーションを追加
+
+影があるかのように明るさを変化させます
+
+以下の手順で行います。
+
+**頂点シェーダーで行うこと**
+
+1. 頂点シェーダーで高さの設定を変数に保存
+2. 高さの設定フラグメントシェーダーに送信
+
+**フラグメントシェーダー行うこと**
+
+1. `varying` データを取得
+2. textureColor の`r, g ,b` の各プロパティを変更する
+
+### コード例
+
+```glsl
+// vertex.glsl に記述
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform vec2 uFrequency;
+uniform float uTime;
+
+attribute vec3 position;
+attribute vec2 uv;
+
+varying vec2 vUv;
+
+// 高さの設定フラグメントシェーダーに送信
+varying float vElevation;
+
+void main() {
+
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  // 頂点シェーダーで高さの設定を変数に保存
+  float elevation = sin(modelPosition.x * uFrequency.x + uTime * 0.5) * 0.1;
+  elevation += sin(modelPosition.y * uFrequency.y+ uTime * 2.0) * 0.1;
+  modelPosition.z += elevation;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+  gl_Position = projectedPosition;
+
+  vUv = uv;
+  vElevation = elevation;
+}
+```
+
+```glsl
+// fragment.glsl に記述
+precision mediump float;
+
+uniform vec3 uColor;
+uniform sampler2D uTexture;
+
+varying vec2 vUv;
+
+// 高さのデータを取得
+varying float vElevation;
+
+void main() {
+  vec4 textureColor = texture2D(uTexture, vUv);
+
+  // r, g, b の各プロパティを変更
+  textureColor.rgb *= vElevation * 2.0 + 0.7;
+  gl_FragColor = textureColor;
+}
+
+```
+
+### 出力結果
+
+<a href="https://gyazo.com/d6e84d51e022981868c3837dbabe375a"><img src="https://i.gyazo.com/d6e84d51e022981868c3837dbabe375a.gif" alt="Image from Gyazo" width="1000"/></a>
+
+## ShaderMaterial
+
+ここまで、`RawShaderMaterial` を使用してきました。
+`ShaderMaterial`でも動作は変わりません。
+シェーダーのコードにあらかじめ用意されたユニフォーム、属性や精度などが自動的に設定されます。
+
+`ShaderMaterial`の使用は以下の手順です。
+
+**JavaScript で行うこと**
+
+1. `RawShaderMaterial`を`ShaderMaterial`に書き換える
+
+**GLSL で行うこと**
+
+1. `vertex.glsl` で以下の設定を削除
+
+   - `uniform mat4 projectionMatrix;`
+   - `uniform mat4 viewMatrix;`
+   - `uniform mat4 modelMatrix;`
+   - `attribute vec3 position;`
+   - `attribute vec2 uv;`
+
+2. `fragment.glsl` で以下の設定を削除
+
+   - `precision mediump float;`
+
+### コード例
+
+```js
+const material = new THREE.ShaderMaterial({
+  vertexShader: testVertexShader,
+  fragmentShader: testFragmentShader,
+  uniforms: {
+    uFrequency: { value: new THREE.Vector2(10, 5) },
+    uTime: { value: 0 },
+    uColor: { value: new THREE.Color('orange') },
+    uTexture: { value: fragTexture }
+  },
+});
+
+```
+
+```glsl
+// vertex.glsl に記述
+uniform mat4 projectionMatrix; // ShaderMaterialを使用する場合、この行は不要です
+uniform mat4 viewMatrix; // ShaderMaterialを使用する場合、この行は不要です
+uniform mat4 modelMatrix; // ShaderMaterialを使用する場合、この行は不要です
+uniform vec2 uFrequency;
+uniform float uTime;
+
+attribute vec3 position; // ShaderMaterialを使用する場合、この行は不要です
+attribute vec2 uv; // ShaderMaterialを使用する場合、この行は不要です
+
+varying vec2 vUv;
+varying float vElevation;
+
+void main() {
+
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  float elevation = sin(modelPosition.x * uFrequency.x + uTime * 0.5) * 0.1;
+  elevation += sin(modelPosition.y * uFrequency.y+ uTime * 2.0) * 0.1;
+  modelPosition.z += elevation;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+  gl_Position = projectedPosition;
+
+  vUv = uv;
+  vElevation = elevation;
+}
+
+
+```
+
+```glsl
+// fragment.glsl に記述
+precision mediump float; // ShaderMaterialを使用する場合、この行は不要です
+
+uniform vec3 uColor;
+uniform sampler2D uTexture;
+
+varying vec2 vUv;
+varying float vElevation;
+
+void main() {
+  vec4 textureColor = texture2D(uTexture, vUv);
+  textureColor.rgb *= vElevation * 2.0 + 0.7;
+  gl_FragColor = textureColor;
+}
+
+```
+
+## デバッグ
+
+Three.js はシェーダー全体をログに記録します。
+`ERROR: 0:10: 'attribute' : syntax error` のようなエラーメッセージを確認しましょう。
+
+このエラーメッセージでわかることは
+10行目の直前でエラーが発生している可能性があるということです。
+
+```glsl
+// 注意: このコードには意図的にエラーを含めています
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform vec2 uFrequency;
+uniform float uTime;
+
+attribute vec3 position // ;(セミコロン)がないためここでエラー発生
+attribute vec2 uv;
+
+varying vec2 vUv;
+varying float vElevation;
+
+void main() {
+
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  float elevation = sin(modelPosition.x * uFrequency.x + uTime * 0.5) * 0.1;
+  elevation += sin(modelPosition.y * uFrequency.y+ uTime * 2.0) * 0.1;
+  modelPosition.z += elevation;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+  gl_Position = projectedPosition;
+
+  vUv = uv;
+  vElevation = elevation;
+}
+```
+
+### 値のデバッグ
+
+はじめの方で説明しましたが、値をコンソールで出力する事ができません。
+なので`gl_FragmentColor`を使用して視覚的に確認します。
+正確ではないですが、十分な場合もあります。
+
+ここでは uv を例に紹介します。
+
+```glsl
+precision mediump float;
+
+uniform vec3 uColor;
+uniform sampler2D uTexture;
+
+varying vec2 vUv;
+varying float vElevation;
+
+void main() {
+  vec4 textureColor = texture2D(uTexture, vUv);
+  textureColor.rgb *= vElevation * 2.0 + 0.7;
+  gl_FragColor = textureColor;
+  gl_FragColor = vec4(vUv, 1.0, 1.0);
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/cc822714677a2db48c3ef1cd00c7ff67.png)](https://gyazo.com/cc822714677a2db48c3ef1cd00c7ff67)
 
