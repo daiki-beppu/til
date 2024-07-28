@@ -69,6 +69,21 @@ update: 2024-07-26
   - [パターン 20](#パターン-20)
     - [コード例](#コード例-19)
     - [出力結果](#出力結果-20)
+  - [パターン 21](#パターン-21)
+    - [コード例](#コード例-20)
+    - [出力結果](#出力結果-21)
+  - [パターン 22](#パターン-22)
+    - [コード例](#コード例-21)
+    - [出力結果](#出力結果-22)
+  - [パターン 23](#パターン-23)
+    - [コード例](#コード例-22)
+    - [出力結果](#出力結果-23)
+  - [パターン 24](#パターン-24)
+    - [コード例](#コード例-23)
+    - [出力結果](#出力結果-24)
+  - [パターン 25](#パターン-25)
+    - [コード例](#コード例-24)
+    - [出力結果](#出力結果-25)
 
 ## 下準備
 
@@ -493,3 +508,126 @@ void main(){
 ### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/bcc553ea100248cb42f0e21a673783b6.png)](https://gyazo.com/bcc553ea100248cb42f0e21a673783b6)
+
+## パターン 21
+
+`floor 関数`を使用して整数に丸めてから `0.0 から 1.0` の間の値を取得している
+
+### コード例
+
+```glsl
+void main(){
+    float strength = floor(vUv.x * 10.0) / 10.0;
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/453d65d03fb97e09f99c52e0494fa544.png)](https://gyazo.com/453d65d03fb97e09f99c52e0494fa544)
+
+## パターン 22
+
+パターン 21 を x 軸 と y 軸 での組み合わせ
+
+### コード例
+
+```glsl
+void main(){
+    float strength = floor(vUv.x * 10.0) / 10.0 * floor(vUv.y * 10.0) / 10.0;
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/3be9baf7f60130bbc8cc766a198da485.png)](https://gyazo.com/3be9baf7f60130bbc8cc766a198da485)
+
+## パターン 23
+
+疑似乱数値使用したパターン
+
+> [!NOTE]
+>
+> `GLSL`には`random 関数`がないため擬似的なランダムな値を作成しています
+> こちらの`random 関数`について詳しく知りたい場合は
+> [The Book of Shaders のリンク](https://thebookofshaders.com/10/)をご覧ください
+
+### コード例
+
+```glsl
+float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+```
+
+```glsl
+void main(){
+    float strength = random(vUv);
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/a6db94847e275cd8d7ccd36dcaf24607.png)](https://gyazo.com/a6db94847e275cd8d7ccd36dcaf24607)
+
+## パターン 24
+
+パターン 23 と パターン 24 の組み合わせ
+
+### コード例
+
+```glsl
+float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+```
+
+```glsl
+void main(){
+    vec2 gridUv = vec2(
+        floor(vUv.x * 10.0) / 10.0,
+        floor(vUv.y * 10.0) / 10.0
+    );
+
+    float strength = random(gridUv);
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/8b00f69d257cbd2f33a1ef423ae67e81.png)](https://gyazo.com/8b00f69d257cbd2f33a1ef423ae67e81)
+
+## パターン 25
+
+パターン 24 に傾斜効果を加えたパターン
+`vUv.y` に `vUv.x` を加えることで傾斜効果を加えることができる
+
+### コード例
+
+```glsl
+float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+```
+
+```glsl
+void main(){
+    vec2 gridUv = vec2(
+        floor(vUv.x * 10.0) / 10.0,
+        floor((vUv.y * 10.0 + vUv.x * 5.0)) / 10.0
+    );
+
+    float strength = random(gridUv);
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/8b00f69d257cbd2f33a1ef423ae67e81.png)](https://gyazo.com/8b00f69d257cbd2f33a1ef423ae67e81)
