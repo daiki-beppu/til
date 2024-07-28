@@ -84,6 +84,21 @@ update: 2024-07-26
   - [パターン 25](#パターン-25)
     - [コード例](#コード例-24)
     - [出力結果](#出力結果-25)
+  - [パターン 26](#パターン-26)
+    - [コード例](#コード例-25)
+    - [出力結果](#出力結果-26)
+  - [パターン 27](#パターン-27)
+    - [コード例](#コード例-26)
+    - [出力結果](#出力結果-27)
+  - [パターン 28](#パターン-28)
+    - [コード例](#コード例-27)
+    - [出力結果](#出力結果-28)
+  - [パターン 29](#パターン-29)
+    - [コード例](#コード例-28)
+    - [出力結果](#出力結果-29)
+  - [パターン 30](#パターン-30)
+    - [コード例](#コード例-29)
+    - [出力結果](#出力結果-30)
 
 ## 下準備
 
@@ -630,4 +645,144 @@ void main(){
 
 ### 出力結果
 
-[![Image from Gyazo](https://i.gyazo.com/8b00f69d257cbd2f33a1ef423ae67e81.png)](https://gyazo.com/8b00f69d257cbd2f33a1ef423ae67e81)
+[![Image from Gyazo](https://i.gyazo.com/0e8ff12b34d952845e0ed9f6bc167fa9.png)](https://gyazo.com/0e8ff12b34d952845e0ed9f6bc167fa9)
+
+## パターン 26
+
+`length 関数`を使用してベクトルの長さを取得している
+
+### コード例
+
+```glsl
+void main(){
+    float strength = length(vUv);
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/3a158f0a28d8aad61ab154c8f11fcdc9.png)](https://gyazo.com/3a158f0a28d8aad61ab154c8f11fcdc9)
+
+## パターン 27
+
+`distance 関数`を使用して特定のポイント間の距離を取得している
+
+### コード例
+
+```glsl
+void main(){
+    float strength = distance(vUv, vec2(0.5)); // 0.5 は中心
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+このパターンは`length 関数`でも実装可能
+
+```glsl
+void main(){
+    float strength = length(vUv - 0.5);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/aedbbb00ff4bf23b63ebf9da6a4b1168.png)](https://gyazo.com/aedbbb00ff4bf23b63ebf9da6a4b1168)
+
+## パターン 28
+
+パターン 27 を反転させたパターン
+`1.0` から減算することで反転することができる
+
+### コード例
+
+```glsl
+void main(){
+    float strength = 1.0 - distance(vUv, vec2(0.5));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/188c91e877f89de8343b9bcd85e09e42.png)](https://gyazo.com/188c91e877f89de8343b9bcd85e09e42)
+
+## パターン 29
+
+パターン 27 の応用
+非常に小さい値から除算することで中心に集まる
+ただし、値が `0.0` になることはないのでよく見ると平面の端が見える
+
+> [!NOTE] なぜ中心に集まるのか？
+> **distance 関数の性質:**
+> distance(vUv, vec2(0.5)) は、各ピクセルの UV 座標と中心点 (0.5, 0.5) との距離を計算します。
+> 中心に近いほどこの距離は小さくなり、中心から遠ざかるほど大きくなります。
+>
+> **除算の効果:**
+> strength = 0.015 / distance(...) という計算は、距離の逆数に定数を掛けています。
+> 距離が小さいほど（つまり中心に近いほど）、この計算結果は大きくなります。
+>
+> **数値の挙動:**
+> 中心点では、distance はほぼ 0 に近づきます（完全に 0 にはなりません）。
+> 0 に近い値で割ると、結果は非常に大きくなります。
+> 例：0.015 / 0.001 = 15
+>
+> **視覚効果:**
+> 結果として、中心付近では strength の値が大きく（明るく）なり、
+> 中心から離れるにつれて strength の値が急速に小さく（暗く）なります。
+>
+> **非線形性:**
+> この除算によって、距離と明るさの関係が非線形になります。
+> つまり、中心からの距離が 2 倍になっても、明るさは単純に 1/2 にはなりません。
+>
+> **0.015 の役割:**
+> この定数は全体の明るさを調整します。
+> 大きくすると全体が明るくなり、小さくすると暗くなります。
+
+### コード例
+
+```glsl
+void main(){
+    float strength = 0.015 / distance(vUv, vec2(0.5));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/0317560037b6d225af52f83f33a734ad.png)](https://gyazo.com/0317560037b6d225af52f83f33a734ad)
+
+<a href="https://gyazo.com/df4ed58906749e6306fd7de3b42e37af"><img src="https://i.gyazo.com/df4ed58906749e6306fd7de3b42e37af.gif" alt="Image from Gyazo" width="990"/></a>
+
+## パターン 30
+
+パターン 29 の応用
+UV 座標の変換を行い、両方向の変化を圧縮して値をオフセットすることで中心に移動させたパターン
+この場合、上から光を押しつぶしたような効果を得られる
+
+`vUv.x * 0.1` は 横方向の変化を `1 / 10` に圧縮
+`vUv.y * 0.5` は 縦方向の変化を `1/ 2` に圧縮
+
+> [!NOTE] オフセット値の計算
+> 今回は値をテストすることでオフセット値を算出しました。
+> 計算でもできるみたいなので載せておきます
+>
+> `(0 * 0.1 + x) + (1 * 0.1 + x) = 1`
+> x + (0.1 + x) = 1
+> 2x + 0.1 = 1
+> 2x = 0.9
+> x = 0.45
+
+### コード例
+
+```glsl
+void main(){
+    vec2 lightUv = vec2(vUv.x * 0.1 + 0.45,vUv.y * 0.5 + 0.25);
+    float strength = 0.015 / distance(lightUv, vec2(0.5));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/0317560037b6d225af52f83f33a734ad.png)](https://gyazo.com/0317560037b6d225af52f83f33a734ad)
