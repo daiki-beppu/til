@@ -9,96 +9,161 @@ update: 2024-07-26
 - [シェーダーパターン](#シェーダーパターン)
   - [下準備](#下準備)
     - [出力結果](#出力結果)
-  - [パターン 1](#パターン-1)
+  - [色を変更する](#色を変更する)
     - [コード例](#コード例)
     - [出力結果](#出力結果-1)
-  - [パターン 2](#パターン-2)
+  - [色を混ぜる](#色を混ぜる)
     - [コード例](#コード例-1)
     - [出力結果](#出力結果-2)
-  - [パターン 3](#パターン-3)
+  - [パターン 1](#パターン-1)
     - [コード例](#コード例-2)
-    - [出力結果](#出力結果-3)
-  - [パターン 4](#パターン-4)
+  - [パターン 2](#パターン-2)
     - [コード例](#コード例-3)
-    - [出力結果](#出力結果-4)
-  - [パターン 5](#パターン-5)
+    - [出力結果](#出力結果-3)
+  - [パターン 3](#パターン-3)
     - [コード例](#コード例-4)
-    - [出力結果](#出力結果-5)
-  - [パターン 6](#パターン-6)
+    - [出力結果](#出力結果-4)
+  - [パターン 4](#パターン-4)
     - [コード例](#コード例-5)
-    - [出力結果](#出力結果-6)
-  - [パターン 7](#パターン-7)
+    - [出力結果](#出力結果-5)
+  - [パターン 5](#パターン-5)
     - [コード例](#コード例-6)
-    - [出力結果](#出力結果-7)
-  - [パターン 8](#パターン-8)
+    - [出力結果](#出力結果-6)
+  - [パターン 6](#パターン-6)
     - [コード例](#コード例-7)
-    - [出力結果](#出力結果-8)
-  - [パターン 9](#パターン-9)
+    - [出力結果](#出力結果-7)
+  - [パターン 7](#パターン-7)
     - [コード例](#コード例-8)
-    - [出力結果](#出力結果-9)
-  - [パターン 10](#パターン-10)
+    - [出力結果](#出力結果-8)
+  - [パターン 8](#パターン-8)
     - [コード例](#コード例-9)
-    - [出力結果](#出力結果-10)
-  - [パターン 11](#パターン-11)
+    - [出力結果](#出力結果-9)
+  - [パターン 9](#パターン-9)
     - [コード例](#コード例-10)
-    - [出力結果](#出力結果-11)
-  - [パターン 12](#パターン-12)
+    - [出力結果](#出力結果-10)
+  - [パターン 10](#パターン-10)
     - [コード例](#コード例-11)
-    - [出力結果](#出力結果-12)
-  - [パターン 13](#パターン-13)
+    - [出力結果](#出力結果-11)
+  - [パターン 11](#パターン-11)
     - [コード例](#コード例-12)
-    - [出力結果](#出力結果-13)
-  - [パターン 14](#パターン-14)
+    - [出力結果](#出力結果-12)
+  - [パターン 12](#パターン-12)
     - [コード例](#コード例-13)
-    - [出力結果](#出力結果-14)
-  - [パターン 15](#パターン-15)
+    - [出力結果](#出力結果-13)
+  - [パターン 13](#パターン-13)
     - [コード例](#コード例-14)
-    - [出力結果](#出力結果-15)
-  - [パターン 16](#パターン-16)
+    - [出力結果](#出力結果-14)
+  - [パターン 14](#パターン-14)
     - [コード例](#コード例-15)
-    - [出力結果](#出力結果-16)
-  - [パターン 17](#パターン-17)
+    - [出力結果](#出力結果-15)
+  - [パターン 15](#パターン-15)
     - [コード例](#コード例-16)
-    - [出力結果](#出力結果-17)
-  - [パターン 18](#パターン-18)
+    - [出力結果](#出力結果-16)
+  - [パターン 16](#パターン-16)
     - [コード例](#コード例-17)
-    - [出力結果](#出力結果-18)
-  - [パターン 19](#パターン-19)
+    - [出力結果](#出力結果-17)
+  - [パターン 17](#パターン-17)
     - [コード例](#コード例-18)
-    - [出力結果](#出力結果-19)
-  - [パターン 20](#パターン-20)
+    - [出力結果](#出力結果-18)
+  - [パターン 18](#パターン-18)
     - [コード例](#コード例-19)
-    - [出力結果](#出力結果-20)
-  - [パターン 21](#パターン-21)
+    - [出力結果](#出力結果-19)
+  - [パターン 19](#パターン-19)
     - [コード例](#コード例-20)
-    - [出力結果](#出力結果-21)
-  - [パターン 22](#パターン-22)
+    - [出力結果](#出力結果-20)
+  - [パターン 20](#パターン-20)
     - [コード例](#コード例-21)
-    - [出力結果](#出力結果-22)
-  - [パターン 23](#パターン-23)
+    - [出力結果](#出力結果-21)
+  - [パターン 21](#パターン-21)
     - [コード例](#コード例-22)
-    - [出力結果](#出力結果-23)
-  - [パターン 24](#パターン-24)
+    - [出力結果](#出力結果-22)
+  - [パターン 22](#パターン-22)
     - [コード例](#コード例-23)
-    - [出力結果](#出力結果-24)
-  - [パターン 25](#パターン-25)
+    - [出力結果](#出力結果-23)
+  - [パターン 23](#パターン-23)
     - [コード例](#コード例-24)
-    - [出力結果](#出力結果-25)
-  - [パターン 26](#パターン-26)
+    - [出力結果](#出力結果-24)
+  - [パターン 24](#パターン-24)
     - [コード例](#コード例-25)
-    - [出力結果](#出力結果-26)
-  - [パターン 27](#パターン-27)
+    - [出力結果](#出力結果-25)
+  - [パターン 25](#パターン-25)
     - [コード例](#コード例-26)
-    - [出力結果](#出力結果-27)
-  - [パターン 28](#パターン-28)
+    - [出力結果](#出力結果-26)
+  - [パターン 26](#パターン-26)
     - [コード例](#コード例-27)
-    - [出力結果](#出力結果-28)
-  - [パターン 29](#パターン-29)
+    - [出力結果](#出力結果-27)
+  - [パターン 27](#パターン-27)
     - [コード例](#コード例-28)
-    - [出力結果](#出力結果-29)
-  - [パターン 30](#パターン-30)
+    - [出力結果](#出力結果-28)
+  - [パターン 28](#パターン-28)
     - [コード例](#コード例-29)
+    - [出力結果](#出力結果-29)
+  - [パターン 29](#パターン-29)
+    - [コード例](#コード例-30)
     - [出力結果](#出力結果-30)
+  - [パターン 30](#パターン-30)
+    - [コード例](#コード例-31)
+    - [出力結果](#出力結果-31)
+  - [パターン 31](#パターン-31)
+    - [コード例](#コード例-32)
+    - [出力結果](#出力結果-32)
+  - [パターン 32](#パターン-32)
+    - [コード例](#コード例-33)
+    - [出力結果](#出力結果-33)
+  - [パターン 33](#パターン-33)
+    - [コード例](#コード例-34)
+    - [出力結果](#出力結果-34)
+  - [パターン 34](#パターン-34)
+    - [コード例](#コード例-35)
+    - [出力結果](#出力結果-35)
+  - [パターン 35](#パターン-35)
+    - [コード例](#コード例-36)
+    - [出力結果](#出力結果-36)
+  - [パターン 36](#パターン-36)
+    - [コード例](#コード例-37)
+    - [出力結果](#出力結果-37)
+  - [パターン 37](#パターン-37)
+    - [コード例](#コード例-38)
+    - [出力結果](#出力結果-38)
+  - [パターン 38](#パターン-38)
+    - [コード例](#コード例-39)
+    - [出力結果](#出力結果-39)
+  - [パターン 39](#パターン-39)
+    - [コード例](#コード例-40)
+    - [出力結果](#出力結果-40)
+  - [パターン 40](#パターン-40)
+    - [コード例](#コード例-41)
+    - [出力結果](#出力結果-41)
+  - [パターン 41](#パターン-41)
+    - [コード例](#コード例-42)
+    - [出力結果](#出力結果-42)
+  - [パターン 42](#パターン-42)
+    - [コード例](#コード例-43)
+    - [出力結果](#出力結果-43)
+  - [パターン 43](#パターン-43)
+    - [コード例](#コード例-44)
+    - [出力結果](#出力結果-44)
+  - [パターン 44](#パターン-44)
+    - [コード例](#コード例-45)
+    - [出力結果](#出力結果-45)
+  - [パターン 45](#パターン-45)
+    - [コード例](#コード例-46)
+    - [出力結果](#出力結果-46)
+  - [パターン 46](#パターン-46)
+    - [コード例](#コード例-47)
+    - [出力結果](#出力結果-47)
+  - [パターン 47](#パターン-47)
+    - [コード例](#コード例-48)
+    - [出力結果](#出力結果-48)
+  - [パターン 48](#パターン-48)
+    - [コード例](#コード例-49)
+    - [出力結果](#出力結果-49)
+  - [パターン 49](#パターン-49)
+    - [コード例](#コード例-50)
+    - [出力結果](#出力結果-50)
+  - [パターン 50](#パターン-50)
+    - [コード例](#コード例-51)
+    - [出力結果](#出力結果-51)
 
 ## 下準備
 
@@ -138,14 +203,13 @@ void main()
 void main(){
     gl_FragColor = vec4(0.5, 0.0, 1.0, 1.0);
 }
-
 ```
 
 ### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/753235fc5a000122294cc5656e7c1375.png)](https://gyazo.com/753235fc5a000122294cc5656e7c1375)
 
-## パターン 1
+## 色を変更する
 
 ### コード例
 
@@ -157,7 +221,43 @@ void main(){
 
 ### 出力結果
 
-[![Image from Gyazo](https://i.gyazo.com/c1a87c82dd27b479db32eca0e7efddd2.png)](https://gyazo.com/c1a87c82dd27b479db32eca0e7efddd2)
+[![Image from Gyazo](https://i.gyazo.com/195d3e1657c57365d1d3b2e90e153a76.png)](https://gyazo.com/195d3e1657c57365d1d3b2e90e153a76)
+
+## 色を混ぜる
+
+`mix 関数`を使用して色を混ぜることできます`mix 関数`は 3 つの引数が必要です
+
+- 第 1 引数: `float`, `vec2`, `vec3`, `vec4` のいずれかで色を指定
+- 第 2 引数: 第 1 引数と同じ形で色を指定
+- 第 3 引数: `float` どちらの色をより多く取得するかを設定 `0.0` の場合第 1 引数に設定した色を表示、`1.0` の場合、第 2 引数に設定した色を表示する
+
+今回は色の強度に応じて変更されるように設定
+
+### コード例
+
+```glsl
+void main(){
+    float strength = vUv.x;
+    vec3 baseColor = vec3(vUv.r * 3.0, vUv.g * 1.5, 0.5);
+    vec3 uvColor = vec3(vUv, 0.0);
+    vec3 mixedColor = mix(baseColor, uvColor, strength);
+    gl_FragColor = vec4(mixedColor, 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/b860d0140f6309a59ed38e7116f85594.png)](https://gyazo.com/b860d0140f6309a59ed38e7116f85594)
+
+## パターン 1
+
+### コード例
+
+```glsl
+void main(){
+    gl_FragColor = vec4(vUv, 1.0, 1.0);
+}
+```
 
 ## パターン 2
 
@@ -179,8 +279,8 @@ void main(){
 
 ```glsl
 void main(){
-    float strengthX = vUv.x;
-   gl_FragColor = vec4(vec3(strengthX), 1.0);
+    float strength = vUv.x;
+   gl_FragColor = vec4(vec3(strength), 1.0);
 }
 ```
 
@@ -194,8 +294,8 @@ void main(){
 
 ```glsl
 void main(){
-    float strengthY = vUv.y;
-    gl_FragColor = vec4(vec3(strengthY), 1.0);
+    float strength = vUv.y;
+    gl_FragColor = vec4(vec3(strength), 1.0);
 }
 ```
 
@@ -209,8 +309,8 @@ void main(){
 
 ```glsl
 void main(){
-    float strengthY = 1.0 - vUv.y;
-    gl_FragColor = vec4(vec3(strengthY), 1.0);
+    float strength = 1.0 - vUv.y;
+    gl_FragColor = vec4(vec3(strength), 1.0);
 }
 ```
 
@@ -224,8 +324,8 @@ void main(){
 
 ```glsl
 void main(){
-    float strengthY = vUv.y * 10.0;
-    gl_FragColor = vec4(vec3(strengthY), 1.0);
+    float strength = vUv.y * 10.0;
+    gl_FragColor = vec4(vec3(strength), 1.0);
 }
 ```
 
@@ -250,8 +350,8 @@ JavaScript の `%`と同じです。
 
 ```glsl
 void main(){
-    float strengthY = mod(vUv.y * 10.0, 1.0);
-    gl_FragColor = vec4(vec3(strengthY), 1.0);
+    float strength = mod(vUv.y * 10.0, 1.0);
+    gl_FragColor = vec4(vec3(strength), 1.0);
 }
 ```
 
@@ -278,23 +378,24 @@ void main(){
 ```glsl
 // step 関数 での処理
 void main(){
-    strengthY = step(0.5, strengthY);
-    gl_FragColor = vec4(vec3(strengthY), 1.0);
+    float strength = mod(vUv.y * 10.0, 1.0);
+    strength = step(0.5, strength);
+    gl_FragColor = vec4(vec3(strength), 1.0);
 }
 ```
 
 ```glsl
     // if 文 での処理 (※パフォーマンスが悪いので避ける)
-    if (strengthY < 0.5) {
-        strengthY = 0.0;
+    if (strength < 0.5) {
+        strength = 0.0;
     } else {
-        strengthY = 1.0;
+        strength = 1.0;
     }
 
     // 三項演算子も使える
-    strengthY = strengthY < 0.5 ? 0.0 : 1.0;
+    strength = strength < 0.5 ? 0.0 : 1.0;
 
-    gl_FragColor = vec4(vec3(strengthY), 1.0);
+    gl_FragColor = vec4(vec3(strength), 1.0);
 ```
 
 ### 出力結果
@@ -310,10 +411,10 @@ void main(){
 ```glsl
 // step 関数 での処理
 void main(){
-    float strengthY = mod((vUv.y * 10.0), 1.0);
-    strengthY = step(0.8, strengthY);
+    float strength = mod((vUv.y * 10.0), 1.0);
+    strength = step(0.8, strength);
 
-    gl_FragColor = vec4(vec3(strengthY), 1.0);
+    gl_FragColor = vec4(vec3(strength), 1.0);
 }
 ```
 
@@ -329,10 +430,10 @@ void main(){
 
 ```glsl
 void main(){
-    float strengthX = mod((vUv.x * 10.0), 1.0);
-    strengthX = step(0.8, strengthX);
+    float strength = mod((vUv.x * 10.0), 1.0);
+    strength = step(0.8, strength);
 
-    gl_FragColor = vec4(vec3(strengthX), 1.0);
+    gl_FragColor = vec4(vec3(strength), 1.0);
 }
 ```
 
@@ -358,6 +459,34 @@ void main(){
 ### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/7fd85b1e98ee2812d667d4ac73f5a7c0.png)](https://gyazo.com/7fd85b1e98ee2812d667d4ac73f5a7c0)
+
+色をつけたとき、交差点の強度が高くなるため、意図した出力にならない
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/db844ec8d8f6d67816fa5d45f8d55db6.png)](https://gyazo.com/db844ec8d8f6d67816fa5d45f8d55db6)
+
+これを回避するために`clamp 関数`を使用する
+`clamp(x, min, max)`: x を min 以上 max 以下の範囲に制限
+
+今回は `strength` を 0.0 から 1.0 の範囲にすることで強度を制御している
+
+```glsl
+void main() {
+    float strength = step(0.8, mod(vUv.x * 10.0, 1.0));
+    strength += step(0.8, mod(vUv.y * 10.0, 1.0));
+    strength = clamp(strength, 0.0, 1.0);
+
+    vec3 blackColor = vec3(0.0902, 0.0863, 0.0863);
+    vec3 uvColor = vec3(vUv.r / 0.75, vUv.g / 1.35, 0.3);
+    vec3 mixedColor = mix(blackColor, uvColor, strength);
+    gl_FragColor = vec4(mixedColor, 1.0);
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/10acb7d8458999769ebf37b9cc81ad6c.png)](https://gyazo.com/10acb7d8458999769ebf37b9cc81ad6c)
 
 ## パターン 12
 
@@ -786,3 +915,466 @@ void main(){
 ### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/b399568f48c95c7540978ce6c4c56e91.png)](https://gyazo.com/b399568f48c95c7540978ce6c4c56e91)
+
+## パターン 31
+
+パターン 30 の応用で x 方向と y 方向の光の効果を乗算したパターン
+
+### コード例
+
+```glsl
+void main(){
+    vec2 lightUvX = vec2(vUv.x * 0.1 + 0.45, vUv.y * 0.5 + 0.25);
+    float lightX = 0.015 / distance(lightUvX, vec2(0.5));
+
+    vec2 lightUvY = vec2(vUv.y * 0.1 + 0.45, vUv.x * 0.5 + 0.25);
+    float lightY = 0.015 / distance(lightUvY, vec2(0.5));
+
+    float strength = lightX * lightY;
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/1c87325c595437b95de4ed0f89534ef6.png)](https://gyazo.com/1c87325c595437b95de4ed0f89534ef6)
+
+## パターン 32
+
+パターン 31 の応用で `rotate 関数`を作成して中心の座標を回転させたパターン
+`#define`を使用して`PI`を変更できない値(定数)として定義
+
+> [!TIP]
+>
+> `#difine`での定義は`=`が必要ないので注意
+
+### コード例
+
+```glsl
+#define PI 3.1415926535897932384626433832795
+```
+
+```glsl
+vec2 rotate(vec2 uv, float rotation, vec2 mid) {
+    return vec2(
+        cos(rotation) * (uv.x - mid.x) + sin(rotation) * (uv.y - mid.y) + mid.x,
+        cos(rotation) * (uv.y - mid.y) - sin(rotation) * (uv.x - mid.x) + mid.y
+    );
+}
+```
+
+```glsl
+void main(){
+    vec2 rotatedUv = rotate(vUv, PI / 4.0, vec2(0.5));
+
+    vec2 lightUvX = vec2(rotatedUv.x * 0.1 + 0.45, rotatedUv.y * 0.5 + 0.25);
+    float lightX = 0.015 / distance(lightUvX, vec2(0.5));
+
+    vec2 lightUvY = vec2(rotatedUv.y * 0.1 + 0.45, rotatedUv.x * 0.5 + 0.25);
+    float lightY = 0.015 / distance(lightUvY, vec2(0.5));
+
+    float strength = lightX * lightY;
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/00a267eaeb21678c99cfecf56959bb59.png)](https://gyazo.com/00a267eaeb21678c99cfecf56959bb59)
+
+## パターン 33
+
+パターン 27 の応用
+`step 関数`を合わせて使用し、オフセットの値で円の半径を調整できるパターン
+
+### コード例
+
+```glsl
+void main(){
+    float strength = step(0.25 ,distance(vUv, vec2(0.5)));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/32497f2b5168617cbc14f1bd4b0554c5.png)](https://gyazo.com/32497f2b5168617cbc14f1bd4b0554c5)
+
+## パターン 34
+
+パターン 33 の応用
+`abs 関数`を使用し、絶対値を使用するパターン
+
+### コード例
+
+```glsl
+void main(){
+    float strength = abs(distance(vUv, vec2(0.5)) - 0.25);
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/e384c34249efb1ab287e23bd05be5b3e.png)](https://gyazo.com/e384c34249efb1ab287e23bd05be5b3e)
+
+## パターン 35
+
+パターン 33 とパターン 34 を組み合わせたパターン
+
+### コード例
+
+```glsl
+void main(){
+    float strength = step(0.01 , abs(distance(vUv, vec2(0.5)) - 0.25));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/4d960edab52ac7520121e6ddec5d652c.png)](https://gyazo.com/4d960edab52ac7520121e6ddec5d652c)
+
+## パターン 36
+
+パターン 35 を `1.0` から減算することで反転させたパターン
+
+### コード例
+
+```glsl
+void main(){
+    float strength = 1.0 - step(0.01 , abs(distance(vUv, vec2(0.5)) - 0.25));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/2b6a0dd81b6b390af95fa821a8943ab0.png)](https://gyazo.com/2b6a0dd81b6b390af95fa821a8943ab0)
+
+## パターン 37
+
+パターン 36 の応用
+`sin 関数` を使用し波を作る
+
+> [!NOTE] Memo
+>
+> `sin 関数`を使用したのに変化がないと感じたら強度(周波数)を上げてみる
+> 今回のパターンなら `sin(sin(vUv.x * 30.0)` の `* 30.0`の部分
+> 元の値が 0.0 から 1.0 の間なので変化が小さい場合がある
+
+### コード例
+
+```glsl
+void main(){
+    vec2 wavedUv = vec2(
+            vUv.x,
+            vUv.y + sin(vUv.x * 30.0) * 0.1
+    );
+    float strength = 1.0 - step(0.01 , abs(distance(wavedUv, vec2(0.5)) - 0.25));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/7915d98b5f8b4f0a059ea74ebcbda192.png)](https://gyazo.com/7915d98b5f8b4f0a059ea74ebcbda192)
+
+## パターン 38
+
+パターン 37 の応用
+x と y の両方向に波を適用したパターン
+
+### コード例
+
+```glsl
+void main(){
+    vec2 wavedUv = vec2(
+            vUv.x + sin(vUv.y * 30.0) * 0.1,
+            vUv.y + sin(vUv.x * 30.0) * 0.1
+    );
+    float strength = 1.0 - step(0.01 , abs(distance(wavedUv, vec2(0.5)) - 0.25));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/7915d98b5f8b4f0a059ea74ebcbda192.png)](https://gyazo.com/7915d98b5f8b4f0a059ea74ebcbda192)
+
+## パターン 39
+
+パターン 38 の応用
+周波数を上げたパターン
+
+### コード例
+
+```glsl
+void main(){
+    vec2 wavedUv = vec2(
+            vUv.x + sin(vUv.y * 100.0) * 0.1,
+            vUv.y + sin(vUv.x * 100.0) * 0.1
+    );
+    float strength = 1.0 - step(0.01 , abs(distance(wavedUv, vec2(0.5)) - 0.25));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/796550ebffe0bf5de2d3740c33f131be.png)](https://gyazo.com/796550ebffe0bf5de2d3740c33f131be)
+
+## パターン 40
+
+`atan 関数` を使用して 2D 座標から角度を取得
+
+### コード例
+
+```glsl
+void main(){
+    float angle = atan(vUv.x, vUv.y);
+    float strength = angle;
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/45e63fb2c04994ca7d07384230e98053.png)](https://gyazo.com/45e63fb2c04994ca7d07384230e98053)
+
+## パターン 41
+
+パターン 40 の応用
+値をオフセットして中心の周りに角度見えるパターン
+
+### コード例
+
+```glsl
+void main(){
+    float angle = atan(vUv.x - 0.5, vUv.y - 0.5);
+    float strength = angle;
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/777915e45ce46e7b2258fe34ecae0293.png)](https://gyazo.com/777915e45ce46e7b2258fe34ecae0293)
+
+## パターン 42
+
+パターン 41 の応用
+`PI * 2.0`で除算することで角度を `-0.5` から `0.5`の範囲にする
+最後に `0.5`を加算して `0.0` から `1.0` の間にしている
+
+こうすることで 角度が色の強度として直接使用することができるようになる
+
+### コード例
+
+```glsl
+void main(){
+    float angle = atan(vUv.x - 0.5, vUv.y - 0.5) / (PI * 2.0) + 0.5;
+    float strength = angle ;
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/6c365b07a9e38cd5f16f244d11dd2e96.png)](https://gyazo.com/6c365b07a9e38cd5f16f244d11dd2e96)
+
+## パターン 43
+
+パターン 42 の応用
+角度を 20 倍にしてから
+`mod 関数`を使用して剰余演算を行い、再度 `0.0` から `1.0` の範囲にする
+これにより 20 回 繰り返されるパターンになる
+
+> [!NOTE] Memo
+
+> `*= 20.0` を変更すること放射状に広がる線の数を調整
+
+### コード例
+
+```glsl
+void main(){
+    float angle = atan(vUv.x - 0.5, vUv.y - 0.5) / (PI * 2.0) + 0.5;
+    angle *= 20.0;
+    angle = mod(angle, 1.0);
+    float strength = angle ;
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/fce75c773a4447fb96ea2e554a0e98bf.png)](https://gyazo.com/fce75c773a4447fb96ea2e554a0e98bf)
+
+## パターン 44
+
+パターン 43 の応用
+`sin 関数`を使用して周波数を調整することでよりはっきりとしたディテールのパターンになる
+
+### コード例
+
+```glsl
+void main(){
+    float angle = atan(vUv.x - 0.5, vUv.y - 0.5) / (PI * 2.0) + 0.5;
+    float strength = sin(angle * 100.0);
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/c918970f854b56c1597bec36224593ec.png)](https://gyazo.com/c918970f854b56c1597bec36224593ec)
+
+## パターン 45
+
+パターン 36 と パターン 44 を組み合わせたパターン
+
+### コード例
+
+```glsl
+void main(){
+    float angle = atan(vUv.x - 0.5, vUv.y - 0.5) / (PI * 2.0) + 0.5;
+    float sinusoid = sin(angle * 100.0);
+
+    float radius = 0.25 + sinusoid * 0.02;
+    float strength = 1.0 - step(0.01 , abs(distance(vUv, vec2(0.5)) - radius));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/56f0ddd87b6d964847552fcebbedeab1.png)](https://gyazo.com/56f0ddd87b6d964847552fcebbedeab1)
+
+## パターン 46
+
+と呼ばれる自然を模したアルゴリズムを適用したパターン
+
+> [!NOTE]
+>
+> のコードは [Github gist](https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83) のコードを使用しています。
+
+### コード例
+
+```glsl
+vec2 fade(vec2 t) {return t * t*t * (t * (t * 6.0 - 15.0) + 10.0); }
+vec4 permute(vec4 x) {return mod(((x * 34.0) + 1.0) * x, 289.0); }
+
+float cnoise(vec2 P) {
+    vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+    Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
+    vec4 ix = Pi.xzxz;
+    vec4 iy = Pi.yyww;
+    vec4 fx = Pf.xzxz;
+    vec4 fy = Pf.yyww;
+    vec4 i = permute(permute(ix) + iy);
+    vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
+    vec4 gy = abs(gx) - 0.5;
+    vec4 tx = floor(gx + 0.5);
+    gx = gx - tx;
+    vec2 g00 = vec2(gx.x, gy.x);
+    vec2 g10 = vec2(gx.y, gy.y);
+    vec2 g01 = vec2(gx.z, gy.z);
+    vec2 g11 = vec2(gx.w, gy.w);
+    vec4 norm = 1.79284291400159 - 0.85373472095314 *
+    vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
+    g00 *= norm.x;
+    g01 *= norm.y;
+    g10 *= norm.z;
+    g11 *= norm.w;
+    float n00 = dot(g00, vec2(fx.x, fy.x));
+    float n10 = dot(g10, vec2(fx.y, fy.y));
+    float n01 = dot(g01, vec2(fx.z, fy.z));
+    float n11 = dot(g11, vec2(fx.w, fy.w));
+    vec2 fade_xy = fade(Pf.xy);
+    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+    return 2.3 * n_xy;
+}
+```
+
+```glsl
+void main(){
+    float strength = cnoise(vUv * 10.0);
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/ff9f4c104a2e0411c4ad31ebf51e3700.png)](https://gyazo.com/ff9f4c104a2e0411c4ad31ebf51e3700)
+
+## パターン 47
+
+パターン 46 の応用
+パーリンノイズに`step 関数`を 使用してはっきり見えるようにしたパターン
+
+### コード例
+
+```glsl
+void main(){
+    float strength = step(0.0, cnoise(vUv * 10.0));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/f58c54ecb3cd9c8825e411ccc8eb0877.png)](https://gyazo.com/f58c54ecb3cd9c8825e411ccc8eb0877)
+
+## パターン 48
+
+パターン 46 の応用
+に`abs 関数`を使用して `1.0` から減算して反転させた稲妻のようなパターン
+
+### コード例
+
+```glsl
+void main(){
+    float strength = 1.0 - abs(cnoise(vUv * 10.0));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+}
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/13795382e9576ee3f5f0b84efd34609d.png)](https://gyazo.com/13795382e9576ee3f5f0b84efd34609d)
+
+## パターン 49
+
+パターン 46 の応用
+に`sin 関数`を使用したサイケデリックなパターン
+
+### コード例
+
+```glsl
+void main(){
+    float strength = sin(cnoise(vUv * 10.0) * 20.0);
+    gl_FragColor = vec4(vec3(strength), 1.0);
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/cf934aeeb70f15fb1956f09db251da32.png)](https://gyazo.com/cf934aeeb70f15fb1956f09db251da32)
+
+## パターン 50
+
+パターン 49 に `step 関数` を組み合わせたパターン
+`step 関数`の第 1 引数を調整することで線の太さを調整できる
+
+### コード例
+
+```glsl
+void main(){
+    float strength = step(0.9, sin(cnoise(vUv * 10.0) * 20.0));
+    gl_FragColor = vec4(vec3(strength), 1.0);
+```
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/9c904a9deb52425136d49b4a98e612a8.png)](https://gyazo.com/9c904a9deb52425136d49b4a98e612a8)
