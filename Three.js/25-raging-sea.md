@@ -111,7 +111,8 @@ const waterMaterial = new THREE.ShaderMaterial({
 });
 ```
 
-> [!TIP] 📝 Memo
+> [!TIP]
+> 📝 **Memo**
 >
 > 1 つの値は `float` 浮動小数点数で設定
 > 2 つ以上の値は `vec2`, `vec3`, `vec4` で 設定
@@ -124,7 +125,8 @@ const waterMaterial = new THREE.ShaderMaterial({
 > `uFrequency` の値を変更することで波の数を制御する事ができる
 > `vec2(x, y)で設定` 値が大きほど波の数が多くなり、低いほど少なくなる
 
-> [!WARNING] 注意点
+> [!WARNING]
+> **注意点**
 > 実際の実装では、これらのユニフォームは`uBigWavesElevation`と`uBigWavesFrequenc`y`という名前で使用します。
 
 ### 2.2. 頂点シェーダーの実装
@@ -373,7 +375,8 @@ const waterMaterial = new THREE.ShaderMaterial({
 });
 ```
 
-> [!TIP] 📝 Memo
+> [!TIP]
+> 📝 **Memo**
 >
 > `uTime`の値は開始時点を表すため、初期値として`0`を設定。
 >
@@ -631,7 +634,8 @@ const debugObuject = {
 - uColorOffset: オフセットする値を設定 `float`
 - uColorMulutiplier: 強度の強さを設定 `float`
 
-> [!TIP] 📝 Memo
+> [!TIP]
+> **📝 Memo**
 >
 > 深い部分と浅い部分で色の変化をつけるためにそれぞれをユニフォームに設定している
 > JavaScript では `THREE.Color` を使用し、
@@ -693,7 +697,8 @@ void main() {
 }
 ```
 
-> [!TIP] 📝 Memo
+> [!TIP]
+> 📝 **Memo**
 >
 > ` #include <colorspace_fragment>`はカラースペースを適切に使用するための記述
 > 詳細については後述する
@@ -728,7 +733,8 @@ gui
   .name('uColorMalutiplier');
 ```
 
-> [!TIP] 📝 Memo
+> [!TIP]
+> 📝 **Memo**
 >
 > `=` で代入するのではなく`.set`プロパティで値を更新する
 
