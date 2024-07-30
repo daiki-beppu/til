@@ -125,8 +125,7 @@ const waterMaterial = new THREE.ShaderMaterial({
 > `uFrequency` の値を変更することで波の数を制御する事ができる
 > `vec2(x, y)で設定` 値が大きほど波の数が多くなり、低いほど少なくなる
 
-> [!WARNING]
-> **注意点**
+> [!WARNING] > **注意点**
 > 実際の実装では、これらのユニフォームは`uBigWavesElevation`と`uBigWavesFrequenc`y`という名前で使用します。
 
 ### 2.2. 頂点シェーダーの実装
@@ -161,7 +160,8 @@ void main() {
 }
 ```
 
-> [!TIP] 📝 Memo
+> [!TIP]
+> 📝 **Memo**
 >
 > `sin(modelPosition.z * uFrequency.y` の `uFrequency.y` を z にしないこと
 > `uFrequency` は vec2 なので x と y のプロパティしかないので z プロパティは存在しない
@@ -634,8 +634,7 @@ const debugObuject = {
 - uColorOffset: オフセットする値を設定 `float`
 - uColorMulutiplier: 強度の強さを設定 `float`
 
-> [!TIP]
-> **📝 Memo**
+> [!TIP] > **📝 Memo**
 >
 > 深い部分と浅い部分で色の変化をつけるためにそれぞれをユニフォームに設定している
 > JavaScript では `THREE.Color` を使用し、
