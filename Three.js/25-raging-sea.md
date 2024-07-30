@@ -111,7 +111,7 @@ const waterMaterial = new THREE.ShaderMaterial({
 });
 ```
 
-> [!TIP]
+> [!NOTE]
 > 📝 **Memo**
 >
 > 1 つの値は `float` 浮動小数点数で設定
@@ -160,7 +160,7 @@ void main() {
 }
 ```
 
-> [!TIP]
+> [!NOTE]
 > 📝 **Memo**
 >
 > `sin(modelPosition.z * uFrequency.y` の `uFrequency.y` を z にしないこと
@@ -375,7 +375,7 @@ const waterMaterial = new THREE.ShaderMaterial({
 });
 ```
 
-> [!TIP]
+> [!NOTE]
 > 📝 **Memo**
 >
 > `uTime`の値は開始時点を表すため、初期値として`0`を設定。
@@ -634,7 +634,7 @@ const debugObuject = {
 - uColorOffset: オフセットする値を設定 `float`
 - uColorMulutiplier: 強度の強さを設定 `float`
 
-> [!TIP] > **📝 Memo**
+> [!NOTE] > **📝 Memo**
 >
 > 深い部分と浅い部分で色の変化をつけるためにそれぞれをユニフォームに設定している
 > JavaScript では `THREE.Color` を使用し、
@@ -696,7 +696,7 @@ void main() {
 }
 ```
 
-> [!TIP]
+> [!NOTE]
 > 📝 **Memo**
 >
 > ` #include <colorspace_fragment>`はカラースペースを適切に使用するための記述
@@ -732,7 +732,7 @@ gui
   .name('uColorMalutiplier');
 ```
 
-> [!TIP]
+> [!NOTE]
 > 📝 **Memo**
 >
 > `=` で代入するのではなく`.set`プロパティで値を更新する
