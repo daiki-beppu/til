@@ -1,7 +1,7 @@
 ---
 title: 26-animaded-galaxy
-date: 2024-08-03
-update: 2024-08-03
+date: 2024/08/03
+update: 2024/08/04
 ---
 
 # アニメーションを適用した銀河の制作
@@ -22,6 +22,12 @@ update: 2024-08-03
   - [フラグメントシェーダーの実装](#フラグメントシェーダーの実装)
   - [ここまでのコードの全体像](#ここまでのコードの全体像-1)
   - [出力結果](#出力結果-2)
+- [アニメーションの適用](#アニメーションの適用)
+  - [ユニフォームの設定](#ユニフォームの設定)
+  - [頂点シェーダーの実装](#頂点シェーダーの実装)
+  - [ランダム性の修正](#ランダム性の修正)
+  - [コードの全体像](#コードの全体像)
+  - [出力結果](#出力結果-3)
 
 ## 下準備
 
@@ -828,15 +834,15 @@ void main() {
 <summary>. jsファイル(クリックして展開)</summary>
 
 ```js
-import GUI from 'lil-gui';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import fragmentShader from './Shaders/fragment.glsl';
-import vertexShader from './Shaders/vertex.glsl';
+import GUI from "lil-gui";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import fragmentShader from "./Shaders/fragment.glsl";
+import vertexShader from "./Shaders/vertex.glsl";
 
 // セットアップ
 const gui = new GUI();
-const canvas = document.querySelector('canvas.webgl');
+const canvas = document.querySelector("canvas.webgl");
 const scene = new THREE.Scene();
 
 // 銀河の設定パラメータ
@@ -848,8 +854,8 @@ parameters.branches = 3;
 parameters.spin = 1;
 parameters.randomness = 0.5;
 parameters.randomnessPower = 3;
-parameters.insideColor = '#ff6030';
-parameters.outsideColor = '#1b3984';
+parameters.insideColor = "#ff6030";
+parameters.outsideColor = "#1b3984";
 
 let geometry = null;
 let material = null;
@@ -914,9 +920,9 @@ const generateGalaxy = () => {
     scales[i] = Math.random();
   }
 
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  geometry.setAttribute('aScale', new THREE.BufferAttribute(colors, 1));
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute("aScale", new THREE.BufferAttribute(colors, 1));
 
   // マテリアル
   material = new THREE.ShaderMaterial({
@@ -936,44 +942,44 @@ const generateGalaxy = () => {
 };
 
 gui
-  .add(parameters, 'count')
+  .add(parameters, "count")
   .min(100)
   .max(1000000)
   .step(100)
   .onFinishChange(generateGalaxy);
 gui
-  .add(parameters, 'radius')
+  .add(parameters, "radius")
   .min(0.01)
   .max(20)
   .step(0.01)
   .onFinishChange(generateGalaxy);
 gui
-  .add(parameters, 'branches')
+  .add(parameters, "branches")
   .min(2)
   .max(20)
   .step(1)
   .onFinishChange(generateGalaxy);
 gui
-  .add(parameters, 'randomness')
+  .add(parameters, "randomness")
   .min(0)
   .max(2)
   .step(0.001)
   .onFinishChange(generateGalaxy);
 gui
-  .add(parameters, 'randomnessPower')
+  .add(parameters, "randomnessPower")
   .min(1)
   .max(10)
   .step(0.001)
   .onFinishChange(generateGalaxy);
-gui.addColor(parameters, 'insideColor').onFinishChange(generateGalaxy);
-gui.addColor(parameters, 'outsideColor').onFinishChange(generateGalaxy);
+gui.addColor(parameters, "insideColor").onFinishChange(generateGalaxy);
+gui.addColor(parameters, "outsideColor").onFinishChange(generateGalaxy);
 
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
 
-window.addEventListener('resize', () => {
+window.addEventListener("resize", () => {
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
 
@@ -989,7 +995,7 @@ const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
   0.1,
-  100,
+  100
 );
 camera.position.x = 3;
 camera.position.y = 3;
@@ -1023,7 +1029,6 @@ const tick = () => {
 };
 
 tick();
-
 ```
 
 </details>
@@ -1079,3 +1084,416 @@ void main() {
 ### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/9080ad1df3bdfecbb56191d434c4585a.png)](https://gyazo.com/9080ad1df3bdfecbb56191d434c4585a)
+
+## アニメーションの適用
+
+アニメーションを適用するには以下のことを行います
+
+- ユニフォーム設定
+- 頂点シェーダーの実装
+
+あわせてランダム性が失われたので修正していきます
+
+### ユニフォームの設定
+
+`uniform`プロパティに`uTime`を設定
+
+```js
+material = new THREE.ShaderMaterial({
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  vertexColors: true,
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: { value: 0 },
+    uSize: { value: 30 * renderer.getPixelRatio() },
+  },
+});
+```
+
+ここで設定する`uTime`の値は経過時間の初期化なので`0`を設定する
+
+### 頂点シェーダーの実装
+
+`atan関数`で`modelPosition.x`と`modelPosition.z`角度を取得
+`length関数`で中心からの距離を取得
+
+中心に近いほど角度は大きく、遠くなるほど角度は小さくなるようにオフセット角度を計算
+その値に `uTime` を乗算することで経過時間ごとにパーティクルの位置が変化します
+
+`uTime * 0.2 ` は アニメーションの速度を調整しています
+
+```glsl
+void main() {
+// Spin
+
+  // ...
+
+  float angle = atan(modelPosition.x, modelPosition.z);
+  float distanceToCenter = length(modelPosition.xz);
+  float angleOffset = (1.0 / distanceToCenter) * uTime * 0.2;
+  angle += angleOffset;
+
+  modelPosition.x = cos(angle) * distanceToCenter ;
+  modelPosition.z = sin(angle) * distanceToCenter ;
+
+  // ...
+}
+```
+
+### ランダム性の修正
+
+このままだと時間がたった場合、すべてのパーティクルが完全な円を軌道上を移動するため、規則的な模様を描いてしまいます。
+これは意図した挙動ではないので修正してきます。
+
+修正するには `position` 属性 のランダム性を削除して
+新たに `aRandomness` 属性を作成
+頂点シェーダーで回転させた後でランダム性を加えます
+
+```js
+// ...
+
+const randomness = new Float32Array(parameters.count * 3);
+
+for (let i = 0; i < parameters.count; i++) {
+  const i3 = i * 3;
+
+  // ...
+
+  const randomX =
+    Math.random() ** parameters.randomnessPower *
+    (Math.random() < 0.5 ? 1 : -1) *
+    parameters.randomness *
+    radius;
+  const randomY =
+    Math.random() ** parameters.randomnessPower *
+    (Math.random() < 0.5 ? 1 : -1) *
+    parameters.randomness *
+    radius;
+  const randomZ =
+    Math.random() ** parameters.randomnessPower *
+    (Math.random() < 0.5 ? 1 : -1) *
+    parameters.randomness *
+    radius;
+
+  randomness[i3] = randomX;
+  randomness[i3 + 1] = randomY;
+  randomness[i3 + 2] = randomZ;
+
+  // ...
+}
+
+geometry.setAttribute("aRandomness", new THREE.BufferAttribute(randomness, 3));
+```
+
+```glsl
+attribute vec3 aRandomness;
+
+void main() {
+  //...
+
+  modelPosition.x = cos(angle) * distanceToCenter + aRandomness.x;
+  modelPosition.y = aRandomness.y;
+  modelPosition.z = sin(angle) * distanceToCenter + aRandomness.z;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  // ..
+}
+```
+
+**修正前**
+<a href="https://gyazo.com/74242279523a4fdbd81833564825fd00"><img src="https://i.gyazo.com/74242279523a4fdbd81833564825fd00.gif" alt="Image from Gyazo" width="1000"/></a>
+
+**修正後**
+
+<a href="https://gyazo.com/83d9f4865548ce77432b5aa6862553de"><img src="https://i.gyazo.com/83d9f4865548ce77432b5aa6862553de.gif" alt="Image from Gyazo" width="1000"/></a>
+
+### コードの全体像
+
+<details>
+<summary>. jsファイル(クリックして展開)</summary>
+
+```js
+import GUI from "lil-gui";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import fragmentShader from "./Shaders/fragment.glsl";
+import vertexShader from "./Shaders/vertex.glsl";
+
+// セットアップ
+const gui = new GUI();
+const canvas = document.querySelector("canvas.webgl");
+const scene = new THREE.Scene();
+
+// 銀河の設定パラメータ
+const parameters = {};
+parameters.count = 200000;
+parameters.size = 0.005;
+parameters.radius = 5;
+parameters.branches = 3;
+parameters.spin = 1;
+parameters.randomness = 0.5;
+parameters.randomnessPower = 3;
+parameters.insideColor = "#ff6030";
+parameters.outsideColor = "#1b3984";
+
+let geometry = null;
+let material = null;
+let points = null;
+
+const generateGalaxy = () => {
+  if (points !== null) {
+    geometry.dispose();
+    material.dispose();
+    scene.remove(points);
+  }
+
+  // ジオメトリ
+  geometry = new THREE.BufferGeometry();
+
+  const positions = new Float32Array(parameters.count * 3);
+  const colors = new Float32Array(parameters.count * 3);
+  const scales = new Float32Array(parameters.count * 1);
+  const randomness = new Float32Array(parameters.count * 3);
+
+  const insideColor = new THREE.Color(parameters.insideColor);
+  const outsideColor = new THREE.Color(parameters.outsideColor);
+
+  for (let i = 0; i < parameters.count; i++) {
+    const i3 = i * 3;
+
+    // Position
+    const radius = Math.random() * parameters.radius;
+
+    const branchAngle =
+      ((i % parameters.branches) / parameters.branches) * Math.PI * 2;
+
+    const randomX =
+      Math.random() ** parameters.randomnessPower *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius;
+    const randomY =
+      Math.random() ** parameters.randomnessPower *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius;
+    const randomZ =
+      Math.random() ** parameters.randomnessPower *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius;
+
+    randomness[i3] = randomX;
+    randomness[i3 + 1] = randomY;
+    randomness[i3 + 2] = randomZ;
+
+    positions[i3] = Math.cos(branchAngle) * radius;
+    positions[i3 + 1] = 0;
+    positions[i3 + 2] = Math.sin(branchAngle) * radius;
+
+    // Color
+    const mixedColor = insideColor.clone();
+    mixedColor.lerp(outsideColor, radius / parameters.radius);
+
+    colors[i3] = mixedColor.r;
+    colors[i3 + 1] = mixedColor.g;
+    colors[i3 + 2] = mixedColor.b;
+
+    // scale
+    scales[i] = Math.random();
+  }
+
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute("aScale", new THREE.BufferAttribute(scales, 1));
+  geometry.setAttribute(
+    "aRandomness",
+    new THREE.BufferAttribute(randomness, 3)
+  );
+
+  // マテリアル
+  material = new THREE.ShaderMaterial({
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    vertexColors: true,
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uTime: { value: 0 },
+      uSize: { value: 5 * renderer.getPixelRatio() },
+    },
+  });
+
+  // ポイントメッシュ
+  points = new THREE.Points(geometry, material);
+  scene.add(points);
+};
+
+gui
+  .add(parameters, "count")
+  .min(100)
+  .max(1000000)
+  .step(100)
+  .onFinishChange(generateGalaxy);
+gui
+  .add(parameters, "radius")
+  .min(0.01)
+  .max(20)
+  .step(0.01)
+  .onFinishChange(generateGalaxy);
+gui
+  .add(parameters, "branches")
+  .min(2)
+  .max(20)
+  .step(1)
+  .onFinishChange(generateGalaxy);
+gui
+  .add(parameters, "randomness")
+  .min(0)
+  .max(2)
+  .step(0.001)
+  .onFinishChange(generateGalaxy);
+gui
+  .add(parameters, "randomnessPower")
+  .min(1)
+  .max(10)
+  .step(0.001)
+  .onFinishChange(generateGalaxy);
+gui.addColor(parameters, "insideColor").onFinishChange(generateGalaxy);
+gui.addColor(parameters, "outsideColor").onFinishChange(generateGalaxy);
+
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+// カメラ
+const camera = new THREE.PerspectiveCamera(
+  75,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
+camera.position.x = 3;
+camera.position.y = 3;
+camera.position.z = 3;
+scene.add(camera);
+
+// Controls
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
+// レンダラー
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+});
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+generateGalaxy();
+
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+
+  material.uniforms.uTime.value = elapsedTime;
+
+  controls.update();
+
+  renderer.render(scene, camera);
+
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+</details>
+
+<details>
+<summary>. glslファイル(クリックして展開)</summary>
+
+```glsl
+// vertex.glsl
+uniform float uTime;
+uniform float uSize;
+
+attribute float aScale;
+attribute vec3 aRandomness;
+
+varying vec3 vColor;
+
+void main() {
+  // Poisition
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  // Spin
+  float angle = atan(modelPosition.x, modelPosition.z);
+  float distanceToCenter = length(modelPosition.xz);
+  float angleOffset = (1.0 / distanceToCenter) * uTime * 0.2;
+  angle += angleOffset;
+
+  modelPosition.x = cos(angle) * distanceToCenter + aRandomness.x;
+  modelPosition.y = aRandomness.y;
+  modelPosition.z = sin(angle) * distanceToCenter + aRandomness.z;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+  // Size
+  gl_PointSize = uSize * aScale;
+  gl_PointSize *= (1.0 / -viewPosition.z);
+
+  // Color
+  vColor = color;
+}
+
+
+```
+
+```glsl
+// fragment.glsl
+varying vec3 vColor;
+
+void main() {
+
+  float strength = distance(gl_PointCoord, vec2(0.5));
+  strength = 1.0 - strength;
+  strength = pow(strength, 10.0);
+
+  vec3 color = mix(vec3(0.0), vColor, strength);
+  gl_FragColor = vec4(color, 1.0);
+
+  #include <colorspace_fragment>
+}
+
+```
+
+</details>
+
+### 出力結果
+
+<a href="https://gyazo.com/6b0f034fbb2802c9b5886b3a2faaf3ec"><img src="https://i.gyazo.com/6b0f034fbb2802c9b5886b3a2faaf3ec.gif" alt="Image from Gyazo" width="1000"/></a>
+
+数式を変えるとこんな感じにもなる
+
+<a href="https://gyazo.com/ecf24bb54ffbb7c096f7f0848d07f6a3"><img src="https://i.gyazo.com/ecf24bb54ffbb7c096f7f0848d07f6a3.gif" alt="Image from Gyazo" width="1000"/></a>
