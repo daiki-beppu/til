@@ -1,7 +1,7 @@
 ---
 title: 27-modified-material
 date: 2024/08/05
-update: 2024/08/11
+updated:2024/08/12
 ---
 
 # シェーダーでの組み込みマテリアルの操作

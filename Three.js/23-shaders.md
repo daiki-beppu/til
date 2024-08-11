@@ -1,60 +1,59 @@
 # シェーダー
 
-- [シェーダー](#シェーダー)
-  - [シェーダーについて](#シェーダーについて)
-    - [頂点シェーダー](#頂点シェーダー)
-    - [フラグメントシェーダー](#フラグメントシェーダー)
-    - [まとめ シェーダーについて](#まとめ-シェーダーについて)
-  - [独自のシェーダーを書く理由](#独自のシェーダーを書く理由)
-    - [Three.js だけでは複雑なビジュアル効果や特殊な計算ができない](#threejs-だけでは複雑なビジュアル効果や特殊な計算ができない)
-    - [パフォーマンス向上のため](#パフォーマンス向上のため)
-  - [RawShaderMaterial を使用して最初のシェーダーを作成](#rawshadermaterial-を使用して最初のシェーダーを作成)
-  - [Sheder を別のファイルに分ける](#sheder-を別のファイルに分ける)
-    - [ファイルのインポート](#ファイルのインポート)
-  - [RawShaderMaterial のプロパティ](#rawshadermaterial-のプロパティ)
-    - [使用可能な一般的なプロパティ](#使用可能な一般的なプロパティ)
-    - [シェーダー内で実装が必要なプロパティ](#シェーダー内で実装が必要なプロパティ)
-  - [GLSL の基本構文](#glsl-の基本構文)
-    - [ログの記録](#ログの記録)
-    - [セミコロンが必須](#セミコロンが必須)
-    - [変数の宣言](#変数の宣言)
-    - [データ型](#データ型)
-      - [float 型のコード例](#float-型のコード例)
-      - [int 型のコード例](#int-型のコード例)
-      - [bool 型のコード例](#bool-型のコード例)
-      - [vec2 のコード例](#vec2-のコード例)
-      - [vec3 のコード例](#vec3-のコード例)
-      - [vec4 のコード例](#vec4-のコード例)
-      - [ベクトルの成分とアクセスルール](#ベクトルの成分とアクセスルール)
-    - [関数](#関数)
-  - [頂点シェーダーを理解する](#頂点シェーダーを理解する)
-    - [main 関数](#main-関数)
-    - [gl\_Position](#gl_position)
-    - [position 属性](#position-属性)
-    - [Matrixs uniform](#matrixs-uniform)
-  - [フラグメントシェーダーを理解する](#フラグメントシェーダーを理解する)
-    - [main 関数](#main-関数-1)
-    - [Precision](#precision)
-    - [gl\_FragColor](#gl_fragcolor)
-  - [attribute 属性](#attribute-属性)
-    - [コード例](#コード例)
-    - [出力結果](#出力結果)
-  - [varying 可変データ](#varying-可変データ)
-    - [コード例](#コード例-1)
-    - [出力結果](#出力結果-1)
-  - [uniform ユニフォーム](#uniform-ユニフォーム)
-    - [コード例](#コード例-2)
-    - [出力結果](#出力結果-2)
-  - [テクスチャ](#テクスチャ)
-    - [コード例](#コード例-3)
-    - [出力結果](#出力結果-3)
-  - [テクスチャのカラーバリエーションを追加](#テクスチャのカラーバリエーションを追加)
-    - [コード例](#コード例-4)
-    - [出力結果](#出力結果-4)
-  - [ShaderMaterial](#shadermaterial)
-    - [コード例](#コード例-5)
-  - [デバッグ](#デバッグ)
-    - [値のデバッグ](#値のデバッグ)
+- [シェーダーについて](#シェーダーについて)
+  - [頂点シェーダー](#頂点シェーダー)
+  - [フラグメントシェーダー](#フラグメントシェーダー)
+  - [まとめ シェーダーについて](#まとめ-シェーダーについて)
+- [独自のシェーダーを書く理由](#独自のシェーダーを書く理由)
+  - [Three.js だけでは複雑なビジュアル効果や特殊な計算ができない](#threejs-だけでは複雑なビジュアル効果や特殊な計算ができない)
+  - [パフォーマンス向上のため](#パフォーマンス向上のため)
+- [RawShaderMaterial を使用して最初のシェーダーを作成](#rawshadermaterial-を使用して最初のシェーダーを作成)
+- [Sheder を別のファイルに分ける](#sheder-を別のファイルに分ける)
+  - [ファイルのインポート](#ファイルのインポート)
+- [RawShaderMaterial のプロパティ](#rawshadermaterial-のプロパティ)
+  - [使用可能な一般的なプロパティ](#使用可能な一般的なプロパティ)
+  - [シェーダー内で実装が必要なプロパティ](#シェーダー内で実装が必要なプロパティ)
+- [GLSL の基本構文](#glsl-の基本構文)
+  - [ログの記録](#ログの記録)
+  - [セミコロンが必須](#セミコロンが必須)
+  - [変数の宣言](#変数の宣言)
+  - [データ型](#データ型)
+    - [float 型のコード例](#float-型のコード例)
+    - [int 型のコード例](#int-型のコード例)
+    - [bool 型のコード例](#bool-型のコード例)
+    - [vec2 のコード例](#vec2-のコード例)
+    - [vec3 のコード例](#vec3-のコード例)
+    - [vec4 のコード例](#vec4-のコード例)
+    - [ベクトルの成分とアクセスルール](#ベクトルの成分とアクセスルール)
+  - [関数](#関数)
+- [頂点シェーダーを理解する](#頂点シェーダーを理解する)
+  - [main 関数](#main-関数)
+  - [gl_Position](#gl_position)
+  - [position 属性](#position-属性)
+  - [Matrixs uniform](#matrixs-uniform)
+- [フラグメントシェーダーを理解する](#フラグメントシェーダーを理解する)
+  - [main 関数](#main-関数-1)
+  - [Precision](#precision)
+  - [gl_FragColor](#gl_fragcolor)
+- [attribute 属性](#attribute-属性)
+  - [コード例](#コード例)
+  - [出力結果](#出力結果)
+- [varying 可変データ](#varying-可変データ)
+  - [コード例](#コード例-1)
+  - [出力結果](#出力結果-1)
+- [uniform ユニフォーム](#uniform-ユニフォーム)
+  - [コード例](#コード例-2)
+  - [出力結果](#出力結果-2)
+- [テクスチャ](#テクスチャ)
+  - [コード例](#コード例-3)
+  - [出力結果](#出力結果-3)
+- [テクスチャのカラーバリエーションを追加](#テクスチャのカラーバリエーションを追加)
+  - [コード例](#コード例-4)
+  - [出力結果](#出力結果-4)
+- [ShaderMaterial](#shadermaterial)
+  - [コード例](#コード例-5)
+- [デバッグ](#デバッグ)
+  - [値のデバッグ](#値のデバッグ)
 
 ## シェーダーについて
 
@@ -199,8 +198,8 @@ const material = new THREE.RawShaderMaterial({
 ### ファイルのインポート
 
 ```js
-import testVertexShader from './shaders/vertex.glsl';
-import testFragmentShader from './shaders/fragment.glsl';
+import testVertexShader from "./shaders/vertex.glsl";
+import testFragmentShader from "./shaders/fragment.glsl";
 ```
 
 しかし、このままでは、JavaScript が`.glsl`の処理方法がわからずエラーが発生します。
@@ -214,23 +213,23 @@ bun add vite-plugin-glsl
 `vite.config.js`内のオブジェクトに`plugins`を配列で定義して配列内で`vite-plugin-glsl`を呼び出す。
 
 ```js
-import restart from 'vite-plugin-restart';
-import glsl from 'vite-plugin-glsl';
+import restart from "vite-plugin-restart";
+import glsl from "vite-plugin-glsl";
 
 export default {
-  root: 'src/', // Sources files (typically where index.html is)
-  publicDir: '../static/', // Path from "root" to static assets (files that are served as they are)
+  root: "src/", // Sources files (typically where index.html is)
+  publicDir: "../static/", // Path from "root" to static assets (files that are served as they are)
   server: {
     host: true, // Open to local network and display URL
-    open: !('SANDBOX_URL' in process.env || 'CODESANDBOX_HOST' in process.env), // Open if it's not a CodeSandbox
+    open: !("SANDBOX_URL" in process.env || "CODESANDBOX_HOST" in process.env), // Open if it's not a CodeSandbox
   },
   build: {
-    outDir: '../dist', // Output in the dist/ folder
+    outDir: "../dist", // Output in the dist/ folder
     emptyOutDir: true, // Empty the folder first
     sourcemap: true, // Add sourcemap
   },
   plugins: [
-    restart({ restart: ['../static/**'] }), // Restart server on static file change
+    restart({ restart: ["../static/**"] }), // Restart server on static file change
     glsl(),
   ],
 };
@@ -711,7 +710,7 @@ for (let i = 0; i < count; i++) {
 
 // ジオメトリに属性を追加する
 geometry.setAttribute(
-  'aRandom', // 属性名、シェーダーで使用する名前で任意の名前を設定できる (a は属性のプレフィックスとしてつけることをおすすめ)
+  "aRandom", // 属性名、シェーダーで使用する名前で任意の名前を設定できる (a は属性のプレフィックスとしてつけることをおすすめ)
   new THREE.BufferAttribute(
     randoms, // データ配列
     1 // positonの場合は 3つの値(x, y, z)で構成されるため 3 でしたが今回はランダムな 1 つの値なので 1 を渡します
@@ -824,7 +823,7 @@ const material = new THREE.RawShaderMaterial({
     uTime: { value: 0 },
 
     // 色を制御するユニフォーム
-    uColor: { value: new THREE.Color('orange') },
+    uColor: { value: new THREE.Color("orange") },
   },
 });
 
@@ -910,7 +909,7 @@ void main() {
 ```js
 // テクスチャ
 const textureLoader = new THREE.TextureLoader();
-const fragTexture = textureLoader.load('./textures/ももちこアイコン.JPG'); // 任意のパスを指定
+const fragTexture = textureLoader.load("./textures/ももちこアイコン.JPG"); // 任意のパスを指定
 
 // マテリアル
 const material = new THREE.RawShaderMaterial({
@@ -919,7 +918,7 @@ const material = new THREE.RawShaderMaterial({
   uniforms: {
     uFrequency: { value: new THREE.Vector2(10, 5) },
     uTime: { value: 0 },
-    uColor: { value: new THREE.Color('orange') },
+    uColor: { value: new THREE.Color("orange") },
     uTexture: { value: fragTexture },
   },
 });
@@ -1091,11 +1090,10 @@ const material = new THREE.ShaderMaterial({
   uniforms: {
     uFrequency: { value: new THREE.Vector2(10, 5) },
     uTime: { value: 0 },
-    uColor: { value: new THREE.Color('orange') },
-    uTexture: { value: fragTexture }
+    uColor: { value: new THREE.Color("orange") },
+    uTexture: { value: fragTexture },
   },
 });
-
 ```
 
 ```glsl
@@ -1155,7 +1153,7 @@ Three.js はシェーダー全体をログに記録します。
 `ERROR: 0:10: 'attribute' : syntax error` のようなエラーメッセージを確認しましょう。
 
 このエラーメッセージでわかることは
-10行目の直前でエラーが発生している可能性があるということです。
+10 行目の直前でエラーが発生している可能性があるということです。
 
 ```glsl
 // 注意: このコードには意図的にエラーを含めています
@@ -1216,4 +1214,3 @@ void main() {
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/cc822714677a2db48c3ef1cd00c7ff67.png)](https://gyazo.com/cc822714677a2db48c3ef1cd00c7ff67)
-

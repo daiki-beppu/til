@@ -1,7 +1,7 @@
 ---
 title: 25-raging-sea
 date: 2024-07-29
-update: 2024-07-30
+updated: 2024-07-30
 ---
 
 # ｢荒れ狂う海｣の制作

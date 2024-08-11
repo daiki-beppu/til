@@ -1,7 +1,7 @@
 ---
 title: 26-animaded-galaxy
 date: 2024/08/03
-update: 2024/08/04
+updated: 2024/08/04
 ---
 
 # アニメーションを適用した銀河の制作
