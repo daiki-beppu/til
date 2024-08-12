@@ -13,6 +13,9 @@ updated:2024/08/12
   - [2.3. 出力結果](#23-出力結果)
 - [3. マテリアルのシェーダーを変更してモデルをねじる](#3-マテリアルのシェーダーを変更してモデルをねじる)
   - [出力結果](#出力結果)
+- [モデルにアニメーションを適用する](#モデルにアニメーションを適用する)
+  - [ここまでのコードの全体像](#ここまでのコードの全体像)
+  - [出力結果](#出力結果-1)
 
 > [!NOTE]
 >
@@ -350,3 +353,243 @@ material.onBeforeCompile = (shader) => {
 [![Image from Gyazo](https://i.gyazo.com/5e0b4242993a34b9525642f6423c67e5.png)](https://gyazo.com/5e0b4242993a34b9525642f6423c67e5)
 
 なかなかにすごい見た目ですが成功です。
+
+## モデルにアニメーションを適用する
+
+[前回](https://github.com/daiki-beppu/til/blob/main/Three.js/26-animaded-galaxy.md)までと同様に `uTime` ユニフォームをシェーダーに送ります。
+
+ですが`ShaderMaterial`のようにそのまま`uniform`にアクセスすることは出来ません。
+これは、Three.js の構造によるものです。
+
+なので、マテリアルの前にオブジェクトを作成して`uTime`を追加します
+
+```js
+const customUniforms = {
+  uTime: { value: 0 },
+};
+```
+
+そしてこのオブジェクトを関数内で使用します。
+
+```js
+material.onBeforeCompile = (shader) => {
+  shader.uniforms.uTime = customUniforms.uTime;
+  shader.vertexShader = shader.vertexShader.replace(
+    "#include <common>",
+    `
+    #include <common>
+
+    mat2 get2DRotateMatrix(float _angle) {
+      return mat2(cos(_angle), - sin(_angle), sin(_angle), cos(_angle));
+    }
+    `
+  );
+
+  shader.vertexShader = shader.vertexShader.replace(
+    "#include <begin_vertex>",
+    `
+    #include <begin_vertex>
+    float angle = (position.y + uTime) * 0.9;
+    mat2 rotateMatrix = get2DRotateMatrix(angle);
+
+    transformed.xz = transformed.xz * rotateMatrix;
+    `
+  );
+};
+```
+
+`customUniforms`がスコープの外で宣言されているため
+`elapsedTime`で更新するだけでアニメーションを適用できます。
+
+```js
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+
+  customUniforms.uTime.value = elapsedTime;
+
+  controls.update();
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+### ここまでのコードの全体像
+
+<details>
+<summary>. jsファイル(クリックして展開)</summary>
+
+```js
+import GUI from "lil-gui";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+// セットアップ
+const gui = new GUI();
+const canvas = document.querySelector("canvas.webgl");
+const scene = new THREE.Scene();
+
+// ローダー
+const textureLoader = new THREE.TextureLoader();
+const gltfLoader = new GLTFLoader();
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+
+// すべてのマテリアルを更新
+const updateAllMaterials = () => {
+  scene.traverse((child) => {
+    if (
+      child instanceof THREE.Mesh &&
+      child.material instanceof THREE.MeshStandardMaterial
+    ) {
+      child.material.envMapIntensity = 1;
+      child.material.needsUpdate = true;
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+};
+
+// 環境マップ
+const environmentMap = cubeTextureLoader.load([
+  "/textures/environmentMaps/0/px.jpg",
+  "/textures/environmentMaps/0/nx.jpg",
+  "/textures/environmentMaps/0/py.jpg",
+  "/textures/environmentMaps/0/ny.jpg",
+  "/textures/environmentMaps/0/pz.jpg",
+  "/textures/environmentMaps/0/nz.jpg",
+]);
+
+scene.background = environmentMap;
+scene.environment = environmentMap;
+
+// マテリアル
+
+// テクスチャ
+const mapTexture = textureLoader.load("/models/LeePerrySmith/color.jpg");
+mapTexture.colorSpace = THREE.SRGBColorSpace;
+const normalTexture = textureLoader.load("/models/LeePerrySmith/normal.jpg");
+
+// マテリアル
+const material = new THREE.MeshStandardMaterial({
+  map: mapTexture,
+  normalMap: normalTexture,
+});
+
+const customUniforms = {
+  uTime: { value: 0 },
+};
+
+material.onBeforeCompile = (shader) => {
+  shader.uniforms.uTime = customUniforms.uTime;
+  shader.vertexShader = shader.vertexShader.replace(
+    "#include <common>",
+    `
+    #include <common>
+
+    uniform float uTime;
+
+    mat2 get2DRotateMatrix(float _angle) {
+      return mat2(cos(_angle), - sin(_angle), sin(_angle), cos(_angle));
+    }
+    `
+  );
+
+  shader.vertexShader = shader.vertexShader.replace(
+    "#include <begin_vertex>",
+    `
+    #include <begin_vertex>
+    float angle = (position.y + uTime) * 0.9;
+    mat2 rotateMatrix = get2DRotateMatrix(angle);
+
+    transformed.xz = transformed.xz * rotateMatrix;
+    `
+  );
+};
+
+// モデル
+gltfLoader.load("/models/LeePerrySmith/LeePerrySmith.glb", (gltf) => {
+  const mesh = gltf.scene.children[0];
+  mesh.rotation.y = Math.PI * 0.5;
+  mesh.material = material;
+  scene.add(mesh);
+
+  updateAllMaterials();
+});
+
+// ライト
+const directionalLight = new THREE.DirectionalLight("#ffffff", 3);
+directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.set(1024, 1024);
+directionalLight.shadow.camera.far = 15;
+directionalLight.shadow.normalBias = 0.05;
+directionalLight.position.set(0.25, 2, -2.25);
+scene.add(directionalLight);
+
+// ウィンドウサイズ
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+// カメラ
+const camera = new THREE.PerspectiveCamera(
+  75,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
+camera.position.set(4, 1, -4);
+scene.add(camera);
+
+// オービットコントロール
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
+// レンダラー
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+});
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1;
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+
+  customUniforms.uTime.value = elapsedTime;
+
+  controls.update();
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+</details>
+
+### 出力結果
+
+<a href="https://gyazo.com/cf27e4e76c0ca600343c80926935d01f"><img src="https://i.gyazo.com/cf27e4e76c0ca600343c80926935d01f.gif" alt="Image from Gyazo" width="1000"/></a>
