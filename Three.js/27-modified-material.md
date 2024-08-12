@@ -16,6 +16,8 @@ updated:2024/08/12
 - [モデルにアニメーションを適用する](#モデルにアニメーションを適用する)
   - [ここまでのコードの全体像](#ここまでのコードの全体像)
   - [出力結果](#出力結果-1)
+- [影の修正](#影の修正)
+  - [出力結果](#出力結果-2)
 
 > [!NOTE]
 >
@@ -593,3 +595,96 @@ tick();
 ### 出力結果
 
 <a href="https://gyazo.com/cf27e4e76c0ca600343c80926935d01f"><img src="https://i.gyazo.com/cf27e4e76c0ca600343c80926935d01f.gif" alt="Image from Gyazo" width="1000"/></a>
+
+## 影の修正
+
+ここでは `castShadow`(投影される影) の修正を行います
+まずは、影を表示するための平面を追加します。
+
+```js
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(15, 15, 15),
+  new THREE.MeshStandardMaterial()
+);
+
+plane.rotation.y = Math.PI;
+plane.position.set(0, -5, 5);
+
+scene.add(plane);
+```
+
+[![Image from Gyazo](https://i.gyazo.com/fff3c4ae5070c6aee35d6330608afec0.png)](https://gyazo.com/fff3c4ae5070c6aee35d6330608afec0)
+
+ご覧の通り、影は全く変更されていません。
+理由は Three.js で影のレンダリングは `depthMaterial` で行われてるためです。
+
+これまでは `MeshStandardMaterial` を変更してきたのでこれまでの変更は反映されません。
+
+この問題を解決するには`depthMaterial`を変更する必要があります。
+まずはカスタムマテリアルを作成します
+
+```js
+const depthMaterial = new THREE.MeshDepthMaterial({
+  depthPacking: THREE.RGBADepthPacking, // 深度情報を RGBA でエンコード
+});
+```
+
+> [!NOTE]
+>
+> **📝 Memo**
+>
+> **depthPacking とは？**
+>
+> depthPacking は 3D 空間における奥行き(深度)情報を 2D テクスチャに格納する方法
+> THREE.RGBADepthPacking の場合 深度情報を r, g, b, a に分割してエンコードする
+> これによってより高い精度の深度情報を保持できる
+
+モデルの`customDepthMaterial`プロパティをカスタムマテリアルに変更する
+`customDepthMaterial` プロパティは、オブジェクトの深度マップ生成時に使用されるカスタムマテリアルを指定します。これにより、影の計算時にも頂点の変形が反映されるようになります。
+
+```js
+gltfLoader.load("/models/LeePerrySmith/LeePerrySmith.glb", (gltf) => {
+  const mesh = gltf.scene.children[0];
+  mesh.rotation.y = Math.PI * 0.5;
+  mesh.material = material;
+  mesh.customDepthMaterial = depthMaterial; // こちらを追加
+  scene.add(mesh);
+
+  updateAllMaterials();
+});
+```
+
+`material` と同じ方法で `onBeforeCompile`メソッドを使用して `depthMatarial` にもカスタムシェーダーを適用する
+
+```js
+depthMaterial.onBeforeCompile = (shader) => {
+  shader.uniforms.uTime = customUniforms.uTime;
+  shader.vertexShader = shader.vertexShader.replace(
+    "#include <common>",
+    `
+    #include <common>
+
+    uniform float uTime;
+
+    mat2 get2DRotateMatrix(float _angle) {
+      return mat2(cos(_angle), - sin(_angle), sin(_angle), cos(_angle));
+    }
+    `
+  );
+
+  shader.vertexShader = shader.vertexShader.replace(
+    "#include <begin_vertex>",
+    `
+    #include <begin_vertex>
+    float angle = (position.y + uTime) * 0.9;
+    mat2 rotateMatrix = get2DRotateMatrix(angle);
+
+    transformed.xz = transformed.xz * rotateMatrix;
+    `
+  );
+};
+```
+
+### 出力結果
+
+<a href="https://gyazo.com/ecd76d892f175aef1d302637e5802912"><img src="https://i.gyazo.com/ecd76d892f175aef1d302637e5802912.gif" alt="Image from Gyazo" width="1000"/></a>
