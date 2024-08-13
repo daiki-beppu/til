@@ -1,7 +1,7 @@
 ---
 title: 28-coffee-smoke
 date: 2024/08/13
-updated:2024/08/13
+updated: 2024/08/13
 ---
 
 # コーヒーの煙の制作
