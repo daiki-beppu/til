@@ -12,15 +12,15 @@ updated:2024/08/13
   - [2.2. 頂点シェーダーにコードを追加する](#22-頂点シェーダーにコードを追加する)
   - [2.3. 出力結果](#23-出力結果)
 - [3. マテリアルのシェーダーを変更してモデルをねじる](#3-マテリアルのシェーダーを変更してモデルをねじる)
-  - [出力結果](#出力結果)
-- [モデルにアニメーションを適用する](#モデルにアニメーションを適用する)
-  - [ここまでのコードの全体像](#ここまでのコードの全体像)
-  - [出力結果](#出力結果-1)
-- [影の修正](#影の修正)
-  - [出力結果](#出力結果-2)
-- [法線の修正](#法線の修正)
-  - [コードの全体像](#コードの全体像)
-  - [出力結果](#出力結果-3)
+  - [3.1. 出力結果](#31-出力結果)
+- [4. モデルにアニメーションを適用する](#4-モデルにアニメーションを適用する)
+  - [4.1. ここまでのコードの全体像](#41-ここまでのコードの全体像)
+  - [4.2. 出力結果](#42-出力結果)
+- [5. 影の修正](#5-影の修正)
+  - [5.1. 出力結果](#51-出力結果)
+- [6. 法線の修正](#6-法線の修正)
+  - [6.1. コードの全体像](#61-コードの全体像)
+  - [6.2. 出力結果](#62-出力結果)
 
 > [!NOTE]
 >
@@ -353,13 +353,13 @@ material.onBeforeCompile = (shader) => {
 > 使用している関数はこちらから引用しています
 > より詳しく知りたい場合は、[The Book of Shader の Rotations](https://thebookofshaders.com/08/) を確認してください
 
-### 出力結果
+### 3.1. 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/5e0b4242993a34b9525642f6423c67e5.png)](https://gyazo.com/5e0b4242993a34b9525642f6423c67e5)
 
 なかなかにすごい見た目ですが成功です。
 
-## モデルにアニメーションを適用する
+## 4. モデルにアニメーションを適用する
 
 [前回](https://github.com/daiki-beppu/til/blob/main/Three.js/26-animaded-galaxy.md)までと同様に `uTime` ユニフォームをシェーダーに送ります。
 
@@ -422,7 +422,7 @@ const tick = () => {
 tick();
 ```
 
-### ここまでのコードの全体像
+### 4.1. ここまでのコードの全体像
 
 <details>
 <summary>. jsファイル(クリックして展開)</summary>
@@ -595,11 +595,11 @@ tick();
 
 </details>
 
-### 出力結果
+### 4.2. 出力結果
 
 <a href="https://gyazo.com/cf27e4e76c0ca600343c80926935d01f"><img src="https://i.gyazo.com/cf27e4e76c0ca600343c80926935d01f.gif" alt="Image from Gyazo" width="1000"/></a>
 
-## 影の修正
+## 5. 影の修正
 
 ここでは `castShadow`(投影される影) の修正を行います
 まずは、影を表示するための平面を追加します。
@@ -688,11 +688,11 @@ depthMaterial.onBeforeCompile = (shader) => {
 };
 ```
 
-### 出力結果
+### 5.1. 出力結果
 
 <a href="https://gyazo.com/ecd76d892f175aef1d302637e5802912"><img src="https://i.gyazo.com/ecd76d892f175aef1d302637e5802912.gif" alt="Image from Gyazo" width="1000"/></a>
 
-## 法線の修正
+## 6. 法線の修正
 
 ここでは コアシャドウ(モデル自身の影)を修正します。
 コアシャドウの修正を行うには法線を位置と同様に回転させる必要があります。
@@ -714,7 +714,7 @@ shader.vertexShader = shader.vertexShader.replace(
 法線のシェーダーは`beginnormal_vertex`に記述されており
 `beginnormal_vertex`の`objectNormal`変数を変更することで修正する
 
-### コードの全体像
+### 6.1. コードの全体像
 
 <details>
 <summary>. jsファイル(クリックして展開)</summary>
@@ -941,6 +941,6 @@ tick();
 
 </details>
 
-### 出力結果
+### 6.2. 出力結果
 
 <a href="https://gyazo.com/5cd6e8cbbe48ce1aa0516654620af67d"><img src="https://i.gyazo.com/5cd6e8cbbe48ce1aa0516654620af67d.gif" alt="Image from Gyazo" width="1000"/></a>
