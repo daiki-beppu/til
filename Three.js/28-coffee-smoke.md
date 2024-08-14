@@ -1,7 +1,7 @@
 ---
 title: 28-coffee-smoke
 date: 2024/08/13
-updated: 2024/08/13
+updated: 2024/08/15
 ---
 
 # コーヒーの煙の制作
@@ -12,6 +12,9 @@ updated: 2024/08/13
   - [ShaderMaterial の作成](#shadermaterial-の作成)
   - [ここまでのコードの全体像](#ここまでのコードの全体像)
   - [出力結果](#出力結果)
+- [Perlin テクスチャ](#perlin-テクスチャ)
+  - [Perlin テクスチャのメリット](#perlin-テクスチャのメリット)
+  - [テクスチャの選択における注意点](#テクスチャの選択における注意点)
 
 > [!NOTE]
 >
@@ -115,7 +118,7 @@ tick();
 煙となるメッシュを作成します
 
 ジオメトリ: `PlaneGeometry`
-マテリアル: `MeshBasicMaterial` (のちほど ShaderMaterial に変更)
+マテリアル: `MeshBasicMaterial` (後で ShaderMaterial に変更)
 
 を使用します
 
@@ -372,3 +375,44 @@ void main() {
 ### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/92cb4116277c668a2165599c5d3419de.png)](https://gyazo.com/92cb4116277c668a2165599c5d3419de)
+
+## Perlin テクスチャ
+
+これまで、使用してきた Perlin ノイズはパフォーマンスが悪いので今回は使用しません。
+
+代わりに以下のテクスチャを使用します
+
+[![Image from Gyazo](https://i.gyazo.com/0fa6f9c195ca390f8c8003ba0a759716.png)](https://gyazo.com/0fa6f9c195ca390f8c8003ba0a759716)
+
+これは Perlin テクスチャといいます。
+Perlin ノイズの代わりに使用することでパフォーマンスが改善されます。
+
+### Perlin テクスチャのメリット
+
+- 計算コストが低い: 事前に生成されたテクスチャを使用するため、リアルタイムでの計算が不要
+- メモリ効率が良い: 1 つのテクスチャから複数のノイズパターンを生成可能
+- GPU フレンドリー: テクスチャサンプリングは GPU に最適化されている
+
+### テクスチャの選択における注意点
+
+Perlin テクスチャを選択する際は以下のことに注意する必要がある。
+
+- 十分なバリエーション: パターンが繰り返されすぎないようにする
+- 適度な大きさ: 十分な精度を得られるサイズを選択。ただし高解像度は不要(ピクセルが補完されるため)
+- シームレスな繰り返し: 画像を並べて配置しても境界線が見えない繰り返しパターンを使用
+
+1 つの画像から複数のノイズを取得するには RGBA の 4 つの異なるチャンネルにそれぞれノイズを保存する方法が良いです。
+ただ今回は、学習と簡素化のために、単純なグレースケールの画像を使用します。
+
+> [!NOTE]
+>
+> Perlin テクスチャは [Perlin Noise Maker](http://kitfox.com/projects/perlinNoiseMaker/) という web サイトで作成できる
+>
+> 他にも
+>
+> - [Noise Texture Pack](https://opengameart.org/content/noise-texture-pack)
+> - [Effct Texture Maker](https://mebiusbox.github.io/contents/EffectTextureMaker/)
+>
+> などがある。
+>
+> Figma を使う人は [Noise & Texture](https://www.figma.com/community/plugin/1138854718618193875/noise-texture)というプラグインもある
