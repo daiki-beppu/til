@@ -3,6 +3,16 @@
 制作物
 https://threejs-demo-rose.vercel.app/
 
+- [開発環境](#開発環境)
+- [目的:GSAP(ライブラリ)を使ってアニメーションを付与](#目的gsapライブラリを使ってアニメーションを付与)
+  - [GSAP のインストール](#gsap-のインストール)
+  - [アニメーションの付与](#アニメーションの付与)
+- [目的:マウスでカメラを制御する](#目的マウスでカメラを制御する)
+  - [OrbitControls を使って実装](#orbitcontrols-を使って実装)
+    - [OrbitControls をインポート](#orbitcontrols-をインポート)
+    - [OrbitControls クラスからインスタンス化](#orbitcontrols-クラスからインスタンス化)
+
+
 ## 開発環境
 
 - Next.js (app Router)
