@@ -10,7 +10,6 @@ updated: 2024/08/16
   - [Snow クラスの作成](#snow-クラスの作成)
   - [SnowConfig 関数の作成](#snowconfig-関数の作成)
   - [完成したもの](#完成したもの)
-- [パーティクルにテクスチャを適用](#パーティクルにテクスチャを適用)
 - [今日の進捗](#今日の進捗)
 
 ## パーティクルの実装
@@ -105,11 +104,5 @@ export const createSnowConfig = () => ({
 <a href="https://gyazo.com/bd01d8baf57865a2abf5ce72f9aa7ca9"><img src="https://i.gyazo.com/bd01d8baf57865a2abf5ce72f9aa7ca9.gif" alt="Image from Gyazo" width="1000"/></a>
 
 [![Image from Gyazo](https://i.gyazo.com/98503b2d2322bc496a5c6c4022f102ce.png)](https://gyazo.com/98503b2d2322bc496a5c6c4022f102ce)
-
-## パーティクルにテクスチャを適用
-
-```js
-
-```
 
 ## 今日の進捗
