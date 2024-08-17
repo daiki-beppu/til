@@ -11,7 +11,7 @@ https://github.com/daiki-beppu/threejs-vite-vanilla
 
 - [ディレクトリ構造とファイル名の変更](#ディレクトリ構造とファイル名の変更)
   - [変更内容](#変更内容)
-- [Enviroment クラスの追加](#enviroment-クラスの追加)
+- [Environment クラスの追加](#environment-クラスの追加)
 - [シェーダーファイルの追加](#シェーダーファイルの追加)
 
 ## ディレクトリ構造とファイル名の変更
@@ -85,7 +85,7 @@ src
 - `style.css`
 - `main.js`
 
-## Enviroment クラスの追加
+## Environment クラスの追加
 
 環境マップをあらかじめ適用しておく
 ファイルを分けたのはライトを追加する際にごちゃごちゃしないようにするため
