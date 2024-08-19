@@ -478,9 +478,8 @@ uniform sampler2D uPerlinTexture;
 varying vec2 vUv;
 
 void main() {
-  vec4 texture = texture( uPerlinTexture, vUv)
-
-  gl_FragColor = vec4(texture);
+ float smoke = texture(uPerlinTexture, vUv).r;
+  gl_FragColor = vec4(1.0, 1.0, 1.0, smoke);
 
   #include <tonemapping_fragment> // toneMapping をサポートする
   #include <colorspace_fragment> // colorSpace をサポートする
@@ -488,6 +487,14 @@ void main() {
 
 ```
 
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> 前述した RGBA チャンネルですがこちらの Perlin テクスチャはグレースケールなので必要なチャンネルは 1 つで R のチャンネルを使用できるため
+> `float smoke = texture(uPerlinTexture, vUv).r;`とすることができる
+> `vec4` => `float`, 末尾に`.r`を追加
+
 **出力結果**
 
-[![Image from Gyazo](https://i.gyazo.com/a744c680d3b11588fbea4a5d1b9b7fe3.png)](https://gyazo.com/a744c680d3b11588fbea4a5d1b9b7fe3)
+[![Image from Gyazo](https://i.gyazo.com/4c42042d01caf392a18e32003347a9d6.png)](https://gyazo.com/4c42042d01caf392a18e32003347a9d6)
