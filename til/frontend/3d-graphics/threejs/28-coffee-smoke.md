@@ -1,7 +1,7 @@
 ---
 title: 28-coffee-smoke
 date: 2024/08/13
-updated: 2024/08/19
+updated: 2024/08/21
 ---
 
 # コーヒーの煙の制作
@@ -19,6 +19,11 @@ updated: 2024/08/19
   - [テクスチャのロード](#テクスチャのロード)
   - [テクスチャをユニフォームでフラグメントシェーダーに送信](#テクスチャをユニフォームでフラグメントシェーダーに送信)
   - [テクスチャの適用](#テクスチャの適用)
+- [煙が上るようなアニメーションを適用](#煙が上るようなアニメーションを適用)
+  - [テクスチャを引き伸ばしてリアルな煙を表現](#テクスチャを引き伸ばしてリアルな煙を表現)
+  - [アニメーションの適用](#アニメーションの適用)
+  - [Smoothstep 関数で値を再マッピングする](#smoothstep-関数で値を再マッピングする)
+  - [断片が見えないように端を調整](#断片が見えないように端を調整)
 
 > [!NOTE]
 >
@@ -493,8 +498,88 @@ void main() {
 >
 > 前述した RGBA チャンネルですがこちらの Perlin テクスチャはグレースケールなので必要なチャンネルは 1 つで R のチャンネルを使用できるため
 > `float smoke = texture(uPerlinTexture, vUv).r;`とすることができる
-> `vec4` => `float`, 末尾に`.r`を追加
+> 変更点: `vec4` => `float`, 末尾に`.r`を追加
+>
+> マテリアルの `transparent` の有効化を忘れずに！
 
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/4c42042d01caf392a18e32003347a9d6.png)](https://gyazo.com/4c42042d01caf392a18e32003347a9d6)
+
+## 煙が上るようなアニメーションを適用
+
+### テクスチャを引き伸ばしてリアルな煙を表現
+
+テクスチャを引き伸ばすために UV 座標を変更する必要があります。
+
+```glsl
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+void main() {
+  vec2 smokeUv = vUv;
+  smokeUv.x *= 0.5;
+  smokeUv.y *= 0.3;
+
+  float smoke = texture(uPerlinTexture, smokeUv).r;
+
+  gl_FragColor = vec4(vec3(1.0), smoke);
+
+  #include <tonemapping_fragment> // toneMapping をサポートする
+  #include <colorspace_fragment> // colorSpace をサポートする
+}
+
+```
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> `varying` で受信した変数を直接変更することが出来ないので、新しい変数を作成する必要があります。
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/e7bbdb59da25aa09ae56e71ab28ca1bc.png)](https://gyazo.com/e7bbdb59da25aa09ae56e71ab28ca1bc)
+
+### アニメーションの適用
+
+マテリアルに`uTime`ユニフォームを追加して `unifrom` クラスのインスタンスを `0` に割り当て、アニメーションの速度を調節するユニフォーム`uAnimationSpeed`も同様に追加する
+
+```js
+const smokeMaterial = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+    uPerlinTexture: new THREE.Uniform(perlinTexture),
+  },
+  side: THREE.DoubleSide,
+  transparent: true,
+  wireframe: false,
+});
+```
+
+`tick`関数内でマテリアルを更新する
+
+```js
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  smokeMaterial.uniforms.uTime.value = elapsedTime;
+
+  controls.update();
+
+  renderer.render(scene, camera);
+
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+### Smoothstep 関数で値を再マッピングする
+
+### 断片が見えないように端を調整
