@@ -27,10 +27,20 @@ updated: 2024/08/22
     - [出力結果](#出力結果-4)
   - [アニメーションの適用](#アニメーションの適用)
     - [出力結果](#出力結果-5)
-  - [Smoothstep 関数で値を再マッピングする](#smoothstep-関数で値を再マッピングする)
+  - [smoothstep 関数で値を再マッピングする](#smoothstep-関数で値を再マッピングする)
     - [出力結果](#出力結果-6)
   - [断片が見えないように端を調整](#断片が見えないように端を調整)
     - [出力結果](#出力結果-7)
+  - [ここまでのコードの全体像](#ここまでのコードの全体像-1)
+- [頂点にアニメーションを適用する](#頂点にアニメーションを適用する)
+  - [2D 上の回転を計算する関数で頂点を回転](#2d-上の回転を計算する関数で頂点を回転)
+    - [出力結果](#出力結果-8)
+  - [ランダムパターンとアニメーション](#ランダムパターンとアニメーション)
+    - [出力結果](#出力結果-9)
+  - [風をシミュレートする](#風をシミュレートする)
+    - [出力結果](#出力結果-10)
+- [シェーダーチャンクの分離](#シェーダーチャンクの分離)
+  - [最終的なコードの全体像](#最終的なコードの全体像)
 
 > [!NOTE]
 >
@@ -462,7 +472,7 @@ const smokeMaterial = new THREE.ShaderMaterial({
 > 📝 **Memo**
 >
 > これまでユニフォームは value プロパティを待つオブジェクトで送信していたが
-> Three.js には Unifrom クラスがあるため今回のような記述ができる
+> Three.js には Uniform クラスがあるため今回のような記述ができる
 > 今後はこちらの記述で勧めていきます。
 
 ### テクスチャの適用
@@ -560,7 +570,7 @@ void main() {
 
 ### アニメーションの適用
 
-マテリアルに`uTime`ユニフォームを追加して `Unifrom` クラスのインスタンスを `0` に割り当て、アニメーションの速度を調節するユニフォーム`uAnimationSpeed`も同様に追加する
+マテリアルに`uTime`ユニフォームを追加して `Uniform` クラスのインスタンスを `0` に割り当て、アニメーションの速度を調節するユニフォーム`uAnimationSpeed`も同様に追加する
 
 ```js
 const smokeMaterial = new THREE.ShaderMaterial({
@@ -638,14 +648,14 @@ perlinTexture.wrapT = THREE.RepeatWrapping;
 
 <a href="https://gyazo.com/f006594749d359efd2e7690b42b5b779"><img src="https://i.gyazo.com/f006594749d359efd2e7690b42b5b779.gif" alt="Image from Gyazo" width="1000"/></a>
 
-### Smoothstep 関数で値を再マッピングする
+### smoothstep 関数で値を再マッピングする
 
 よりリアルな煙を表現するために値を再マッピングします。
 
 現在の Perlin テクスチャは `0 (黒) から 1 (白)`で表現されています。
 これだとテクスチャ内に大きな透明領域がありません。
 
-これを修正するために `Smoothstep 関数`を使用して
+これを修正するために `smoothstep 関数`を使用して
 `0.4 から 1` の間になるように値を再マッピングします。
 
 > [!NOTE]
@@ -654,7 +664,7 @@ perlinTexture.wrapT = THREE.RepeatWrapping;
 >
 > `step 関数` と `Smoothstep 関数`の違いは
 > `step 関数` は 指定の値で瞬時に変化するのに対して
-> `Smoothstep 関数は` 指定の範囲内で滑らかに変化します。
+> `smoothstep 関数は` 指定の範囲内で滑らかに変化します。
 > [![Image from Gyazo](https://i.gyazo.com/a9604ddc00b9b56dfed5d8ab26023fde.png)](https://gyazo.com/a9604ddc00b9b56dfed5d8ab26023fde)
 
 ```glsl
@@ -731,3 +741,865 @@ void main() {
 #### 出力結果
 
 <a href="https://gyazo.com/66df6e46d6264ee58b40753c2903bc5a"><img src="https://i.gyazo.com/66df6e46d6264ee58b40753c2903bc5a.gif" alt="Image from Gyazo" width="1000"/></a>
+
+### ここまでのコードの全体像
+
+<details>
+<summary>. jsファイル(クリックして展開)</summary>
+
+```js
+import GUI from "lil-gui";
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import fragmentShader from "./shaders/coffeeSmoke/fragment.glsl";
+import vertexShader from "./shaders/coffeeSmoke/vertex.glsl";
+
+// セットアップ
+const gui = new GUI();
+const canvas = document.querySelector("canvas.webgl");
+const scene = new THREE.Scene();
+
+// ローダー
+const textureLoader = new THREE.TextureLoader();
+const gltfLoader = new GLTFLoader();
+
+// ウィンドウサイズ
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+// カメラ
+const camera = new THREE.PerspectiveCamera(
+  25,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
+camera.position.x = 8;
+camera.position.y = 10;
+camera.position.z = 12;
+scene.add(camera);
+
+// オービットコントロール
+const controls = new OrbitControls(camera, canvas);
+controls.target.y = 3;
+controls.enableDamping = true;
+
+// レンダラー
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+});
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// モデル
+gltfLoader.load("./bakedModel.glb", (gltf) => {
+  gltf.scene.getObjectByName("baked").material.map.anisotropy = 8;
+  scene.add(gltf.scene);
+});
+
+// 煙
+const smokeConfig = {
+  geometry: {
+    width: 1,
+    height: 1,
+    widthSegments: 16,
+    heightSegments: 64,
+    translate: { x: 0, y: 0.5, z: 0 },
+    scale: { x: 1.5, y: 6, z: 1.5 },
+  },
+  mesh: {
+    position: { x: 0, y: 1.83, z: 0 },
+  },
+};
+
+const { width, height, widthSegments, heightSegments, translate, scale } =
+  smokeConfig.geometry;
+
+const smokeGeometry = new THREE.PlaneGeometry(
+  width,
+  height,
+  widthSegments,
+  heightSegments
+);
+
+smokeGeometry.translate(translate.x, translate.y, translate.z);
+smokeGeometry.scale(scale.x, scale.y, scale.z);
+
+const perlinTexture = textureLoader.load("./perlin.png");
+perlinTexture.wrapS = THREE.RepeatWrapping;
+perlinTexture.wrapT = THREE.RepeatWrapping;
+
+const smokeMaterial = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+    uPerlinTexture: new THREE.Uniform(perlinTexture),
+  },
+  side: THREE.DoubleSide,
+  transparent: true,
+  wireframe: false,
+});
+
+const { position } = smokeConfig.mesh;
+const smoke = new THREE.Mesh(smokeGeometry, smokeMaterial);
+
+smoke.position.set(position.x, position.y, position.z);
+
+scene.add(smoke);
+
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  smokeMaterial.uniforms.uTime.value = elapsedTime;
+
+  controls.update();
+
+  renderer.render(scene, camera);
+
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+</details>
+
+<details>
+<summary>. glslファイル(クリックして展開)</summary>
+
+```glsl
+// vertex.glsl
+
+varying vec2 vUv;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+  vUv = uv;
+}
+```
+
+```glsl
+// fragment.glsl
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+void main() {
+  vec2 smokeUv = vUv;
+  smokeUv.x *= 0.5;
+  smokeUv.y *= 0.3;
+  smokeUv.y -= uTime * uAnimationSpeed;
+
+  float smoke = texture(uPerlinTexture, smokeUv).r;
+
+  smoke = smoothstep(0.4, 1.0, smoke);
+
+  smoke *= smoothstep(0.0, 0.1, vUv.x);
+  smoke *= smoothstep(1.0, 0.9, vUv.x);
+  smoke *= smoothstep(0.0, 0.1, vUv.y);
+  smoke *= smoothstep(1.0, 0.4, vUv.y);
+
+  gl_FragColor = vec4(vec3(1.0), smoke);
+
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+</details>
+
+## 頂点にアニメーションを適用する
+
+まず、煙のままだと変化がわかりにくいので
+`gl_fragColor`を`赤 vec4(1.0, 0.0, 0.0, 1.0)`に設定する(色はわかりやすければ何色でもいい)
+
+```glsl
+
+// ....
+
+void main() {
+
+  // ...
+
+  gl_FragColor = vec4(vec3(1.0), smoke);
+  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // 調整後削除するため上書きするだけで OK
+
+  // ...
+
+}
+```
+
+`wireFrame` を有効化する
+
+```js
+const smokeMaterial = new THREE.ShaderMaterial({
+  // ...
+  wireframe: true,
+});
+```
+
+### 2D 上の回転を計算する関数で頂点を回転
+
+まずは 2D 上の回転を計算する関数を追加します。
+この関数は web で検索したり AI に質問すれば簡単に生成できる典型的な関数です。
+
+```glsl
+vec2 rotate2D(vec2 value, float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  mat2 m = mat2(c, s, -s, c);
+  return m * value;
+}
+```
+
+試しに Claude 3.5 Sonnet に質問してみました
+
+[![Image from Gyazo](https://i.gyazo.com/5d2805104d4302949a92fc9b4e6bd817.png)](https://gyazo.com/5d2805104d4302949a92fc9b4e6bd817)
+
+若干変数名などは異なりますが同じように出力してくれました！
+
+UV 座標のときと同様に `position 属性`を直接変更することは出来ないので
+新しい変数を用意し`position 属性`を割り当てます
+
+```glsl
+// vertex.glsl に記述
+
+varying vec2 vUv;
+
+vec2 rotate2D(vec2 value, float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  mat2 m = mat2(c, s, -s, c);
+  return m * value;
+}
+
+void main() {
+  vec3 newPosition = position;
+
+  vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+  vUv = uv;
+}
+```
+
+先ほど作成した`rotate2D 関数`を使用して頂点を回転させます。
+
+```glsl
+// vertex.glsl に記述
+
+// ...
+
+vec2 rotate2D(vec2 value, float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  mat2 m = mat2(c, s, -s, c);
+  return m * value;
+}
+
+void main() {
+  vec3 newPosition = position;
+
+  // ツイスト
+  float angle = 2.0;
+  newPosition.xz = rotate2D(newPosition.xz, angle);
+
+  // ...
+}
+```
+
+**回転前**
+[![Image from Gyazo](https://i.gyazo.com/44089f8581a1d2a5ac08b56eacdd60fa.png)](https://gyazo.com/44089f8581a1d2a5ac08b56eacdd60fa)
+
+**回転後**
+
+[![Image from Gyazo](https://i.gyazo.com/5198051342d08d5efe581e78b810881b.png)](https://gyazo.com/5198051342d08d5efe581e78b810881b)
+
+このままだとすべての頂点が同じように回転してしまっています。
+高度に応じて回転量を変更するように修正します
+
+```glsl
+// vertex.glsl に記述
+
+// ...
+
+vec2 rotate2D(vec2 value, float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  mat2 m = mat2(c, s, -s, c);
+  return m * value;
+}
+
+void main() {
+  vec3 newPosition = position;
+
+  // ツイスト
+   float angle = newPosition.y;
+  newPosition.xz = rotate2D(newPosition.xz, angle);
+
+  // ...
+}
+```
+
+#### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/9ff2a308b4fc6ef8c2a798122e4088b9.png)](https://gyazo.com/9ff2a308b4fc6ef8c2a798122e4088b9)
+
+これでも十分に素敵なものになりましたが、
+規則的すぎるのとアニメーションが適用されていません。
+
+次はこれらを修正していきます。
+
+### ランダムパターンとアニメーション
+
+ランダムパターンは
+Perlin テクスチャを使用することでランダム値を取得する事ができます。
+フラグメントシェーダーのときと同様に`uPerlinTexture`を使用します。
+
+アニメーションも同様に`uTime`と`uAnimationSpeed`で適用します。
+
+```glsl
+// vertex.glsl に記述
+
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+vec2 rotate2D(vec2 value, float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  mat2 m = mat2(c, s, -s, c);
+  return m * value;
+}
+
+void main() {
+  vec3 newPosition = position;
+
+  // ツイスト
+  float twistPerlin = texture(
+    uPerlinTexture, vec2(
+      0.5, // テクスチャ座標の中心を取得
+      uv.y * 0.2 - uTime * uAnimationSpeed
+      )).r;
+
+  float angle = twistPerlin * 10.0; // 10.0 は強度を上げている
+
+  vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+  vUv = uv;
+}
+```
+
+#### 出力結果
+
+<a href="https://gyazo.com/67a055b7cd1a838d68c13f24f657bdb4"><img src="https://i.gyazo.com/67a055b7cd1a838d68c13f24f657bdb4.gif" alt="Image from Gyazo" width="1000"/></a>
+
+### 風をシミュレートする
+
+風のシミュレートもツイストと同様の方法で計算します。
+
+まずは値をオフセットするための変数を用意します。
+
+```glsl
+// vertex.glsl
+
+// ...
+
+void main() {
+
+  // ...
+
+  // 風
+  vec2 windOffset = vec2(
+    0.0, // X 軸方向
+    0.0 // Z 軸方向
+    );
+  newPosition.xz += windOffset;
+
+  // ...
+}
+```
+
+ツイストと同様の方法で Perlin テクスチャの色を取得します
+
+```glsl
+// vertex.glsl
+
+// ...
+
+void main() {
+
+  // ...
+
+  // 風
+  vec2 windOffset = vec2(
+    texture(uPerlinTexture, vec2(
+      0.25, // ツイストとは違うパターン使用
+      uTime // アニメーションの適用
+    )).r,
+    0.0
+    );
+
+  windOffset *= 10.0; // 強度を上げる
+  newPosition.xz += windOffset;
+
+  // ...
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/f5086ab4fd020b589d02be5d714618ed"><img src="https://i.gyazo.com/f5086ab4fd020b589d02be5d714618ed.gif" alt="Image from Gyazo" width="1000"/></a>
+
+このままだとカップから煙が出ていません。
+これを修正します。
+
+```glsl
+// vertex.glsl
+
+// ...
+
+void main() {
+
+  // ...
+
+  // 風
+  vec2 windOffset = vec2(
+    texture(uPerlinTexture, vec2(
+      0.25, // ツイストとは違うパターン使用
+      uTime // アニメーションの適用
+    )).r,
+    0.0
+    );
+
+  windOffset *= uv.y * 10.0;
+  newPosition.xz += windOffset;
+
+  // ...
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/a470763757ea6d977797ae14ab85a1a4"><img src="https://i.gyazo.com/a470763757ea6d977797ae14ab85a1a4.gif" alt="Image from Gyazo" width="1000"/></a>
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> `uv.y * 10.0` とすることで 0 から 1 の値になる
+> これによりカップに固定する事ができる
+
+かなり良くなりましたがまだ、あまり現実的ではありません。
+最初はゆっくりと増加し、上部に行くほど急速に増加するようにしたいです
+
+これは `pow 関数`で実現することが出来ます
+
+```glsl
+// vertex.glsl
+
+// ...
+
+void main() {
+
+  // ...
+
+  // 風
+  vec2 windOffset = vec2(
+    texture(uPerlinTexture, vec2(
+      0.25, // ツイストとは違うパターン使用
+      uTime // アニメーションの適用
+    )).r,
+    0.0
+    );
+
+  windOffset *= pow(uv.y, 2.0) * 10.0;
+  newPosition.xz += windOffset;
+
+  // ...
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/b1efa04af7dbf1063822905909c4e711.gif)](https://gyazo.com/b1efa04af7dbf1063822905909c4e711)
+
+Perlin テクスチャの値は 0 から 1 の間で取得するため
+このままだと風は正の方向にしか動きません、
+X 軸方向の値に `0.5` を減算することで修正します。
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> 0.5 減算することで値が `-0.5 から 0.5` なり正と負の両方向の値を取得できる
+
+```glsl
+// vertex.glsl
+
+// ...
+
+void main() {
+
+  // ...
+
+  // 風
+  vec2 windOffset = vec2(
+    texture(uPerlinTexture, vec2(
+      0.25, // ツイストとは違うパターン使用
+      uTime // アニメーションの適用
+    )).r -0.5,
+    0.0
+    );
+
+  windOffset *= pow(uv.y, 2.0) * 10.0;
+  newPosition.xz += windOffset;
+
+  // ...
+}
+```
+
+違うパターンを Z 軸方向にも適用しアニメーションのスピードを調節
+
+```glsl
+// vertex.glsl
+
+// ...
+
+void main() {
+
+  // ...
+
+  // 風
+  vec2 windOffset = vec2(
+    texture(uPerlinTexture, vec2(0.25, uTime * uAnimationSpeed)).r - 0.5,
+    texture(uPerlinTexture, vec2(0.75, uTime * uAnimationSpeed)).r - 0.5
+    );
+
+  windOffset *= pow(uv.y, 2.0) * 10.0;
+  newPosition.xz += windOffset;
+
+  // ...
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/9250880e7cb7f700170f93800d535cfb"><img src="https://i.gyazo.com/9250880e7cb7f700170f93800d535cfb.gif" alt="Image from Gyazo" width="1000"/></a>
+
+マテリアルをもとに戻して depthWrite を 無効にして深度バッファに描画しないようにする
+
+```js
+const smokeMaterial = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+    uPerlinTexture: new THREE.Uniform(perlinTexture),
+  },
+  side: THREE.DoubleSide,
+  transparent: true,
+  depthWrite: false, // 深度バッファの描画を無効化
+  wireframe: false,
+});
+```
+
+#### 出力結果
+
+<a href="https://gyazo.com/fb9e5544bce4ce4b8398090c099196e5"><img src="https://i.gyazo.com/fb9e5544bce4ce4b8398090c099196e5.gif" alt="Image from Gyazo" width="1000"/></a>
+
+## シェーダーチャンクの分離
+
+`#include` を使用してファイルの分割を行います
+今回は`rotate2D 関数`を分割してみます
+
+`/src/shaders/` に `includes`フォルダを作成し`rotate2D.glsl`ファイルを作成
+`rotate2D 関数`の記述を`rotate2D.glsl`ファイルに移動する
+
+```glsl
+// rotate2D.glsl に記述
+
+vec2 rotate2D(vec2 value, float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  mat2 m = mat2(c, s, -s, c);
+  return m * value;
+}
+```
+
+`#include ファイルパス`でチャンクを読み込み
+
+```glsl
+// vertex.glsl
+
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+#include ../includes/rotate2D.glsl
+
+void main() {
+  // ...
+}
+```
+
+### 最終的なコードの全体像
+
+<details>
+<summary>. jsファイル(クリックして展開)</summary>
+
+```js
+import GUI from "lil-gui";
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import fragmentShader from "./shaders/coffeeSmoke/fragment.glsl";
+import vertexShader from "./shaders/coffeeSmoke/vertex.glsl";
+
+// セットアップ
+const gui = new GUI();
+const canvas = document.querySelector("canvas.webgl");
+const scene = new THREE.Scene();
+
+// ローダー
+const textureLoader = new THREE.TextureLoader();
+const gltfLoader = new GLTFLoader();
+
+// ウィンドウサイズ
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+// カメラ
+const camera = new THREE.PerspectiveCamera(
+  25,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
+camera.position.x = 8;
+camera.position.y = 10;
+camera.position.z = 12;
+scene.add(camera);
+
+// オービットコントロール
+const controls = new OrbitControls(camera, canvas);
+controls.target.y = 3;
+controls.enableDamping = true;
+
+// レンダラー
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+});
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// モデル
+gltfLoader.load("./bakedModel.glb", (gltf) => {
+  gltf.scene.getObjectByName("baked").material.map.anisotropy = 8;
+  scene.add(gltf.scene);
+});
+
+// 煙
+const smokeConfig = {
+  geometry: {
+    width: 1,
+    height: 1,
+    widthSegments: 16,
+    heightSegments: 64,
+    translate: { x: 0, y: 0.5, z: 0 },
+    scale: { x: 1.5, y: 6, z: 1.5 },
+  },
+  mesh: {
+    position: { x: 0, y: 1.83, z: 0 },
+  },
+};
+
+const { width, height, widthSegments, heightSegments, translate, scale } =
+  smokeConfig.geometry;
+
+const smokeGeometry = new THREE.PlaneGeometry(
+  width,
+  height,
+  widthSegments,
+  heightSegments
+);
+
+smokeGeometry.translate(translate.x, translate.y, translate.z);
+smokeGeometry.scale(scale.x, scale.y, scale.z);
+
+const perlinTexture = textureLoader.load("./perlin.png");
+perlinTexture.wrapS = THREE.RepeatWrapping;
+perlinTexture.wrapT = THREE.RepeatWrapping;
+
+const smokeMaterial = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+    uPerlinTexture: new THREE.Uniform(perlinTexture),
+  },
+  side: THREE.DoubleSide,
+  transparent: true,
+  depthWrite: false,
+  wireframe: false,
+});
+
+const { position } = smokeConfig.mesh;
+const smoke = new THREE.Mesh(smokeGeometry, smokeMaterial);
+
+smoke.position.set(position.x, position.y, position.z);
+
+scene.add(smoke);
+
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  smokeMaterial.uniforms.uTime.value = elapsedTime;
+
+  controls.update();
+
+  renderer.render(scene, camera);
+
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+</details>
+
+<details>
+<summary>. glslファイル(クリックして展開)</summary>
+
+```glsl
+// vertex.glsl
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+#include ../includes/rotate2D.glsl
+
+void main() {
+  vec3 newPosition = position;
+
+  // ツイスト
+  float twistPerlin = texture(uPerlinTexture, vec2(0.5, uv.y * 0.2 - uTime * uAnimationSpeed)).r;
+  float angle = twistPerlin * 10.0;
+  newPosition.xz = rotate2D(newPosition.xz, angle);
+
+  // 風
+  vec2 windOffset = vec2(
+    texture(uPerlinTexture, vec2(0.25, uTime * uAnimationSpeed)).r - 0.5,
+    texture(uPerlinTexture, vec2(0.75, uTime * uAnimationSpeed)).r - 0.5);
+
+  windOffset *= pow(uv.y, 2.0) * 10.0;
+
+  vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+  vUv = uv;
+}
+```
+
+```glsl
+// fragment.glsl
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+void main() {
+  vec2 smokeUv = vUv;
+  smokeUv.x *= 0.5;
+  smokeUv.y *= 0.3;
+  smokeUv.y -= uTime * uAnimationSpeed;
+
+  float smoke = texture(uPerlinTexture, smokeUv).r;
+
+  smoke = smoothstep(0.4, 1.0, smoke);
+
+  smoke *= smoothstep(0.0, 0.1, vUv.x);
+  smoke *= smoothstep(1.0, 0.9, vUv.x);
+  smoke *= smoothstep(0.0, 0.1, vUv.y);
+  smoke *= smoothstep(1.0, 0.4, vUv.y);
+
+  gl_FragColor = vec4(vec3(1.0), smoke);
+
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+
+```
+
+```glsl
+// rotate2D.glsl
+vec2 rotate2D(vec2 value, float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  mat2 m = mat2(c, s, -s, c);
+  return m * value;
+}
+```
+
+</details>
