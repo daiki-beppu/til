@@ -1,17 +1,19 @@
 ---
 title: 28-coffee-smoke
 date: 2024/08/13
-updated: 2024/08/21
+updated: 2024/08/22
 ---
 
 # コーヒーの煙の制作
 
 - [下準備](#下準備)
+    - [出力結果](#出力結果)
   - [ベースメッシュの作成](#ベースメッシュの作成)
+    - [出力結果](#出力結果-1)
   - [GLSL ファイルの準備](#glsl-ファイルの準備)
   - [ShaderMaterial の作成](#shadermaterial-の作成)
   - [ここまでのコードの全体像](#ここまでのコードの全体像)
-  - [出力結果](#出力結果)
+  - [出力結果](#出力結果-2)
 - [Perlin テクスチャ](#perlin-テクスチャ)
   - [Perlin テクスチャのメリット](#perlin-テクスチャのメリット)
   - [テクスチャの選択における注意点](#テクスチャの選択における注意点)
@@ -19,11 +21,16 @@ updated: 2024/08/21
   - [テクスチャのロード](#テクスチャのロード)
   - [テクスチャをユニフォームでフラグメントシェーダーに送信](#テクスチャをユニフォームでフラグメントシェーダーに送信)
   - [テクスチャの適用](#テクスチャの適用)
+    - [出力結果](#出力結果-3)
 - [煙が上るようなアニメーションを適用](#煙が上るようなアニメーションを適用)
   - [テクスチャを引き伸ばしてリアルな煙を表現](#テクスチャを引き伸ばしてリアルな煙を表現)
+    - [出力結果](#出力結果-4)
   - [アニメーションの適用](#アニメーションの適用)
+    - [出力結果](#出力結果-5)
   - [Smoothstep 関数で値を再マッピングする](#smoothstep-関数で値を再マッピングする)
+    - [出力結果](#出力結果-6)
   - [断片が見えないように端を調整](#断片が見えないように端を調整)
+    - [出力結果](#出力結果-7)
 
 > [!NOTE]
 >
@@ -118,7 +125,7 @@ tick();
 
 </details>
 
-**出力結果**
+#### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/9423b58bd20300ea7bd069cf19b606e9.png)](https://gyazo.com/9423b58bd20300ea7bd069cf19b606e9)
 
@@ -177,7 +184,7 @@ scene.add(smoke);
 >
 > 今回は最初からいい感じの値を設定しているが、実際のプロジェクトでは画面に何かを表示してからそのパラメータを調整する。
 
-**出力結果**
+#### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/f079ba08b87c265934a0535f368f22f1.png)](https://gyazo.com/f079ba08b87c265934a0535f368f22f1)
 
@@ -486,8 +493,11 @@ void main() {
  float smoke = texture(uPerlinTexture, vUv).r;
   gl_FragColor = vec4(1.0, 1.0, 1.0, smoke);
 
-  #include <tonemapping_fragment> // toneMapping をサポートする
-  #include <colorspace_fragment> // colorSpace をサポートする
+  // Three.js の トーンマッピングを適用する
+  #include <tonemapping_fragment>
+
+  // Three.js の カラースペースを適用する
+  #include <colorspace_fragment>
 }
 
 ```
@@ -502,7 +512,7 @@ void main() {
 >
 > マテリアルの `transparent` の有効化を忘れずに！
 
-**出力結果**
+#### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/4c42042d01caf392a18e32003347a9d6.png)](https://gyazo.com/4c42042d01caf392a18e32003347a9d6)
 
@@ -518,16 +528,22 @@ uniform sampler2D uPerlinTexture;
 varying vec2 vUv;
 
 void main() {
+  // 新しい UV 座標を作成して、テクスチャの伸縮を調整
   vec2 smokeUv = vUv;
+
+  // UV 座標の X 値を半分にすることで X 軸方向にテクスチャを 2 倍に引き伸ばす
   smokeUv.x *= 0.5;
+
+  // UV 座標の Y 値に 0.3 を乗算することで Y 軸方向にテクスチャを約 3.33 倍に引き伸ばす
   smokeUv.y *= 0.3;
 
-  float smoke = texture(uPerlinTexture, smokeUv).r;
+  float smoke = texture(
+    uPerlinTexture, smokeUv).r;
 
   gl_FragColor = vec4(vec3(1.0), smoke);
 
-  #include <tonemapping_fragment> // toneMapping をサポートする
-  #include <colorspace_fragment> // colorSpace をサポートする
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }
 
 ```
@@ -538,13 +554,13 @@ void main() {
 >
 > `varying` で受信した変数を直接変更することが出来ないので、新しい変数を作成する必要があります。
 
-**出力結果**
+#### 出力結果
 
 [![Image from Gyazo](https://i.gyazo.com/e7bbdb59da25aa09ae56e71ab28ca1bc.png)](https://gyazo.com/e7bbdb59da25aa09ae56e71ab28ca1bc)
 
 ### アニメーションの適用
 
-マテリアルに`uTime`ユニフォームを追加して `unifrom` クラスのインスタンスを `0` に割り当て、アニメーションの速度を調節するユニフォーム`uAnimationSpeed`も同様に追加する
+マテリアルに`uTime`ユニフォームを追加して `Unifrom` クラスのインスタンスを `0` に割り当て、アニメーションの速度を調節するユニフォーム`uAnimationSpeed`も同様に追加する
 
 ```js
 const smokeMaterial = new THREE.ShaderMaterial({
@@ -580,6 +596,138 @@ const tick = () => {
 tick();
 ```
 
+フラグメントシェーダーに以下の記述をする
+
+```glsl
+// fragment.glsl に記述
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+void main() {
+  vec2 smokeUv = vUv;
+  smokeUv.x *= 0.5;
+  smokeUv.y *= 0.3;
+
+   // アニメーションの適用、 減算することで上昇する
+  smokeUv.y -= uTime * uAnimationSpeed;
+
+  float smoke = texture(uPerlinTexture, smokeUv).r;
+
+  gl_FragColor = vec4(vec3(1.0), smoke);
+
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+少し時間が立つと長い線しか見えなくなるので
+テクスチャを繰り返すことで修正する。
+
+```js
+const perlinTexture = textureLoader.load("./perlin.png");
+perlinTexture.wrapS = THREE.RepeatWrapping;
+perlinTexture.wrapT = THREE.RepeatWrapping;
+```
+
+#### 出力結果
+
+すこしわかりにくいですがアニメーションが適用できています。
+
+<a href="https://gyazo.com/f006594749d359efd2e7690b42b5b779"><img src="https://i.gyazo.com/f006594749d359efd2e7690b42b5b779.gif" alt="Image from Gyazo" width="1000"/></a>
+
 ### Smoothstep 関数で値を再マッピングする
 
+よりリアルな煙を表現するために値を再マッピングします。
+
+現在の Perlin テクスチャは `0 (黒) から 1 (白)`で表現されています。
+これだとテクスチャ内に大きな透明領域がありません。
+
+これを修正するために `Smoothstep 関数`を使用して
+`0.4 から 1` の間になるように値を再マッピングします。
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> `step 関数` と `Smoothstep 関数`の違いは
+> `step 関数` は 指定の値で瞬時に変化するのに対して
+> `Smoothstep 関数は` 指定の範囲内で滑らかに変化します。
+> [![Image from Gyazo](https://i.gyazo.com/a9604ddc00b9b56dfed5d8ab26023fde.png)](https://gyazo.com/a9604ddc00b9b56dfed5d8ab26023fde)
+
+```glsl
+// fragment.glsl に記述
+
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+void main() {
+  vec2 smokeUv = vUv;
+  smokeUv.x *= 0.5;
+  smokeUv.y *= 0.3;
+  smokeUv.y -= uTime * uAnimationSpeed;
+
+  float smoke = texture(uPerlinTexture, smokeUv).r;
+
+  smoke = smoothstep(
+    0.4,  // 下限値 0.0 から 1.0 の間で指定
+    1.0,  // 上限値 0.0 から 1.0 の間で指定
+    smoke // 変更する値を指定
+  );
+
+  gl_FragColor = vec4(vec3(1.0), smoke);
+
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+#### 出力結果
+
+<a href="https://gyazo.com/6d1db9e1b5af1f908769323ea471b31d"><img src="https://i.gyazo.com/6d1db9e1b5af1f908769323ea471b31d.gif" alt="Image from Gyazo" width="1000"/></a>
+
 ### 断片が見えないように端を調整
+
+かなりリアルに近づいたのですがよく見ると
+ジオメトリの断片が見えてしまい不自然です。
+
+これを修正するために`smoothstep 関数`で断片を再マッピングします。
+
+```glsl
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform sampler2D uPerlinTexture;
+
+varying vec2 vUv;
+
+void main() {
+  vec2 smokeUv = vUv;
+  smokeUv.x *= 0.5;
+  smokeUv.y *= 0.3;
+  smokeUv.y -= uTime * uAnimationSpeed;
+
+  float smoke = texture(uPerlinTexture, smokeUv).r;
+
+  smoke = smoothstep(0.4, 1.0, smoke);
+
+  smoke = 1.0; // 変化がわかりやすくするため、調整後削除
+  smoke *= smoothstep(0.0, 0.1, vUv.x); // 左の端
+  smoke *= smoothstep(1.0, 0.9, vUv.x); // 右の端
+  smoke *= smoothstep(0.0, 0.1, vUv.y); // 上の端
+  smoke *= smoothstep(1.0, 0.4, vUv.y); // 下の端
+
+  gl_FragColor = vec4(vec3(1.0), smoke);
+
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+#### 出力結果
+
+<a href="https://gyazo.com/66df6e46d6264ee58b40753c2903bc5a"><img src="https://i.gyazo.com/66df6e46d6264ee58b40753c2903bc5a.gif" alt="Image from Gyazo" width="1000"/></a>
