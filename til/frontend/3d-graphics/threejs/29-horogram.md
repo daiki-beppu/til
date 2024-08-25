@@ -1,7 +1,7 @@
 ---
 title: 29-horogram
 date: 2024/08/22
-updated: 2024/08/24
+updated: 2024/08/25
 ---
 
 # ホログラムの制作
@@ -11,6 +11,9 @@ updated: 2024/08/24
   - [出力結果](#出力結果)
 - [ストライプパターンにアニメーションを適用](#ストライプパターンにアニメーションを適用)
   - [出力結果](#出力結果-1)
+- [フレネル効果について](#フレネル効果について)
+  - [3D グラフィックにおけるフレネル効果の重要性](#3d-グラフィックにおけるフレネル効果の重要性)
+- [フレネル効果の実装](#フレネル効果の実装)
 
 > [!NOTE]
 >
@@ -267,7 +270,7 @@ void main() {
 ## ストライプパターンにアニメーションを適用
 
 マテリアルに`uniforms` プロパティを追加して
-`tTime`, `uAnimationSpeed`を`new THREE.Unifrom(value)`で追加
+`uTime`, `uAnimationSpeed`を`new THREE.Uniform(value)`で追加
 
 `uTimeは経過時間`を、`uAnimationSpeedはアニメーションの速度`を制御します。
 
@@ -326,3 +329,47 @@ void main() {
 ### 出力結果
 
 [<a href="https://gyazo.com/299e3fb55025ecf84b138c9509849ad4"><video width="1000" autoplay muted loop playsinline controls><source src="https://i.gyazo.com/299e3fb55025ecf84b138c9509849ad4.mp4" type="video/mp4"/></video></a>](https://i.gyazo.com/299e3fb55025ecf84b138c9509849ad4.gif)
+
+## フレネル効果について
+
+フレネル効果 (Fresnel effect) は、光の反射と屈折が視線の角度によって変化する現象のこと
+
+フレネル効果の特徴
+
+- 表面に対して垂直に近い角度から見ると物体は比較的透明に見える
+- 表面に対して浅い角度から見ると物体はより反射して見える
+
+例: 水の表面
+真上(水面に対して垂直に近い角度)から見ると水中が見えるが、浅い角度(水面に対して水平に近い角度)から見ると水に反射して見える
+
+### 3D グラフィックにおけるフレネル効果の重要性
+
+- リアルな表現 : 物体をより自然に見せる
+- 奥行きを強調 : オブジェクトの形状や位置関係をより強調する
+- マテリアル表現の豊かさ : 金属やプラスチック、ガラスなど多彩な材質を表現できる
+
+Three.js の場合 **PBR** を使用している
+`MeshStandardMaterial`や`MeshPhysicalMaterial`にはフレネル効果を使用して表現されている
+
+## フレネル効果の実装
+
+フレネル効果の計算を行うために頂点シェーダーで **Normal(法線)** を`variyng` でフラグメントシェーダーに送信します
+
+```glsl
+// vertex.glsl に記述
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+  // varying
+  vPosition = modelPosition.xyz;
+  vNormal = vNormal;
+}
+```
