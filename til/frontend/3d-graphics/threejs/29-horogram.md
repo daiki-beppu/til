@@ -14,6 +14,14 @@ updated: 2024/08/25
 - [フレネル効果について](#フレネル効果について)
   - [3D グラフィックにおけるフレネル効果の重要性](#3d-グラフィックにおけるフレネル効果の重要性)
 - [フレネル効果の実装](#フレネル効果の実装)
+  - [フレネル効果の値を計算](#フレネル効果の値を計算)
+  - [視線方向の計算](#視線方向の計算)
+  - [ドット積の計算](#ドット積の計算)
+  - [問題の修正: フレネル効果の計算値がオブジェクトの回転によって変化してしまう](#問題の修正-フレネル効果の計算値がオブジェクトの回転によって変化してしまう)
+  - [問題の修正: 表面に規則的な模様が見える](#問題の修正-表面に規則的な模様が見える)
+- [ストライプと組み合わせる](#ストライプと組み合わせる)
+  - [ここまでのコードの全体像](#ここまでのコードの全体像)
+  - [出力結果](#出力結果-2)
 
 > [!NOTE]
 >
@@ -370,6 +378,466 @@ void main() {
 
   // varying
   vPosition = modelPosition.xyz;
-  vNormal = vNormal;
+  vNormal = normal;
 }
 ```
+
+```glsl
+// fragment.glsl に記述
+
+uniform float uTime;
+uniform float uAnimationSpeed;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  // ...
+
+  gl_FragColor = vec4(vec3(1.0), stripes);
+  gl_FragColor = vec4(vec3(vNormal), 1.0); // 法線を取得できているかテスト
+
+  // Three.js オプション
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/9df39a3b2b450dbf66290a2b900accce.png)](https://gyazo.com/9df39a3b2b450dbf66290a2b900accce)
+
+### フレネル効果の値を計算
+
+フレネル効果の計算には**視線方向**と**ドット積**を使用します
+まずは視線方向を計算します
+
+### 視線方向の計算
+
+`viewDirection(視線方向)`は
+`vPosition(フラグメントの 3D 上の位置)` から `cameraPosition(カメラの位置)`を減算して求めます
+
+```glsl
+// fragment.glsl に記述
+
+// ...
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  // ...
+
+  vec3 viewDirection = vPosition - cameraPosition;
+
+  // ...
+}
+```
+
+### ドット積の計算
+
+ドット積は
+`dot 関数` という特殊な関数で 2 つのベクトルの内積を求めますが
+この関数はベクトルの長さが同じじゃないといけません
+
+`vNoraml(法線)`のベクトルの長さは `1` なので
+
+`viewDirection(視線方向)` のベクトルの長さを `1` にするために `noramize 関数`を使用して値を正規化します。
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> なぜ法線ベクトルの長さは 1 なのか？
+>
+> glsl で法線ベクトルは主に計算の簡略化のために単位ベクトル(長さが 1 のベクトル)として定義されているため
+
+```glsl
+// fragment.glsl に記述
+
+// ...
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  // ...
+
+  vec3 viewDirection = normalize(vPosition - cameraPosition); // 値を 1 に正規化
+
+  // ...
+```
+
+これで `dot 関数`が使用できます。
+
+```glsl
+// fragment.glsl に記述
+
+// ...
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  // ...
+
+  vec3 viewDirection = normalize(vPosition - cameraPosition);
+  float fresnel = dot(viewDirection, vNormal);
+
+  // ...
+```
+
+**出力結果**
+
+めちゃくちゃわかりにくですがうっすら輪郭が見えます
+
+[![Image from Gyazo](https://i.gyazo.com/b2193e5f928b36fe98bc63f3cdda8899.png)](https://gyazo.com/b2193e5f928b36fe98bc63f3cdda8899)
+
+このままだと 2 つの問題があります
+
+1. フレネル効果の計算値がオブジェクトの回転によって変化してしまう
+2. 表面に規則的な模様が見える
+
+これらを修正してきます
+
+### 問題の修正: フレネル効果の計算値がオブジェクトの回転によって変化してしまう
+
+フレネル効果の計算値がオブジェクトの回転で変化しないように修正します。
+
+まずは法線の向きを修正します。
+法線の向きを修正するには頂点シェーダーでモデルの法線を計算します
+
+```glsl
+// vertex.glsl に記述
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  // ...
+
+    // モデルの法線
+  vec4 modelNormal = modelMatrix * vec4(normal, 0.0); // 0.0 にすることでモデルが変換(移動、回転、スケール)してもそれらが適用されない
+
+  // varying
+  vPosition = modelPosition.xyz;
+  vNormal = modelNormal.xyz;
+}
+```
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> なぜ normal のときは vec4 の第 4 引数 が 0.0 ？
+>
+> `1.0` に設定する場合、ベクトルは同次であることを示す
+> これにより変換(移動、回転、拡大縮小)も同様に適用される
+>
+> `0.0` に設定する場合、ベクトルは同次では無いことを示す
+> なので変換は適用されない。
+> 法線には適用させたくないので `0.0` に 設定する
+
+```glsl
+// faragment.glsl に記述
+// ...
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  vec3 viewDirection = normalize(vPosition - cameraPosition);
+  float fresnel = dot(viewDirection, vNormal) + 1.0;
+  // + 1.0 は 値を 0 から 1 の範囲にするため、これをしないとなにも表示されなくなる
+
+  fresnel = pow(fresnel, 2.0);
+  // ストライプの時と同様、よりシャープにするため
+
+  gl_FragColor = vec4(vec3(1.0), fresnel);
+
+  // ...
+}
+```
+
+出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/f7f3b9af20f081d19a5df0824cc0cddd.png)](https://gyazo.com/f7f3b9af20f081d19a5df0824cc0cddd)
+
+### 問題の修正: 表面に規則的な模様が見える
+
+[![Image from Gyazo](https://i.gyazo.com/c3a961e393a2d50137f5255d10b57b6f.png)](https://gyazo.com/c3a961e393a2d50137f5255d10b57b6f)
+
+画像ではうまく表示されませんが、よく見ると
+規則的な模様が見えます。
+
+これは 頂点間では変化した値が補間されるためベクトルの長さが常に `1` ではなくなっているためです。
+
+これはフラグメントシェーダーで再度正規化することで修正出来ます
+
+```glsl
+// farment.glsl に記述
+
+uniform float uTime;
+uniform float uAnimationSpeed;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  vec3 normal = normalize(vNormal); // 法線の正規化
+
+  // ...
+
+  vec3 viewDirection = normalize(vPosition - cameraPosition);
+  float fresnel = dot(viewDirection, normal) + 1.0;
+
+  fresnel = pow(fresnel, 2.0);
+
+  gl_FragColor = vec4(vec3(1.0), fresnel);
+
+  // ...
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/eb44afa5a95328dd313b5d150a862cb8.png)](https://gyazo.com/eb44afa5a95328dd313b5d150a862cb8)
+
+## ストライプと組み合わせる
+
+```glsl
+// farment.glsl に記述
+
+// ...
+
+void main() {
+    // 法線
+  vec3 normal = normalize(vNormal);
+
+  // ストライプ
+  float stripes = mod((vPosition.y - uTime * uAnimationSpeed) * 20.0, 1.0);
+  stripes = pow(stripes, 3.0);
+
+  // フレネル効果
+  vec3 viewDirection = normalize(vPosition - cameraPosition);
+  float fresnel = dot(viewDirection, normal) + 1.0;
+  fresnel = pow(fresnel, 2.0);
+
+  // ホログラフィック
+  float holographic = stripes * fresnel;
+  holographic += fresnel * 1.10; // 暗くて見えにくいので強度を調整
+
+  gl_FragColor = vec4(vec3(1.0), holographic);
+
+  // Three.js オプション
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+### ここまでのコードの全体像
+
+<details>
+<summary>. jsファイル(クリックして展開)</summary>
+
+```js
+import GUI from 'lil-gui';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import fragmentShader from './shaders/holographic/fragment.glsl';
+import vertexShader from './shaders/holographic/vertex.glsl';
+
+// セットアップ
+const gui = new GUI();
+const canvas = document.querySelector('canvas.webgl');
+const scene = new THREE.Scene();
+const gltfLoader = new GLTFLoader();
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+window.addEventListener('resize', () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+// カメラ
+const camera = new THREE.PerspectiveCamera(
+  25,
+  sizes.width / sizes.height,
+  0.1,
+  100,
+);
+camera.position.set(7, 7, 7);
+scene.add(camera);
+
+// オービットコントロール
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
+// レンダラー
+const rendererParameters = {};
+rendererParameters.clearColor = '#1d1f2a';
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+});
+renderer.setClearColor(rendererParameters.clearColor);
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+gui.addColor(rendererParameters, 'clearColor').onChange(() => {
+  renderer.setClearColor(rendererParameters.clearColor);
+});
+
+// マテリアル
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+  },
+  transparent: true,
+});
+
+// オブジェクト
+// Torus knot
+const torusKnot = new THREE.Mesh(
+  new THREE.TorusKnotGeometry(0.6, 0.25, 128, 32),
+  material,
+);
+torusKnot.position.x = 3;
+scene.add(torusKnot);
+
+// Sphere
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(), material);
+sphere.position.x = -3;
+scene.add(sphere);
+
+// Suzanne
+let suzanne = null;
+gltfLoader.load('./suzanne.glb', (gltf) => {
+  suzanne = gltf.scene;
+  suzanne.traverse((child) => {
+    if (child.isMesh) child.material = material;
+  });
+  scene.add(suzanne);
+});
+
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  material.uniforms.uTime.value = elapsedTime;
+
+  if (suzanne) {
+    suzanne.rotation.x = -elapsedTime * 0.1;
+    suzanne.rotation.y = elapsedTime * 0.2;
+  }
+
+  sphere.rotation.x = -elapsedTime * 0.1;
+  sphere.rotation.y = elapsedTime * 0.2;
+
+  torusKnot.rotation.x = -elapsedTime * 0.1;
+  torusKnot.rotation.y = elapsedTime * 0.2;
+
+  controls.update();
+
+  renderer.render(scene, camera);
+
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+
+THREE.MeshStandardMaterial
+
+
+```
+
+</details>
+
+<details>
+<summary>. glslファイル(クリックして展開)</summary>
+
+```glsl
+// vertex.glsl
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+    // モデルの法線
+  vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+
+  // varying
+  vPosition = modelPosition.xyz;
+  vNormal = modelNormal.xyz;
+}
+```
+
+```glsl
+// fragent.glsl
+uniform float uTime;
+uniform float uAnimationSpeed;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  // 法線
+  vec3 normal = normalize(vNormal);
+
+  // ストライプ
+  float stripes = mod((vPosition.y - uTime * uAnimationSpeed) * 20.0, 1.0);
+  stripes = pow(stripes, 3.0);
+
+  // フレネル効果
+  vec3 viewDirection = normalize(vPosition - cameraPosition);
+  float fresnel = dot(viewDirection, normal) + 1.0;
+  fresnel = pow(fresnel, 2.0);
+
+  // ホログラフィック
+  float holographic = stripes * fresnel;
+  holographic += fresnel * 1.10;
+
+  gl_FragColor = vec4(vec3(1.0), holographic);
+
+  // Three.js オプション
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+</details>
+
+
+### 出力結果
+
+[![Image from Gyazo](https://i.gyazo.com/7e3e4ea8e0b2eb0e08a563896ca3a2c7.png)](https://gyazo.com/7e3e4ea8e0b2eb0e08a563896ca3a2c7)
+
