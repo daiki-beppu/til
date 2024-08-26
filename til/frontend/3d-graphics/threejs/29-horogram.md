@@ -1,27 +1,32 @@
 ---
 title: 29-horogram
 date: 2024/08/22
-updated: 2024/08/25
+updated: 2024/08/26
 ---
 
 # ホログラムの制作
 
 - [下準備](#下準備)
-- [ストライプパターンを作成](#ストライプパターンを作成)
+- [ストライプパターンの実装](#ストライプパターンの実装)
+  - [ストライプパターンの作成](#ストライプパターンの作成)
   - [出力結果](#出力結果)
-- [ストライプパターンにアニメーションを適用](#ストライプパターンにアニメーションを適用)
+  - [ストライプパターンにアニメーションを適用](#ストライプパターンにアニメーションを適用)
   - [出力結果](#出力結果-1)
-- [フレネル効果について](#フレネル効果について)
-  - [3D グラフィックにおけるフレネル効果の重要性](#3d-グラフィックにおけるフレネル効果の重要性)
 - [フレネル効果の実装](#フレネル効果の実装)
-  - [フレネル効果の値を計算](#フレネル効果の値を計算)
-  - [視線方向の計算](#視線方向の計算)
-  - [ドット積の計算](#ドット積の計算)
-  - [問題の修正: フレネル効果の計算値がオブジェクトの回転によって変化してしまう](#問題の修正-フレネル効果の計算値がオブジェクトの回転によって変化してしまう)
-  - [問題の修正: 表面に規則的な模様が見える](#問題の修正-表面に規則的な模様が見える)
-- [ストライプと組み合わせる](#ストライプと組み合わせる)
+  - [フレネル効果の概要](#フレネル効果の概要)
+    - [3D グラフィックにおけるフレネル効果の重要性](#3d-グラフィックにおけるフレネル効果の重要性)
+  - [フレネル効果の計算](#フレネル効果の計算)
+    - [視線方向の計算](#視線方向の計算)
+    - [ドット積の計算](#ドット積の計算)
+  - [フレネル効果効果の問題点と修正](#フレネル効果効果の問題点と修正)
+    - [問題の修正: フレネル効果の計算値がオブジェクトの回転によって変化してしまう](#問題の修正-フレネル効果の計算値がオブジェクトの回転によって変化してしまう)
+    - [問題の修正: 表面に規則的な模様が見える](#問題の修正-表面に規則的な模様が見える)
+- [ホログラム効果の完成](#ホログラム効果の完成)
+  - [ストライプパターンとフレネル効果の組み合わせ](#ストライプパターンとフレネル効果の組み合わせ)
+  - [背面の表示と修正](#背面の表示と修正)
+  - [深度バッファの調整](#深度バッファの調整)
+  - [ブレンディングモードの設定](#ブレンディングモードの設定)
   - [ここまでのコードの全体像](#ここまでのコードの全体像)
-  - [出力結果](#出力結果-2)
 
 > [!NOTE]
 >
@@ -208,7 +213,9 @@ void main() {
 
 </details>
 
-## ストライプパターンを作成
+## ストライプパターンの実装
+
+### ストライプパターンの作成
 
 [シェーダーパターンで学習した内容](https://github.com/daiki-beppu/til/blob/main/til/frontend/3d-graphics/threejs/24-shader-patterns.md#%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3-7)とよく似ているが
 今回は **UV 座標**ではなく`modelPosition`を割り当てる
@@ -275,7 +282,7 @@ void main() {
 
 [![Image from Gyazo](https://i.gyazo.com/89e5e8949ac8c1b557154d475b09ff58.png)](https://gyazo.com/89e5e8949ac8c1b557154d475b09ff58)
 
-## ストライプパターンにアニメーションを適用
+### ストライプパターンにアニメーションを適用
 
 マテリアルに`uniforms` プロパティを追加して
 `uTime`, `uAnimationSpeed`を`new THREE.Uniform(value)`で追加
@@ -338,7 +345,9 @@ void main() {
 
 [<a href="https://gyazo.com/299e3fb55025ecf84b138c9509849ad4"><video width="1000" autoplay muted loop playsinline controls><source src="https://i.gyazo.com/299e3fb55025ecf84b138c9509849ad4.mp4" type="video/mp4"/></video></a>](https://i.gyazo.com/299e3fb55025ecf84b138c9509849ad4.gif)
 
-## フレネル効果について
+## フレネル効果の実装
+
+### フレネル効果の概要
 
 フレネル効果 (Fresnel effect) は、光の反射と屈折が視線の角度によって変化する現象のこと
 
@@ -350,7 +359,7 @@ void main() {
 例: 水の表面
 真上(水面に対して垂直に近い角度)から見ると水中が見えるが、浅い角度(水面に対して水平に近い角度)から見ると水に反射して見える
 
-### 3D グラフィックにおけるフレネル効果の重要性
+#### 3D グラフィックにおけるフレネル効果の重要性
 
 - リアルな表現 : 物体をより自然に見せる
 - 奥行きを強調 : オブジェクトの形状や位置関係をより強調する
@@ -359,7 +368,7 @@ void main() {
 Three.js の場合 **PBR** を使用している
 `MeshStandardMaterial`や`MeshPhysicalMaterial`にはフレネル効果を使用して表現されている
 
-## フレネル効果の実装
+### フレネル効果の計算
 
 フレネル効果の計算を行うために頂点シェーダーで **Normal(法線)** を`variyng` でフラグメントシェーダーに送信します
 
@@ -409,12 +418,10 @@ void main() {
 
 [![Image from Gyazo](https://i.gyazo.com/9df39a3b2b450dbf66290a2b900accce.png)](https://gyazo.com/9df39a3b2b450dbf66290a2b900accce)
 
-### フレネル効果の値を計算
+#### 視線方向の計算
 
 フレネル効果の計算には**視線方向**と**ドット積**を使用します
 まずは視線方向を計算します
-
-### 視線方向の計算
 
 `viewDirection(視線方向)`は
 `vPosition(フラグメントの 3D 上の位置)` から `cameraPosition(カメラの位置)`を減算して求めます
@@ -437,7 +444,7 @@ void main() {
 }
 ```
 
-### ドット積の計算
+#### ドット積の計算
 
 ドット積は
 `dot 関数` という特殊な関数で 2 つのベクトルの内積を求めますが
@@ -498,6 +505,8 @@ void main() {
 
 [![Image from Gyazo](https://i.gyazo.com/b2193e5f928b36fe98bc63f3cdda8899.png)](https://gyazo.com/b2193e5f928b36fe98bc63f3cdda8899)
 
+### フレネル効果効果の問題点と修正
+
 このままだと 2 つの問題があります
 
 1. フレネル効果の計算値がオブジェクトの回転によって変化してしまう
@@ -505,7 +514,7 @@ void main() {
 
 これらを修正してきます
 
-### 問題の修正: フレネル効果の計算値がオブジェクトの回転によって変化してしまう
+#### 問題の修正: フレネル効果の計算値がオブジェクトの回転によって変化してしまう
 
 フレネル効果の計算値がオブジェクトの回転で変化しないように修正します。
 
@@ -570,7 +579,7 @@ void main() {
 
 [![Image from Gyazo](https://i.gyazo.com/f7f3b9af20f081d19a5df0824cc0cddd.png)](https://gyazo.com/f7f3b9af20f081d19a5df0824cc0cddd)
 
-### 問題の修正: 表面に規則的な模様が見える
+#### 問題の修正: 表面に規則的な模様が見える
 
 [![Image from Gyazo](https://i.gyazo.com/c3a961e393a2d50137f5255d10b57b6f.png)](https://gyazo.com/c3a961e393a2d50137f5255d10b57b6f)
 
@@ -611,7 +620,9 @@ void main() {
 
 [![Image from Gyazo](https://i.gyazo.com/eb44afa5a95328dd313b5d150a862cb8.png)](https://gyazo.com/eb44afa5a95328dd313b5d150a862cb8)
 
-## ストライプと組み合わせる
+## ホログラム効果の完成
+
+### ストライプパターンとフレネル効果の組み合わせ
 
 ```glsl
 // farment.glsl に記述
@@ -643,22 +654,139 @@ void main() {
 }
 ```
 
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/7e3e4ea8e0b2eb0e08a563896ca3a2c7.png)](https://gyazo.com/7e3e4ea8e0b2eb0e08a563896ca3a2c7)
+
+### 背面の表示と修正
+
+背面を表示するためにマテリアルの`side`プロパティに`side: THREE.DoubleSide`を追加します。
+
+```js
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+  },
+  transparent: true,
+  side: THREE.DoubleSide, // オブジェクトの両側を表示する
+});
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/59f324876ec85318dc325d4e48ef089c.png)](https://gyazo.com/59f324876ec85318dc325d4e48ef089c)
+
+このままだと、背面が強調されて表示されます。
+フレネル効果を適用したとき範囲を調整するために `+ 1.0` を加算しました
+背面も表示する場合は、これが悪さをしてしまいます。
+
+こちらを修正するにはまず、背面を取得する必要があります。
+GLSL には 描画しているフラグメントがカメラに向いているかを示す
+`gl_FrontFacing`という名前の変数があります。
+
+この変数を利用してカメラに向いていないとき値に `-1.0` を乗算して、反転させます
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> `gl_ForantFacing`はブール値 (true, false)
+
+```glsl
+// fragment.glsl に記述
+// ...
+
+void main() {
+
+  // 法線
+  vec3 normal = normalize(vNormal);
+
+  if(!gl_FrontFacing) {
+    normal *= -1.0;
+  }
+
+  // ...
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/95fca759ce3784f824db6b01c81c02d0.png)](https://gyazo.com/95fca759ce3784f824db6b01c81c02d0)
+
+### 深度バッファの調整
+
+良くなりましたが深度バッファが有効化されているため、前面が背面を隠してしまっています。
+
+これを修正するにはマテリアルの`depthWrite`プロパティを`false`に設定します
+
+```js
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+  },
+  transparent: true,
+  side: THREE.DoubleSide,
+  depthWrite: false, // 深度バッファを無効化
+});
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/16ba40fd6d69fe48255cdc8c48172aa7.png)](https://gyazo.com/16ba40fd6d69fe48255cdc8c48172aa7)
+
+### ブレンディングモードの設定
+
+さらに、ホログラムは光で構成されていることを鑑みて
+マテリアルの`blending`プロパティを`THREE.AdditiveBlending`に設定することで
+よりより見た目にすることが出来ます。
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> `THREE.AdditiveBlending` は 新しく描画されるピクセルの色値を既存のピクセルの色値に加算する。これにより重なり合う部分が明るくなり、光が重なり開くような効果を得られる
+
+```js
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+  },
+  transparent: true,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/94acba668e41b6a24bc94a0023f3094e.png)](https://gyazo.com/94acba668e41b6a24bc94a0023f3094e)
+
 ### ここまでのコードの全体像
 
 <details>
 <summary>. jsファイル(クリックして展開)</summary>
 
 ```js
-import GUI from 'lil-gui';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import fragmentShader from './shaders/holographic/fragment.glsl';
-import vertexShader from './shaders/holographic/vertex.glsl';
+import GUI from "lil-gui";
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import fragmentShader from "./shaders/holographic/fragment.glsl";
+import vertexShader from "./shaders/holographic/vertex.glsl";
 
 // セットアップ
 const gui = new GUI();
-const canvas = document.querySelector('canvas.webgl');
+const canvas = document.querySelector("canvas.webgl");
 const scene = new THREE.Scene();
 const gltfLoader = new GLTFLoader();
 const sizes = {
@@ -666,7 +794,7 @@ const sizes = {
   height: window.innerHeight,
 };
 
-window.addEventListener('resize', () => {
+window.addEventListener("resize", () => {
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
 
@@ -682,7 +810,7 @@ const camera = new THREE.PerspectiveCamera(
   25,
   sizes.width / sizes.height,
   0.1,
-  100,
+  100
 );
 camera.position.set(7, 7, 7);
 scene.add(camera);
@@ -693,7 +821,7 @@ controls.enableDamping = true;
 
 // レンダラー
 const rendererParameters = {};
-rendererParameters.clearColor = '#1d1f2a';
+rendererParameters.clearColor = "#1d1f2a";
 
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
@@ -703,7 +831,7 @@ renderer.setClearColor(rendererParameters.clearColor);
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-gui.addColor(rendererParameters, 'clearColor').onChange(() => {
+gui.addColor(rendererParameters, "clearColor").onChange(() => {
   renderer.setClearColor(rendererParameters.clearColor);
 });
 
@@ -716,13 +844,16 @@ const material = new THREE.ShaderMaterial({
     uAnimationSpeed: new THREE.Uniform(0.03),
   },
   transparent: true,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
 });
 
 // オブジェクト
 // Torus knot
 const torusKnot = new THREE.Mesh(
   new THREE.TorusKnotGeometry(0.6, 0.25, 128, 32),
-  material,
+  material
 );
 torusKnot.position.x = 3;
 scene.add(torusKnot);
@@ -734,7 +865,7 @@ scene.add(sphere);
 
 // Suzanne
 let suzanne = null;
-gltfLoader.load('./suzanne.glb', (gltf) => {
+gltfLoader.load("./suzanne.glb", (gltf) => {
   suzanne = gltf.scene;
   suzanne.traverse((child) => {
     if (child.isMesh) child.material = material;
@@ -768,10 +899,6 @@ const tick = () => {
 };
 
 tick();
-
-THREE.MeshStandardMaterial
-
-
 ```
 
 </details>
@@ -813,7 +940,9 @@ void main() {
 
   // 法線
   vec3 normal = normalize(vNormal);
-
+  if(!gl_FrontFacing) {
+    normal *= -1.0;
+  }
   // ストライプ
   float stripes = mod((vPosition.y - uTime * uAnimationSpeed) * 20.0, 1.0);
   stripes = pow(stripes, 3.0);
@@ -833,11 +962,7 @@ void main() {
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 }
+
 ```
+
 </details>
-
-
-### 出力結果
-
-[![Image from Gyazo](https://i.gyazo.com/7e3e4ea8e0b2eb0e08a563896ca3a2c7.png)](https://gyazo.com/7e3e4ea8e0b2eb0e08a563896ca3a2c7)
-
