@@ -25,6 +25,7 @@ updated: 2024/08/26
   - [ストライプパターンとフレネル効果の組み合わせ](#ストライプパターンとフレネル効果の組み合わせ)
   - [背面の表示と修正](#背面の表示と修正)
   - [深度バッファの調整](#深度バッファの調整)
+  - [フォールオフ(減衰効果)](#フォールオフ減衰効果)
   - [ここまでのコードの全体像](#ここまでのコードの全体像)
 
 > [!NOTE]
@@ -770,6 +771,38 @@ const material = new THREE.ShaderMaterial({
 
 [![Image from Gyazo](https://i.gyazo.com/94acba668e41b6a24bc94a0023f3094e.png)](https://gyazo.com/94acba668e41b6a24bc94a0023f3094e)
 
+### フォールオフ(減衰効果)
+
+エッジのアルファ値をフェードアウトします。
+フレネル効果にスムーズステップを適用し値を再マッピングすることでフォールオフ(減衰効果)を実現します。
+
+```glsl
+// faragment.glsl に記述
+
+// ...
+
+void main() {
+
+  // ...
+
+  // フォールオフ
+  float falloff = smoothstep(0.8, 0.0, fresnel);
+
+  // ホログラフィック
+  float holographic = stripes * fresnel;
+  holographic += fresnel * 1.10;
+  holographic *= falloff;
+
+  gl_FragColor = vec4(vec3(1.0), holographic);
+
+  // ...
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/d50cd24b5aa92d635739d03778cb0da3.png)](https://gyazo.com/d50cd24b5aa92d635739d03778cb0da3)
+
 ### ここまでのコードの全体像
 
 <details>
@@ -951,9 +984,13 @@ void main() {
   float fresnel = dot(viewDirection, normal) + 1.0;
   fresnel = pow(fresnel, 2.0);
 
+  // フォールオフ
+  float falloff = smoothstep(0.8, 0.0, fresnel);
+
   // ホログラフィック
   float holographic = stripes * fresnel;
   holographic += fresnel * 1.10;
+  holographic *= falloff;
 
   gl_FragColor = vec4(vec3(1.0), holographic);
 
