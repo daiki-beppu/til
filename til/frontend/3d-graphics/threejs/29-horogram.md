@@ -1,7 +1,7 @@
 ---
 title: 29-horogram
 date: 2024/08/22
-updated: 2024/08/26
+updated: 2024/08/28
 ---
 
 # ホログラムの制作
@@ -27,6 +27,8 @@ updated: 2024/08/26
   - [深度バッファの調整](#深度バッファの調整)
   - [フォールオフ(減衰効果)](#フォールオフ減衰効果)
   - [ここまでのコードの全体像](#ここまでのコードの全体像)
+- [色の変更](#色の変更)
+  - [デバッグ UI の追加](#デバッグ-ui-の追加)
 
 > [!NOTE]
 >
@@ -1002,3 +1004,95 @@ void main() {
 ```
 
 </details>
+
+## 色の変更
+
+デバッグ UI で色の変更を行います
+
+色を変更するためにユニフォームをフラグメントシェーダーに送信します
+マテリアルの`uniforms`プロパティに`uColor`ユニフォームを追加し
+`new THREE.Uniform(new THREE.Color(('red'))`で追加します
+
+```js
+// マテリアル
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+    uColor: new THREE.Uniform(new THREE.Color("red")),
+  },
+  transparent: true,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+```
+
+```glsl
+// fargment.glsl に記述
+
+// ...
+
+uniform vec3  uColor; // 色は vec3 で扱う
+
+// ...
+
+void main() {
+
+// ...
+
+  gl_FragColor = vec4(vec3(uColor), holographic);
+
+  // ...
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/e22e46c343a3788ae82e9843a1f3a411.png)](https://gyazo.com/e22e46c343a3788ae82e9843a1f3a411)
+
+### デバッグ UI の追加
+
+ダミーのオブジェクトを作成します
+
+```js
+const debugUIConfig = {
+  color: "#70c1ff",
+};
+```
+
+lilgui で デバッグ UI を追加します
+今回は色の変更なので`gui.addColor`を使用します
+
+`onChange`で変更を検知してデバッグ UI での色を再設定します
+
+```js
+gui.addColor(debugUIConfig, "color").onChange(() => {
+  material.uniforms.uColor.value.set(debugUIConfig.color);
+});
+```
+
+`uColor`もダミーオブジェクトの値に設定します
+
+```js
+// マテリアル
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+    uColor: new THREE.Uniform(new THREE.Color(debugUIConfig.color)),
+  },
+  transparent: true,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/dd1fdee7b854ae0a34336ead9d3552da"><img src="https://i.gyazo.com/dd1fdee7b854ae0a34336ead9d3552da.gif" alt="Image from Gyazo" width="1000"/></a>
