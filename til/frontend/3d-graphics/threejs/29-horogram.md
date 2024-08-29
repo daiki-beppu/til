@@ -1,7 +1,7 @@
 ---
 title: 29-horogram
 date: 2024/08/22
-updated: 2024/08/28
+updated: 2024/08/29
 ---
 
 # ホログラムの制作
@@ -29,6 +29,10 @@ updated: 2024/08/28
   - [ここまでのコードの全体像](#ここまでのコードの全体像)
 - [色の変更](#色の変更)
   - [デバッグ UI の追加](#デバッグ-ui-の追加)
+- [グリッチ効果の実装](#グリッチ効果の実装)
+  - [ランダム関数の作成](#ランダム関数の作成)
+  - [すべての頂点にグリッチ効果を適用](#すべての頂点にグリッチ効果を適用)
+  - [アニメーションの修正](#アニメーションの修正)
 
 > [!NOTE]
 >
@@ -1096,3 +1100,151 @@ const material = new THREE.ShaderMaterial({
 **出力結果**
 
 <a href="https://gyazo.com/dd1fdee7b854ae0a34336ead9d3552da"><img src="https://i.gyazo.com/dd1fdee7b854ae0a34336ead9d3552da.gif" alt="Image from Gyazo" width="1000"/></a>
+
+## グリッチ効果の実装
+
+### ランダム関数の作成
+
+まずは、x 軸と z 軸の頂点がランダムで移動するようにします
+ですが GLSL にはランダム関数が組み込まれていません
+
+[Book of Shaders の記事](https://thebookofshaders.com/10/)を参考に次のように変更しました。
+
+```glsl
+
+float random2D(vec2 value) {
+  return fract(sin(dot(value.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+// vec2 を受け取って float の 0,0 から 1,0 までのランダム値を返す
+
+```
+
+### すべての頂点にグリッチ効果を適用
+
+`random2D関数`を使用して `modelPosition` を変更します。
+
+```glsl
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+float random2D(vec2 value) {
+  return fract(sin(dot(value.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  // グリッチ効果
+  modelPosition.x += random2D(modelPosition.xz);
+  modelPosition.z += random2D(modelPosition.zx);
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+    // モデルの法線
+  vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+
+  // varying
+  vPosition = modelPosition.xyz;
+  vNormal = modelNormal.xyz;
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/dd3f415e30060f285ba4adc44da7c7cf"><img src="https://i.gyazo.com/dd3f415e30060f285ba4adc44da7c7cf.gif" alt="Image from Gyazo" width="1000"/></a>
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> なぜ x 軸には `modelPosition.xz` で z 軸には `modelPosition.zx`なの？
+>
+> これは、x 軸と z 軸で異なるランダム値を生成するため。
+>
+> - `modelPosition.xz` は (x, z) 座標を表す
+> - `modelPosition.zx` は (z, x) 座標を表す
+>
+> GLSL のスウィズリングを応用し同じ入力値から異なる値を出力できる
+> x 軸と z 軸が同じ値にならないので、より自然なランダムな移動になる
+
+### アニメーションの修正
+
+tick 関数のアニメーションをコメントアウトしモデルの動きを止めると
+グリッチ効果も停止して見えます
+
+```js
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  material.uniforms.uTime.value = elapsedTime;
+
+  // if (suzanne) {
+  //   suzanne.rotation.x = -elapsedTime * 0.1;
+  //   suzanne.rotation.y = elapsedTime * 0.2;
+  // }
+
+  // sphere.rotation.x = -elapsedTime * 0.1;
+  // sphere.rotation.y = elapsedTime * 0.2;
+
+  // torusKnot.rotation.x = -elapsedTime * 0.1;
+  // torusKnot.rotation.y = elapsedTime * 0.2;
+
+  controls.update();
+
+  renderer.render(scene, camera);
+
+  window.requestAnimationFrame(tick);
+};
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/970f29a0178cce4f86c134312b7bb171"><img src="https://i.gyazo.com/970f29a0178cce4f86c134312b7bb171.gif" alt="Image from Gyazo" width="1000"/></a>
+
+これを修正するために
+`uTime` を使用します
+
+```glsl
+// vertex.glsl に記述
+
+uniform float uTime;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+float random2D(vec2 value) {
+  return fract(sin(dot(value.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  // グリッチ効果
+  modelPosition.x += random2D(modelPosition.xz + uTime) - 0.5;
+  modelPosition.z += random2D(modelPosition.zx + uTime) - 0.5;
+
+  // 値を - 0.5 しているのは 範囲を - 0.5 から 0.5 にして両方向に動くようにするため
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+    // モデルの法線
+  vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+
+  // varying
+  vPosition = modelPosition.xyz;
+  vNormal = modelNormal.xyz;
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/0c54d98832cb41bb3bbf13ae1fde8c23"><img src="https://i.gyazo.com/0c54d98832cb41bb3bbf13ae1fde8c23.gif" alt="Image from Gyazo" width="1000"/></a>
