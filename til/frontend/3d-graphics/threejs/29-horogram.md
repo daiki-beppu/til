@@ -1,7 +1,7 @@
 ---
 title: 29-horogram
 date: 2024/08/22
-updated: 2024/08/29
+updated: 2024/08/30
 ---
 
 # ホログラムの制作
@@ -33,6 +33,9 @@ updated: 2024/08/29
   - [ランダム関数の作成](#ランダム関数の作成)
   - [すべての頂点にグリッチ効果を適用](#すべての頂点にグリッチ効果を適用)
   - [アニメーションの修正](#アニメーションの修正)
+  - [下から上へと波のように変化させる](#下から上へと波のように変化させる)
+  - [グリッチ効果の頻度を調整](#グリッチ効果の頻度を調整)
+  - [異なる周波数を利用してランダム性を追加](#異なる周波数を利用してランダム性を追加)
 
 > [!NOTE]
 >
@@ -1248,3 +1251,85 @@ void main() {
 **出力結果**
 
 <a href="https://gyazo.com/0c54d98832cb41bb3bbf13ae1fde8c23"><img src="https://i.gyazo.com/0c54d98832cb41bb3bbf13ae1fde8c23.gif" alt="Image from Gyazo" width="1000"/></a>
+
+### 下から上へと波のように変化させる
+
+グリッチ効果が下から上へと波のように変化するようにします。
+これを実現するには
+
+変数 `glitchStrength` 作成し `sin 関数`で `uTime` を -1.0 から 1.0 の値に変換します
+`modelPosition`に乗算します。
+
+下から上へと変化させるために
+`modelPosition.y` を減算します
+
+```glsl
+// vertex.glsl に記述
+
+uniform float uTime;
+
+// ...
+
+void main() {
+  // ...
+
+  // グリッチ効果
+  float glitchStrength = sin(uTime - modelPosition.y); // 下から上へと変化
+  glitchStrength *= 0.25; // 効果を弱める
+
+  modelPosition.x += (random2D(modelPosition.xz + uTime) - 0.5) * glitchStrength;
+  modelPosition.z += (random2D(modelPosition.zx + uTime) - 0.5) * glitchStrength;
+
+  // ...
+
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/5b55c7ee737eaa0e213e45f56034945b"><img src="https://i.gyazo.com/5b55c7ee737eaa0e213e45f56034945b.gif" alt="Image from Gyazo" width="1000"/></a>
+
+### グリッチ効果の頻度を調整
+
+sin 関数を使用しているので 値は -1 から 1 に変化します。
+そのためほとんどの場合アクティブな状態となるため常にグリッチ効果が表示されてしまいます。
+
+この状態を修正するために `smoothstep 関数` で値を再マッピングします。
+これによりグリッチ効果の表示頻度を調整します。
+
+```glsl
+// vertex.glsl に記述
+
+uniform float uTime;
+
+// ...
+
+void main() {
+  // ...
+
+  // グリッチ効果
+  float glitchStrength = sin(uTime - modelPosition.y);
+
+   // 値を再マッピングして表示頻度を調整
+  glitchStrength = smoothstep(
+    0.3, // 値が 1,0 に近いほど表示頻度が少なくなる
+    1.0, // 値が 0.0 に近いほどグリッチ効果が急激に変化する
+    glitchStrength);
+
+  glitchStrength *= 0.25;
+
+  modelPosition.x += (random2D(modelPosition.xz + uTime) - 0.5) * glitchStrength;
+  modelPosition.z += (random2D(modelPosition.zx + uTime) - 0.5) * glitchStrength;
+
+  // ...
+
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/ce186234e5c9a8233f18572a0fa62d07"><img src="https://i.gyazo.com/ce186234e5c9a8233f18572a0fa62d07.gif" alt="Image from Gyazo" width="1000"/></a>
+
+### 異なる周波数を利用してランダム性を追加
+
+
