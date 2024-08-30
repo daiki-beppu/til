@@ -1,7 +1,7 @@
 ---
 title: 29-horogram
 date: 2024/08/22
-updated: 2024/08/30
+updated: 2024/08/31
 ---
 
 # ホログラムの制作
@@ -35,6 +35,7 @@ updated: 2024/08/30
   - [アニメーションの修正](#アニメーションの修正)
   - [下から上へと波のように変化させる](#下から上へと波のように変化させる)
   - [グリッチ効果の頻度を調整](#グリッチ効果の頻度を調整)
+  - [異なる周波数を利用してランダム性を追加](#異なる周波数を利用してランダム性を追加)
 
 > [!NOTE]
 >
@@ -1329,5 +1330,38 @@ void main() {
 
 <a href="https://gyazo.com/ce186234e5c9a8233f18572a0fa62d07"><img src="https://i.gyazo.com/ce186234e5c9a8233f18572a0fa62d07.gif" alt="Image from Gyazo" width="1000"/></a>
 
+### 異なる周波数を利用してランダム性を追加
+
+まずは繰り返し数式を記述しないために 変数 `glichTime`を作成
+
+周波数の異なる sin 関数を 3 つ用意しそれぞれを加算します
+そして sin 関数の数で割り戻します
+
+```glsl
+// vertex.glsl に記述
+
+// ...
+
+void main() {
+
+  // ...
+
+  // グリッチ効果
+  float glichTime = uTime - modelPosition.y;
+  float glitchStrength = sin(glichTime) + sin(glichTime * 2.354) + sin(glichTime * 9.6436);
+  glitchStrength /= 3.0;
+  glitchStrength = smoothstep(0.3, 1.0, glitchStrength);
+  glitchStrength *= 0.25;
+
+  modelPosition.x += (random2D(modelPosition.xz + uTime) - 0.5) * glitchStrength;
+  modelPosition.z += (random2D(modelPosition.zx + uTime) - 0.5) * glitchStrength;
+
+  // ...
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/9c1a18ad4b83ae624575c618875f76f0"><img src="https://i.gyazo.com/9c1a18ad4b83ae624575c618875f76f0.gif" alt="Image from Gyazo" width="1000"/></a>
 
 
