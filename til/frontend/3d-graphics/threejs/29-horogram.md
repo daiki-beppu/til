@@ -1,7 +1,7 @@
 ---
 title: 29-horogram
 date: 2024/08/22
-updated: 2024/08/31
+updated: 2024/09/01
 ---
 
 # ホログラムの制作
@@ -36,6 +36,8 @@ updated: 2024/08/31
   - [下から上へと波のように変化させる](#下から上へと波のように変化させる)
   - [グリッチ効果の頻度を調整](#グリッチ効果の頻度を調整)
   - [異なる周波数を利用してランダム性を追加](#異なる周波数を利用してランダム性を追加)
+- [シェーダーチャンクの分離](#シェーダーチャンクの分離)
+  - [最終的なコードの全体像](#最終的なコードの全体像)
 
 > [!NOTE]
 >
@@ -1364,4 +1366,268 @@ void main() {
 
 <a href="https://gyazo.com/9c1a18ad4b83ae624575c618875f76f0"><img src="https://i.gyazo.com/9c1a18ad4b83ae624575c618875f76f0.gif" alt="Image from Gyazo" width="1000"/></a>
 
+## シェーダーチャンクの分離
 
+`random2D 関数`を別ファイルに切り出します
+shaders フォルダ内に includes フォルダを作成して
+`random2D.glsl`ファイルを作成します
+
+```glsl
+// random2D.glsl に記述
+
+float random2D(vec2 value) {
+  return fract(sin(dot(value.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+```
+
+`random2D 関数`の代わりに `#include` を使用します
+
+```glsl
+// vertex.glsl に記述
+
+// ...
+
+#include ../includes/random2D.glsl
+
+void main() {
+  // ...
+
+  modelPosition.x += (random2D(modelPosition.xz + uTime) - 0.5) * glitchStrength;
+  modelPosition.z += (random2D(modelPosition.zx + uTime) - 0.5) * glitchStrength;
+
+  // ...
+}
+```
+
+### 最終的なコードの全体像
+
+<details>
+<summary>. jsファイル(クリックして展開)</summary>
+
+```js
+import GUI from "lil-gui";
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import fragmentShader from "./shaders/holographic/fragment.glsl";
+import vertexShader from "./shaders/holographic/vertex.glsl";
+
+// セットアップ
+const gui = new GUI();
+const canvas = document.querySelector("canvas.webgl");
+const scene = new THREE.Scene();
+const gltfLoader = new GLTFLoader();
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+// カメラ
+const camera = new THREE.PerspectiveCamera(
+  25,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
+camera.position.set(7, 7, 7);
+scene.add(camera);
+
+// オービットコントロール
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
+// レンダラー
+const rendererParameters = {};
+rendererParameters.clearColor = "#1d1f2a";
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+});
+renderer.setClearColor(rendererParameters.clearColor);
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+gui.addColor(rendererParameters, "clearColor").onChange(() => {
+  renderer.setClearColor(rendererParameters.clearColor);
+});
+
+const debugUIConfig = {
+  color: "#70c1ff",
+};
+
+gui.addColor(debugUIConfig, "color").onChange(() => {
+  material.uniforms.uColor.value.set(debugUIConfig.color);
+});
+
+// マテリアル
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uAnimationSpeed: new THREE.Uniform(0.03),
+    uColor: new THREE.Uniform(new THREE.Color(debugUIConfig.color)),
+  },
+  transparent: true,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+
+// オブジェクト
+// Torus knot
+const torusKnot = new THREE.Mesh(
+  new THREE.TorusKnotGeometry(0.6, 0.25, 128, 32),
+  material
+);
+torusKnot.position.x = 3;
+scene.add(torusKnot);
+
+// Sphere
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(), material);
+sphere.position.x = -3;
+scene.add(sphere);
+
+// Suzanne
+let suzanne = null;
+gltfLoader.load("./suzanne.glb", (gltf) => {
+  suzanne = gltf.scene;
+  suzanne.traverse((child) => {
+    if (child.isMesh) child.material = material;
+  });
+  scene.add(suzanne);
+});
+
+// アニメーション
+const clock = new THREE.Clock();
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+  material.uniforms.uTime.value = elapsedTime;
+
+  if (suzanne) {
+    suzanne.rotation.x = -elapsedTime * 0.1;
+    suzanne.rotation.y = elapsedTime * 0.2;
+  }
+
+  sphere.rotation.x = -elapsedTime * 0.1;
+  sphere.rotation.y = elapsedTime * 0.2;
+
+  torusKnot.rotation.x = -elapsedTime * 0.1;
+  torusKnot.rotation.y = elapsedTime * 0.2;
+
+  controls.update();
+
+  renderer.render(scene, camera);
+
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+</details>
+
+<details>
+<summary>. glslファイル(クリックして展開)</summary>
+
+```glsl
+// vertex.glsl
+
+uniform float uTime;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+#include ../includes/random2D.glsl
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  // グリッチ効果
+  float glichTime = uTime - modelPosition.y;
+  float glitchStrength = sin(glichTime) + sin(glichTime * 2.354) + sin(glichTime * 9.6436);
+  glitchStrength /= 3.0;
+  glitchStrength = smoothstep(0.3, 1.0, glitchStrength);
+  glitchStrength *= 0.25;
+
+  modelPosition.x += (random2D(modelPosition.xz + uTime) - 0.5) * glitchStrength;
+  modelPosition.z += (random2D(modelPosition.zx + uTime) - 0.5) * glitchStrength;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+    // モデルの法線
+  vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+
+  // varying
+  vPosition = modelPosition.xyz;
+  vNormal = modelNormal.xyz;
+}
+```
+
+```glsl
+// fragment.glsl
+
+uniform float uTime;
+uniform float uAnimationSpeed;
+uniform vec3 uColor;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+  // 法線
+  vec3 normal = normalize(vNormal);
+  if(!gl_FrontFacing) {
+    normal *= -1.0;
+  }
+  // ストライプ
+  float stripes = mod((vPosition.y - uTime * uAnimationSpeed) * 20.0, 1.0);
+  stripes = pow(stripes, 3.0);
+
+  // フレネル効果
+  vec3 viewDirection = normalize(vPosition - cameraPosition);
+  float fresnel = dot(viewDirection, normal) + 1.0;
+  fresnel = pow(fresnel, 2.0);
+
+  // フォールオフ
+  float falloff = smoothstep(0.8, 0.0, fresnel);
+
+  // ホログラフィック
+  float holographic = stripes * fresnel;
+  holographic += fresnel * 1.10;
+  holographic *= falloff;
+
+  gl_FragColor = vec4(vec3(uColor), holographic);
+
+  // Three.js オプション
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+```glsl
+// random2D.glsl
+
+float random2D(vec2 value) {
+  return fract(sin(dot(value.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+```
+
+</details>
