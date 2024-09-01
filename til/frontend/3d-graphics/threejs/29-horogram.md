@@ -280,11 +280,14 @@ void main() {
 > 📝 **Memo**
 >
 > **なぜ UV 座標ではなく `modelPosition`？**
+>
 > UV 座標は 2D 平面上の相対的な位置を表す。 3D オブジェクトの表面に対してのみ適用される。
 > 今回はオブジェクト全体に対して適用させたいので 3D 空間における絶対位置である `modelPosition`を使用する
 > これにより物体の形状や向きに関係なくシームレスなパターンを作成できる
 >
-> **スウィズリング** > `vPosition` は `vec3` だが `modelPosition` は `vec4` なので
+> **スウィズリング**
+>
+> `vPosition` は `vec3` だが `modelPosition` は `vec4` なので
 > `modelPosition.xyz` のようにどの値を取得するか指定する必要がある
 > これをスウィズリングと呼ぶ
 > また`modelPosition.zxy`のように順序を変更したり、`modelPositon.xxyのように`同じ値を繰り返し指定することもできる
