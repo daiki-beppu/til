@@ -9,6 +9,7 @@ updated: 2024/09/06
 - [下準備](#下準備)
 - [花火の実装](#花火の実装)
   - [パーティクルサイズの調整](#パーティクルサイズの調整)
+    - [ユニフォームでパーティクルサイズを調整](#ユニフォームでパーティクルサイズを調整)
 
 > [!NOTE]
 >
@@ -216,3 +217,55 @@ void main() {
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/15a22022cb9bc89e01e64498e510fc99.png)](https://gyazo.com/15a22022cb9bc89e01e64498e510fc99)
+
+#### ユニフォームでパーティクルサイズを調整
+
+マテリアルに `uniforms`プロパティに `uSize` を追加
+
+```js
+  const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uSize: new THREE.Uniform(size),
+    },
+  }
+```
+
+頂点シェーダーで `gl_PointSize` を `50.0 => uSize` に変更します。
+
+```glsl
+vertex.glsl に記述
+
+uniform float uSize;
+
+void main() {
+  // ...
+
+  gl_PointSize = uSize;
+  gl_PointSize *= 1.0 / - viewPosition.z;
+}
+```
+
+`createFirework 関数`のパラメータに`size`を追加して
+`uSize` の値に `size` パラメータを設定する
+
+こうすることで、引数からパーティクルサイズを調整することができる
+
+```js
+const createFirework = (count, position, size) => {
+  // ...
+
+  const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uSize: new THREE.Uniform(size),
+    },
+  });
+
+  // ...
+};
+
+createFirework(100, new THREE.Vector3(), 50);
+```
