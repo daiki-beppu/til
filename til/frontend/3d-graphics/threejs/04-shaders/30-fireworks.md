@@ -1,7 +1,7 @@
 ---
 title: 30-fireworks
 date: 2024/09/01
-updated: 2024/09/02
+updated: 2024/09/06
 ---
 
 # ｢花火｣の制作
@@ -18,7 +18,7 @@ updated: 2024/09/02
 
 以下の状態からはじめます
 
-[![Image from Gyazo](https://i.gyazo.com/11811701b2684237b9e0d07dbeafc43e.png)](https://gyazo.com/11811701b2684237b9e0d07dbeafc43e)
+[![Image from Gyazo](https://i.gyazo.com/70c7b8250b40023c2fa34d348cee0d02.png)](https://gyazo.com/70c7b8250b40023c2fa34d348cee0d02)
 
 <details>
 <summary>. jsファイル(クリックして展開)</summary>
@@ -83,9 +83,9 @@ const createFirework = (count, position) => {
   for (let i = 0; i < count; i++) {
     const positionIndex = i * 3;
 
-    positionsArray[positionIndex] = Math.random() - 5;
-    positionsArray[positionIndex + 1] = Math.random() - 5;
-    positionsArray[positionIndex + 2] = Math.random() - 5;
+    positionsArray[positionIndex] = Math.random() - 0.5;
+    positionsArray[positionIndex + 1] = Math.random() - 0.5;
+    positionsArray[positionIndex + 2] = Math.random() - 0.5;
   }
 
   const geometry = new THREE.BufferGeometry();
@@ -212,3 +212,7 @@ void main() {
   gl_PointSize *= 1.0 / - viewPosition.z; // 遠近感を加える
 }
 ```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/15a22022cb9bc89e01e64498e510fc99.png)](https://gyazo.com/15a22022cb9bc89e01e64498e510fc99)
