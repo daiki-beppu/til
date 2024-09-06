@@ -18,13 +18,14 @@ updated: 2024/09/01
   - [フレネル効果の計算](#フレネル効果の計算)
     - [視線方向の計算](#視線方向の計算)
     - [ドット積の計算](#ドット積の計算)
-  - [フレネル効果効果の問題点と修正](#フレネル効果効果の問題点と修正)
+  - [フレネル効果の問題点と修正](#フレネル効果の問題点と修正)
     - [問題の修正: フレネル効果の計算値がオブジェクトの回転によって変化してしまう](#問題の修正-フレネル効果の計算値がオブジェクトの回転によって変化してしまう)
     - [問題の修正: 表面に規則的な模様が見える](#問題の修正-表面に規則的な模様が見える)
 - [ホログラム効果の完成](#ホログラム効果の完成)
   - [ストライプパターンとフレネル効果の組み合わせ](#ストライプパターンとフレネル効果の組み合わせ)
   - [背面の表示と修正](#背面の表示と修正)
   - [深度バッファの調整](#深度バッファの調整)
+  - [ブレンディングモードの設定](#ブレンディングモードの設定)
   - [フォールオフ(減衰効果)](#フォールオフ減衰効果)
   - [ここまでのコードの全体像](#ここまでのコードの全体像)
 - [色の変更](#色の変更)
@@ -519,7 +520,7 @@ void main() {
 
 [![Image from Gyazo](https://i.gyazo.com/b2193e5f928b36fe98bc63f3cdda8899.png)](https://gyazo.com/b2193e5f928b36fe98bc63f3cdda8899)
 
-### フレネル効果効果の問題点と修正
+### フレネル効果の問題点と修正
 
 このままだと 2 つの問題があります
 
@@ -754,7 +755,7 @@ const material = new THREE.ShaderMaterial({
 
 [![Image from Gyazo](https://i.gyazo.com/16ba40fd6d69fe48255cdc8c48172aa7.png)](https://gyazo.com/16ba40fd6d69fe48255cdc8c48172aa7)
 
-###` ブレンディングモードの設定
+### ブレンディングモードの設定
 
 さらに、ホログラムは光で構成されていることを鑑みて
 マテリアルの`blending`プロパティを`THREE.AdditiveBlending`に設定することで
@@ -1337,7 +1338,7 @@ void main() {
 
 ### 異なる周波数を利用してランダム性を追加
 
-まずは繰り返し数式を記述しないために 変数 `glichTime`を作成
+まずは繰り返し数式を記述しないために 変数 `glotchTime`を作成
 
 周波数の異なる sin 関数を 3 つ用意しそれぞれを加算します
 そして sin 関数の数で割り戻します
@@ -1352,8 +1353,8 @@ void main() {
   // ...
 
   // グリッチ効果
-  float glichTime = uTime - modelPosition.y;
-  float glitchStrength = sin(glichTime) + sin(glichTime * 2.354) + sin(glichTime * 9.6436);
+  float glotchTime = uTime - modelPosition.y;
+  float glitchStrength = sin(glotchTime) + sin(glotchTime * 2.354) + sin(glotchTime * 9.6436);
   glitchStrength /= 3.0;
   glitchStrength = smoothstep(0.3, 1.0, glitchStrength);
   glitchStrength *= 0.25;
@@ -1560,8 +1561,8 @@ void main() {
   vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
   // グリッチ効果
-  float glichTime = uTime - modelPosition.y;
-  float glitchStrength = sin(glichTime) + sin(glichTime * 2.354) + sin(glichTime * 9.6436);
+  float glotchTime = uTime - modelPosition.y;
+  float glitchStrength = sin(glotchTime) + sin(glotchTime * 2.354) + sin(glotchTime * 9.6436);
   glitchStrength /= 3.0;
   glitchStrength = smoothstep(0.3, 1.0, glitchStrength);
   glitchStrength *= 0.25;
