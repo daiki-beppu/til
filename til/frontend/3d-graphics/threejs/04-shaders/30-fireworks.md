@@ -1,7 +1,7 @@
 ---
 title: 30-fireworks
 date: 2024/09/01
-updated: 2024/09/06
+updated: 2024/09/07
 ---
 
 # ｢花火｣の制作
@@ -10,6 +10,9 @@ updated: 2024/09/06
 - [花火の実装](#花火の実装)
   - [パーティクルサイズの調整](#パーティクルサイズの調整)
     - [ユニフォームでパーティクルサイズを調整](#ユニフォームでパーティクルサイズを調整)
+  - [レンダリングの高さに比例させる](#レンダリングの高さに比例させる)
+  - [ピクセル比を適切に処理する](#ピクセル比を適切に処理する)
+  - [ここまでのコードの全体像](#ここまでのコードの全体像)
 
 > [!NOTE]
 >
@@ -269,3 +272,298 @@ const createFirework = (count, position, size) => {
 
 createFirework(100, new THREE.Vector3(), 50);
 ```
+
+### レンダリングの高さに比例させる
+
+今のままでは、レンダリングの高さに合わせてサイズが変更されません。
+これを修正します。
+
+まずレンダリングの解像度をシェーダーに送信します。
+マテリアルの`uniforms`プロパティに`uResolution`を追加
+`sizes.width`と`sizes.height`を送信するので`Vector2`を使用する
+
+```js
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uSize: new THREE.Uniform(size),
+    uResolution: new THREE.Uniform(
+      new THREE.Vector2(sizes.width, sizes.height)
+    ),
+  },
+});
+```
+
+スコープの関係でコールバック関数の `resize`メソッドからマテリアルにアクセスできません。
+なので `sizes`オブフェクトに `resolution`プロパティを追加して
+値を`new THREE.Vector2(sizes.width, sizes.height)`に設定します
+
+```js
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+  pixelRatio: Math.min(window.devicePixelRatio, 2),
+};
+
+sizes.resolution = new THREE.Vector2(sizes.width, sizes.height);
+```
+
+`new THREE.Vector2(sizes.width, sizes.height)`の代わりに`resolution`を使用してユニフォームに送信します。
+
+```js
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uSize: new THREE.Uniform(size),
+    uResolution: new THREE.Uniform(sizes.resolution),
+  },
+});
+```
+
+こうすることで、コールバック関数の `resize`メソッドにアクセスできる様になったので、値を更新することが出来ます。
+
+```js
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+  sizes.resolution.set(sizes.width, sizes.height);
+
+  // ...
+});
+```
+
+次に頂点シェーダーで`uResolution`ユニフォームを取得し
+`gl_PointSize` に `uResolution.y` 乗算することで修正することができる
+
+```glsl
+// vertex.glsl に記述
+
+uniform float uSize;
+uniform vec2 uResolution;
+
+void main() {
+
+  // ...
+
+  gl_PointSize = uSize * uResolution.y;
+  gl_PointSize *= 1.0 / -viewPosition.z;
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/44ef584eb1bbfc13e91d93bc3d44940b.png)](https://gyazo.com/44ef584eb1bbfc13e91d93bc3d44940b)
+
+ピクセルサイズが大きすぎたので `50 => 0.5`に修正します
+
+```js
+createFirework(100, new THREE.Vector3(), 0.5);
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/22e5c92866d1eaa9d4ddf0f672a87102"><img src="https://i.gyazo.com/22e5c92866d1eaa9d4ddf0f672a87102.gif" alt="Image from Gyazo" width="989"/></a>
+
+これでレンダリングの高さに合わせてパーティクルサイズが変わるようになりました。
+次は、ピクセル比を処理していきます。
+
+### ピクセル比を適切に処理する
+
+`sizes`オブジェクトに`pixelRatio`プロパティを追加し
+値は`pixelRatio`と同様の数式`Math.min(window.devicePixelRatio, 2)`を使用します
+
+```js
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+  pixelRatio: Math.min(window.devicePixelRatio, 2),
+};
+```
+
+次に、コールバック関数 `resize` メソッド内で更新します
+
+```js
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+  sizes.pixelRatio = Math.min(window.devicePixelRatio, 2);
+  sizes.resolution.set(sizes.width, sizes.height);
+
+  // ...
+});
+```
+
+次に、レンダラーに先程の値を送信します
+
+```js
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(sizes.pixelRatio);
+```
+
+最後に`sizes.resolution`の`sizes.widht`と`sizes.height`に`sizes.pixelRatio`を乗算しま
+す
+
+```js
+sizes.resolution = new THREE.Vector2(
+  sizes.width * sizes.pixelRatio,
+  sizes.height * sizes.pixelRatio
+);
+
+window.addEventListener('resize', () => {
+  // ...
+
+  sizes.resolution.set(
+    sizes.width * sizes.pixelRatio,
+    sizes.height * sizes.pixelRatio,
+  )
+```
+
+### ここまでのコードの全体像
+
+<details>
+<summary>. jsファイル(クリックして展開)</summary>
+
+```js
+import GUI from "lil-gui";
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import fragmentShader from "./shaders/firework/fragment.glsl";
+import vertexShader from "./shaders/firework/vertex.glsl";
+
+// セットアップ
+const gui = new GUI({ width: 340 });
+const canvas = document.querySelector("canvas.webgl");
+const scene = new THREE.Scene();
+const textureLoader = new THREE.TextureLoader();
+
+// ウィンドウサイズ
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+  pixelRatio: Math.min(window.devicePixelRatio, 2),
+};
+
+sizes.resolution = new THREE.Vector2(
+  sizes.width * sizes.pixelRatio,
+  sizes.height * sizes.pixelRatio
+);
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+  sizes.pixelRatio = Math.min(window.devicePixelRatio, 2);
+  sizes.resolution.set(
+    sizes.width * sizes.pixelRatio,
+    sizes.height * sizes.pixelRatio
+  );
+
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(sizes.pixelRatio);
+});
+
+// カメラ
+const camera = new THREE.PerspectiveCamera(
+  25,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
+
+camera.position.set(1.5, 0, 6);
+scene.add(camera);
+
+// オービットコントロール
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
+// レンダラー
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+});
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(sizes.pixelRatio);
+
+const createFirework = (count, position, size) => {
+  const vertices = 3;
+  const positionsArray = new Float32Array(count * vertices);
+
+  for (let i = 0; i < count; i++) {
+    const positionIndex = i * 3;
+
+    positionsArray[positionIndex] = Math.random() - 0.5;
+    positionsArray[positionIndex + 1] = Math.random() - 0.5;
+    positionsArray[positionIndex + 2] = Math.random() - 0.5;
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positionsArray, vertices)
+  );
+
+  const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uSize: new THREE.Uniform(size),
+      uResolution: new THREE.Uniform(sizes.resolution),
+    },
+  });
+
+  const firework = new THREE.Points(geometry, material);
+  firework.position.copy(position);
+  scene.add(firework);
+};
+
+createFirework(100, new THREE.Vector3(), 0.5);
+
+// アニメーション
+const tick = () => {
+  controls.update();
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+</details>
+
+<details>
+<summary>. glslファイル(クリックして展開)</summary>
+
+```glsl
+// vertex.glsl
+
+uniform float uSize;
+uniform vec2 uResolution;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+  gl_PointSize = uSize * uResolution.y;
+  gl_PointSize *= 1.0 / -viewPosition.z;
+}
+```
+
+```glsl
+// fragment.glsl
+
+void main() {
+  gl_FragColor = vec4(1.0, 0.3, 0.0, 1.0);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+</details>
