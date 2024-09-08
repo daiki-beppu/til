@@ -1,7 +1,7 @@
 ---
 title: 30-fireworks
 date: 2024/09/01
-updated: 2024/09/07
+updated: 2024/09/08
 ---
 
 # ｢花火｣の制作
@@ -9,10 +9,11 @@ updated: 2024/09/07
 - [下準備](#下準備)
 - [花火の実装](#花火の実装)
   - [パーティクルサイズの調整](#パーティクルサイズの調整)
-    - [ユニフォームでパーティクルサイズを調整](#ユニフォームでパーティクルサイズを調整)
+  - [ユニフォームでパーティクルサイズを調整](#ユニフォームでパーティクルサイズを調整)
   - [レンダリングの高さに比例させる](#レンダリングの高さに比例させる)
   - [ピクセル比を適切に処理する](#ピクセル比を適切に処理する)
-  - [ここまでのコードの全体像](#ここまでのコードの全体像)
+    - [ここまでのコードの全体像](#ここまでのコードの全体像)
+  - [テクスチャの適用](#テクスチャの適用)
 
 > [!NOTE]
 >
@@ -221,7 +222,7 @@ void main() {
 
 [![Image from Gyazo](https://i.gyazo.com/15a22022cb9bc89e01e64498e510fc99.png)](https://gyazo.com/15a22022cb9bc89e01e64498e510fc99)
 
-#### ユニフォームでパーティクルサイズを調整
+### ユニフォームでパーティクルサイズを調整
 
 マテリアルに `uniforms`プロパティに `uSize` を追加
 
@@ -420,7 +421,7 @@ window.addEventListener('resize', () => {
   )
 ```
 
-### ここまでのコードの全体像
+#### ここまでのコードの全体像
 
 <details>
 <summary>. jsファイル(クリックして展開)</summary>
@@ -567,3 +568,109 @@ void main() {
 ```
 
 </details>
+
+### テクスチャの適用
+
+サイズの調整が完了したのでテクスチャを適用していきます
+まずはテクスチャをロードします
+
+```js
+// 任意のパスを使用してください
+
+const textures = [
+  textureLoader.load('./particles/1.png'),
+  textureLoader.load('./particles/2.png'),
+  textureLoader.load('./particles/3.png'),
+  textureLoader.load('./particles/4.png'),
+  textureLoader.load('./particles/5.png'),
+  textureLoader.load('./particles/6.png'),
+  textureLoader.load('./particles/7.png'),
+  textureLoader.load('./particles/8.png'),
+]
+```
+
+`createFirework 関数`に `texture` パラメータを追加します
+
+```js
+const createFirework = (count, position, size, texture) => {
+  // ...
+}
+
+createFirework(100, new THREE.Vector3(), 0.5, textures[7])
+```
+
+マテリアルの `uniforms` プロパティに `uTexture` を追加
+
+```js
+  const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uSize: new THREE.Uniform(size),
+      uResolution: new THREE.Uniform(sizes.resolution),
+      uTexture: new THREE.Uniform(texture),
+    },
+  })
+```
+
+フラグメントシェーダーで `uTexture`を取得し`gl_PointCoord`を使用する
+今回はグレースケールの画像を使用しているのでRGBA すべてのチャンネルは必要ないので
+r チャンネルのみを取得して`textureAlpha`に保存します。
+
+マテリアルの`transparent`を有効化を忘れないでください
+
+```js
+const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uSize: new THREE.Uniform(size),
+      uResolution: new THREE.Uniform(sizes.resolution),
+      uTexture: new THREE.Uniform(texture),
+    },
+    transparent: true,
+  })
+```
+
+```glsl
+uniform sampler2D uTexture;
+
+void main() {
+  float textureAlpha = texture(uTexture, gl_PointCoord).r;
+  gl_FragColor = vec4(vec3(1.0), textureAlpha);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/547e087bbe958928c91cd85668671c02.png)](https://gyazo.com/547e087bbe958928c91cd85668671c02)
+
+以下の記述を追加して最終調整を行います
+
+- `texture.flipY = false` => 画像の上下反転
+- `depthWrite: false` => 深度バッファの無効化
+- `blending: THREE.AdditiveBlending` => ブレンディングモードの設定
+
+```js
+  texture.flipY = false
+  const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uSize: new THREE.Uniform(size),
+      uResolution: new THREE.Uniform(sizes.resolution),
+      uTexture: new THREE.Uniform(texture),
+    },
+    transparent: true,
+    depthWrite: false, // より自然な透明度の表現
+    blending: THREE.AdditiveBlending,  // 光の加算効果
+  })
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/fd21e8ad6a591035921cd0fc277493e9.png)](https://gyazo.com/fd21e8ad6a591035921cd0fc277493e9)
+
+
