@@ -1,7 +1,7 @@
 ---
 title: 30-fireworks
 date: 2024/09/01
-updated: 2024/09/08
+updated: 2024/09/09
 ---
 
 # ｢花火｣の制作
@@ -14,6 +14,7 @@ updated: 2024/09/08
   - [ピクセル比を適切に処理する](#ピクセル比を適切に処理する)
     - [ここまでのコードの全体像](#ここまでのコードの全体像)
   - [テクスチャの適用](#テクスチャの適用)
+  - [ランダムサイズの追加](#ランダムサイズの追加)
 
 > [!NOTE]
 >
@@ -674,3 +675,47 @@ void main() {
 [![Image from Gyazo](https://i.gyazo.com/fd21e8ad6a591035921cd0fc277493e9.png)](https://gyazo.com/fd21e8ad6a591035921cd0fc277493e9)
 
 
+### ランダムサイズの追加
+
+サイズが一定で現実味が無いのでランダムサイズを追加します
+
+```js
+const createFirework = (count, position, size, texture) => {
+  // ...
+
+  const sizesArray = new Float32Array(count)
+
+  for (let i = 0; i < count; i++) {
+    // ...
+
+    sizesArray[i] = Math.random()
+  }
+
+  // ...
+
+  geometry.setAttribute(
+    'aSize',
+    new THREE.Float32BufferAttribute(positionsArray, 1),
+  )
+
+```
+
+頂点シェーダーで適用します
+
+```glsl
+uniform float uSize;
+uniform vec2 uResolution;
+
+attribute float aSize;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+
+  gl_PointSize = uSize * uResolution.y * aSize;
+  gl_PointSize *= 1.0 / -viewPosition.z;
+}
+```
