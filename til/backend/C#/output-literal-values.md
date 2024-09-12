@@ -1,7 +1,7 @@
 ---
 title: output-literal-values
 date: 2024/09/07
-updated: 2024/09/07
+updated: 2024/09/12
 ---
 
 # リテラル値の出力
@@ -11,6 +11,7 @@ updated: 2024/09/07
   - [文字リテラル (char 型)](#文字リテラル-char-型)
   - [文字列リテラル (string 型)](#文字列リテラル-string-型)
   - [整数リテラル (int 型)](#整数リテラル-int-型)
+  - [浮動小数リテラル (float, double, decimal 型)](#浮動小数リテラル-float-double-decimal-型)
 
 ## リテラル値とは
 
@@ -73,3 +74,28 @@ Console.WriteLine(123);
 // 出力結果
 123
 ```
+
+### 浮動小数リテラル (float, double, decimal 型)
+
+浮動小数点数を表すデータ型は 3 つあります。
+
+- float 型 (有効桁数 6-9桁)
+- double 型 (有効桁数 15-17桁)
+- decimal 型 (有効桁数 28-29桁)
+
+`decimal > double > float`の順で正確
+
+`float`リテラル は数値の後に`F`を追加し記述する
+この`F`はリテラルサフィックスと呼ばれ、 `float`型の値を使用することをコンパイラに指示する役割を持つ。
+
+`float`の場合は 小文字の`f`または大文字の`F`のいずれかを使用することができる。
+
+```csharp
+Console.WriteLine(0.25F);
+```
+
+```text
+0.25
+```
+
+予期しない計算エラーを回避する場合に、固定少数部の値は `float` 使用することがおすすめ
