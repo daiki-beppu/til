@@ -1,7 +1,7 @@
 ---
 title: 30-fireworks
 date: 2024/09/01
-updated: 2024/09/09
+updated: 2024/09/13
 ---
 
 # ｢花火｣の制作
@@ -15,6 +15,7 @@ updated: 2024/09/09
     - [ここまでのコードの全体像](#ここまでのコードの全体像)
   - [テクスチャの適用](#テクスチャの適用)
   - [ランダムサイズの追加](#ランダムサイズの追加)
+  - [パーティクルを球状に配置(球分布)](#パーティクルを球状に配置球分布)
 
 > [!NOTE]
 >
@@ -298,7 +299,7 @@ const material = new THREE.ShaderMaterial({
 ```
 
 スコープの関係でコールバック関数の `resize`メソッドからマテリアルにアクセスできません。
-なので `sizes`オブフェクトに `resolution`プロパティを追加して
+なので `sizes`オブジェクトに `resolution`プロパティを追加して
 値を`new THREE.Vector2(sizes.width, sizes.height)`に設定します
 
 ```js
@@ -404,7 +405,7 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(sizes.pixelRatio);
 ```
 
-最後に`sizes.resolution`の`sizes.widht`と`sizes.height`に`sizes.pixelRatio`を乗算しま
+最後に`sizes.resolution`の`sizes.width`と`sizes.height`に`sizes.pixelRatio`を乗算しま
 す
 
 ```js
@@ -579,15 +580,15 @@ void main() {
 // 任意のパスを使用してください
 
 const textures = [
-  textureLoader.load('./particles/1.png'),
-  textureLoader.load('./particles/2.png'),
-  textureLoader.load('./particles/3.png'),
-  textureLoader.load('./particles/4.png'),
-  textureLoader.load('./particles/5.png'),
-  textureLoader.load('./particles/6.png'),
-  textureLoader.load('./particles/7.png'),
-  textureLoader.load('./particles/8.png'),
-]
+  textureLoader.load("./particles/1.png"),
+  textureLoader.load("./particles/2.png"),
+  textureLoader.load("./particles/3.png"),
+  textureLoader.load("./particles/4.png"),
+  textureLoader.load("./particles/5.png"),
+  textureLoader.load("./particles/6.png"),
+  textureLoader.load("./particles/7.png"),
+  textureLoader.load("./particles/8.png"),
+];
 ```
 
 `createFirework 関数`に `texture` パラメータを追加します
@@ -595,42 +596,42 @@ const textures = [
 ```js
 const createFirework = (count, position, size, texture) => {
   // ...
-}
+};
 
-createFirework(100, new THREE.Vector3(), 0.5, textures[7])
+createFirework(100, new THREE.Vector3(), 0.5, textures[7]);
 ```
 
 マテリアルの `uniforms` プロパティに `uTexture` を追加
 
 ```js
-  const material = new THREE.ShaderMaterial({
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
-    uniforms: {
-      uSize: new THREE.Uniform(size),
-      uResolution: new THREE.Uniform(sizes.resolution),
-      uTexture: new THREE.Uniform(texture),
-    },
-  })
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uSize: new THREE.Uniform(size),
+    uResolution: new THREE.Uniform(sizes.resolution),
+    uTexture: new THREE.Uniform(texture),
+  },
+});
 ```
 
 フラグメントシェーダーで `uTexture`を取得し`gl_PointCoord`を使用する
-今回はグレースケールの画像を使用しているのでRGBA すべてのチャンネルは必要ないので
+今回はグレースケールの画像を使用しているので RGBA すべてのチャンネルは必要ないので
 r チャンネルのみを取得して`textureAlpha`に保存します。
 
-マテリアルの`transparent`を有効化を忘れないでください
+マテリアルの`transparent`を有効化することを忘れないでください。
 
 ```js
 const material = new THREE.ShaderMaterial({
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
-    uniforms: {
-      uSize: new THREE.Uniform(size),
-      uResolution: new THREE.Uniform(sizes.resolution),
-      uTexture: new THREE.Uniform(texture),
-    },
-    transparent: true,
-  })
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uSize: new THREE.Uniform(size),
+    uResolution: new THREE.Uniform(sizes.resolution),
+    uTexture: new THREE.Uniform(texture),
+  },
+  transparent: true,
+});
 ```
 
 ```glsl
@@ -655,25 +656,24 @@ void main() {
 - `blending: THREE.AdditiveBlending` => ブレンディングモードの設定
 
 ```js
-  texture.flipY = false
-  const material = new THREE.ShaderMaterial({
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
-    uniforms: {
-      uSize: new THREE.Uniform(size),
-      uResolution: new THREE.Uniform(sizes.resolution),
-      uTexture: new THREE.Uniform(texture),
-    },
-    transparent: true,
-    depthWrite: false, // より自然な透明度の表現
-    blending: THREE.AdditiveBlending,  // 光の加算効果
-  })
+texture.flipY = false;
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uSize: new THREE.Uniform(size),
+    uResolution: new THREE.Uniform(sizes.resolution),
+    uTexture: new THREE.Uniform(texture),
+  },
+  transparent: true,
+  depthWrite: false, // より自然な透明度の表現
+  blending: THREE.AdditiveBlending, // 光の加算効果
+});
 ```
 
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/fd21e8ad6a591035921cd0fc277493e9.png)](https://gyazo.com/fd21e8ad6a591035921cd0fc277493e9)
-
 
 ### ランダムサイズの追加
 
@@ -719,3 +719,76 @@ void main() {
   gl_PointSize *= 1.0 / -viewPosition.z;
 }
 ```
+
+### パーティクルを球状に配置(球分布)
+
+Three.js には球状に配置するために最適な`Sphericalクラス`があります。
+まずは、`createFirework`の引数から球の半径をコントロールします
+
+```js
+const createFirework = (count, position, size, texture, radius) => {
+  //  ...
+};
+
+createFirework(100, new THREE.Vector3(), 0.5, textures[7], 1);
+```
+
+次に、for ループ内で`Sphericalクラス`をインスタンス化します
+値には 3 つの引数を設定します
+
+- `radius` (半径): 原点からの距離
+- `phi` (Φ, ファイ): XY 平面からの角度 (0 < Φ < π)
+- `theta` (Θ, シータ): X 軸からの角度（0 ≤ θ < 2π）
+
+```js
+const createFirework = (count, position, size, texture, radius) => {
+  // ...
+
+  for (let i = 0; i < count; i++) {
+    const positionIndex = i * 3;
+
+    const spherical = new THREE.Spherical(
+      radius * (0.75 + Math.random() * 0.25), // ランダム性をもたせるために0.75 から 1.0 の間の値に再マッピング
+      Math.random() * Math.PI, // Φ (ファイ): 0 から π の間で均等分布
+      Math.random() * Math.PI * 2 // Θ (シータ): 0 から 2π の間でランダム
+    );
+
+    // ...
+  }
+  // ...
+};
+```
+
+続いて球面座標を 3D 位置に変換します。
+
+`position` 変数を用意して空の`Vector3`を作成し
+`setFromSpherical`メソッドで 3D 位置に変換できます
+
+最後に、`positionArray`に`position`変数を割り当てます
+
+```js
+const createFirework = (count, position, size, texture, radius) => {
+  // ...
+
+  for (let i = 0; i < count; i++) {
+    const spherical = new THREE.Spherical(
+      radius * (0.75 + Math.random() * 0.25),
+      Math.random() * Math.PI,
+      Math.random() * Math.PI * 2
+    );
+
+    const position = new THREE.Vector3();
+    position.setFromSpherical(spherical);
+
+    positionsArray[positionIndex] = position.x;
+    positionsArray[positionIndex + 1] = position.y;
+    positionsArray[positionIndex + 2] = position.z;
+
+    // ...
+  }
+};
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/1f48fc205dcb93fb4bdeef3496282c06"><img src="https://i.gyazo.com/1f48fc205dcb93fb4bdeef3496282c06.gif" alt="Image from Gyazo" width="1000"/></a>
