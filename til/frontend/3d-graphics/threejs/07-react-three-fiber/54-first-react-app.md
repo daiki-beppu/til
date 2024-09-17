@@ -1,7 +1,7 @@
 ---
 title: 54-first-react-app
 date: 2024/09/15
-updated: 2024/09/16
+updated: 2024/09/17
 ---
 
 # 初めての React アプリケーション制作
@@ -15,6 +15,9 @@ updated: 2024/09/16
     - [JavaScript 式の埋め込み](#javascript-式の埋め込み)
     - [JSX と HTML の比較](#jsx-と-html-の比較)
   - [JSX と HTML の主な違い](#jsx-と-html-の主な違い)
+- [コンポーネントの作成](#コンポーネントの作成)
+- [ホットモジュールリプレイスメント(HMR)について](#ホットモジュールリプレイスメントhmrについて)
+- [クリッカーコンポーネントの作成](#クリッカーコンポーネントの作成)
 
 ## 下準備
 
@@ -222,3 +225,69 @@ root.render(
 | ルート要素              | 単一のルート要素が必要              | 複数のルート要素可能             |
 | JavaScript 式の埋め込み | 中括弧 `{}` で可能                  | 不可能                           |
 | コメント                | `{/* コメント */}`                  | `<!-- コメント -->`              |
+
+## コンポーネントの作成
+
+React のコンポーネントは独立した UI の再利用可能な部品のこと
+
+`/src`フォルダ内に`App.jsx`ファイルを作成
+
+```jsx
+// App.jsx に記述
+
+export default function App() {
+  return <h1>My App</h1>;
+}
+```
+
+```jsx
+// index.jsx に記述
+
+import { createRoot } from "react-dom/client";
+import App from "./components/App";
+import "./style.css";
+
+const root = createRoot(document.querySelector("#root"));
+
+root.render(
+  <div>
+    <App />
+  </div>
+);
+```
+
+[![Image from Gyazo](https://i.gyazo.com/e90da4c510ce9716bdd75c0bb5f4955d.jpg)](https://gyazo.com/e90da4c510ce9716bdd75c0bb5f4955d)
+
+コンポーネントを作成することで何度も再利用することができる
+
+```jsx
+// index.jsx に記述
+
+import { createRoot } from "react-dom/client";
+import App from "./components/App";
+import "./style.css";
+
+const root = createRoot(document.querySelector("#root"));
+
+root.render(
+  <div>
+    <App />
+    <App />
+    <App />
+    <App />
+    <App />
+  </div>
+);
+```
+
+[![Image from Gyazo](https://i.gyazo.com/cadf77664e38a18d1ce01981a78bdaf7.jpg)](https://gyazo.com/cadf77664e38a18d1ce01981a78bdaf7)
+
+## ホットモジュールリプレイスメント(HMR)について
+
+ホットモジュールリプレイスメントはアプリケーション実行中に
+モジュールを交換、追加、削除できる機能。
+
+これによりフルリロードすることなくアプリケーションの状態を保持したまま更新することができる
+
+## クリッカーコンポーネントの作成
+
