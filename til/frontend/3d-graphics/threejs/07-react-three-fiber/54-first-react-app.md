@@ -1,7 +1,7 @@
 ---
 title: 54-first-react-app
 date: 2024/09/15
-updated: 2024/09/17
+updated: 2024/09/18
 ---
 
 # 初めての React アプリケーション制作
@@ -18,8 +18,16 @@ updated: 2024/09/17
 - [コンポーネントの作成](#コンポーネントの作成)
   - [コンポーネントを作成するメリット](#コンポーネントを作成するメリット)
   - [コンポーネントの利用方法](#コンポーネントの利用方法)
-- [ホットモジュールリプレイスメント(HMR)について](#ホットモジュールリプレイスメントhmrについて)
+- [HMR(ホットモジュールリプレイスメント)について](#hmrホットモジュールリプレイスメントについて)
   - [HMR のメリット](#hmr-のメリット)
+- [カウンターの作成](#カウンターの作成)
+  - [クリッカーコンポーネントの作成](#クリッカーコンポーネントの作成)
+  - [useState フック を使用してカウンターを更新](#usestate-フック-を使用してカウンターを更新)
+  - [useState フックの使い方](#usestate-フックの使い方)
+  - [useEffect フックを使用してローカルストレージに値を保存する](#useeffect-フックを使用してローカルストレージに値を保存する)
+  - [カウントの値をローカルストレージに保存](#カウントの値をローカルストレージに保存)
+- [クリッカーの表示、非表示の切り替え](#クリッカーの表示非表示の切り替え)
+- [ローカルストレージのデータを削除する](#ローカルストレージのデータを削除する)
 
 ## 下準備
 
@@ -202,6 +210,8 @@ root.render(
 );
 ```
 
+**出力結果**
+
 [![Image from Gyazo](https://i.gyazo.com/8d8c414f8892d4ffcc92a2c28aa11ede.png)](https://gyazo.com/8d8c414f8892d4ffcc92a2c28aa11ede)
 
 出来ないこと
@@ -266,6 +276,8 @@ root.render(
 );
 ```
 
+**出力結果**
+
 [![Image from Gyazo](https://i.gyazo.com/e90da4c510ce9716bdd75c0bb5f4955d.jpg)](https://gyazo.com/e90da4c510ce9716bdd75c0bb5f4955d)
 
 コンポーネントを作成することで何度も再利用することができる
@@ -290,9 +302,11 @@ root.render(
 );
 ```
 
+**出力結果**
+
 [![Image from Gyazo](https://i.gyazo.com/cadf77664e38a18d1ce01981a78bdaf7.jpg)](https://gyazo.com/cadf77664e38a18d1ce01981a78bdaf7)
 
-## ホットモジュールリプレイスメント(HMR)について
+## HMR(ホットモジュールリプレイスメント)について
 
 ホットモジュールリプレイスメントはアプリケーション実行中に
 モジュールを交換、追加、削除できる機能。
@@ -304,3 +318,141 @@ root.render(
 - 開発速度の向上: 変更が即座に反映される
 - 状態の保持: ページ全体をリロードすることなく更新するのでアプリケーションの状態が保持される
 - 開発体験の向上: 頻繁なリロードが不要
+
+## カウンターの作成
+
+ボタンをクリックするとカウントが増える機能を作成します
+
+### クリッカーコンポーネントの作成
+
+`/src`ファイル内に`Clicker.jsx`ファイルを作成
+
+```jsx
+export default function Clicker() {
+  return (
+    <div>
+      <div>Clicks count: 0</div>
+      <button type="button">add count</button>
+    </div>
+  );
+}
+```
+
+`App`コンポーネントで`Clicker`コンポーネントを呼び出す
+
+```jsx
+export default function App() {
+  return <Clicker />;
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/f20a104249c03145073b1ebe0824c006.jpg)](https://gyazo.com/f20a104249c03145073b1ebe0824c006)
+
+### useState フック を使用してカウンターを更新
+
+`useState`フックの役割は変数と関数を提供すること
+変数を更新したい場合は変数を再度割り当てるかわりに関数を使用する
+
+### useState フックの使い方
+
+```jsx
+import { useEffect, useState } from "react";
+
+export default function Clicker() {
+  // count: 現在のカウント値, setCount: カウントを更新する関数
+  const [count, setCount] = useState(0); // 0 は初期値
+
+  // ボタンクリックのイベントハンドラー
+  const handleButtonClick = () => {
+    setCount((prevCount) => prevCount + 1);
+  };
+
+  return (
+    <div>
+      <div>Clicks count: {count}</div>
+      <button type="button" onClick={handleButtonClick}>
+        add count
+      </button>
+    </div>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/bb96d6435e2ec07d1f5ef8f1f4d83884"><img src="https://i.gyazo.com/bb96d6435e2ec07d1f5ef8f1f4d83884.gif" alt="Image from Gyazo" width="302"/></a>
+
+### useEffect フックを使用してローカルストレージに値を保存する
+
+`useEffect`フックの役割はコンポーネントのレンダリング後に実行される副作用を定義すること
+
+### カウントの値をローカルストレージに保存
+
+useEffect の第二引数（[count]）は依存配列と呼ばれます。この配列に含まれる値が変更されたときのみ、effect が再実行されます。空の配列（[]）を渡すと、コンポーネントのマウント時とアンマウント時にのみ実行されます。
+
+ローカルストレージに保存される値は文字列になるので数値(`number` 型)に変換する必要がある
+
+また`useState`の初期値に `?? (null 合体演算子)`を使用することで不要な`useState`を減らし、最適化することができる
+
+`?? (null 合体演算子)`は `getItem("count")` が `null` または`undined`のとき`0`を返す
+
+```jsx
+import { useEffect, useState } from "react";
+
+export default function Clicker() {
+  const [count, setCount] = useState(
+    Number.parseInt(localStorage.getItem("count") ?? 0)
+  );
+
+  useEffect(() => {
+    Number.parseInt(localStorage.setItem("count", count));
+  }, [count]);
+
+  const buttonClick = () => {
+    setCount((prevCount) => prevCount + 1);
+  };
+  return (
+    <div>
+      <div>Clicks count: {count}</div>
+      <button type="button" onClick={buttonClick}>
+        add count
+      </button>
+    </div>
+  );
+}
+```
+
+<a href="https://gyazo.com/6cdff72a10536702198c4eb1802551ca"><img src="https://i.gyazo.com/6cdff72a10536702198c4eb1802551ca.gif" alt="Image from Gyazo" width="1000"/></a>
+
+## クリッカーの表示、非表示の切り替え
+
+`useState`を使用して`hasClicker`という状態変数を定義して
+
+`setHasCliker(!hasClicker)`をでの値を反転させることで状態を切り替える
+
+```jsx
+import { useState } from "react";
+import Clicker from "./Clicker";
+
+export default function App() {
+  const [hasClicker, setHasCliker] = useState(true);
+
+  const toggleClickerClick = () => {
+    setHasCliker(!hasClicker);
+  };
+  return (
+    <>
+      <button type="button" onClick={toggleClickerClick}>
+        {hasClicker ? "Hide" : "Show "} Clicker
+      </button>
+      {hasClicker && <Clicker />}
+    </>
+  );
+}
+```
+
+<a href="https://gyazo.com/3440382263181b6222f0b3afb1fcf660"><img src="https://i.gyazo.com/3440382263181b6222f0b3afb1fcf660.gif" alt="Image from Gyazo" width="428"/></a>
+
+## ローカルストレージのデータを削除する
