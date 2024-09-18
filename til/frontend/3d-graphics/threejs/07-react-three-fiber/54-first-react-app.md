@@ -456,3 +456,22 @@ export default function App() {
 <a href="https://gyazo.com/3440382263181b6222f0b3afb1fcf660"><img src="https://i.gyazo.com/3440382263181b6222f0b3afb1fcf660.gif" alt="Image from Gyazo" width="428"/></a>
 
 ## ローカルストレージのデータを削除する
+
+`clicker`コンポーネントがアンマウントされたときに`localStorage`のデータを削除する
+
+`useEffect` 内に `return` を記述することでコンポーネントがアンマウントされたときに呼び出す必要がある指示を提供することが出来ます
+
+```jsx
+import { useEffect, useState } from "react";
+
+  // ...
+
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("count");
+    };
+  }, []);
+
+ // ...
+}
+```
