@@ -1,7 +1,7 @@
 ---
 title: 54-first-react-app
 date: 2024/09/15
-updated: 2024/09/18
+updated: 2024/09/19
 ---
 
 # 初めての React アプリケーション制作
@@ -28,6 +28,8 @@ updated: 2024/09/18
   - [カウントの値をローカルストレージに保存](#カウントの値をローカルストレージに保存)
 - [クリッカーの表示、非表示の切り替え](#クリッカーの表示非表示の切り替え)
 - [ローカルストレージのデータを削除する](#ローカルストレージのデータを削除する)
+- [props について](#props-について)
+  - [異なるテキストカラーを props から設定する](#異なるテキストカラーを-props-から設定する)
 
 ## 下準備
 
@@ -475,3 +477,175 @@ import { useEffect, useState } from "react";
  // ...
 }
 ```
+
+## props について
+
+まずは`Clicker`コンポーネントをいくつか複製します
+
+```jsx
+// ...
+export default function App({ children }) {
+  // ...
+
+  return (
+    <>
+      {children}
+      <button type="button" onClick={toggleClickerClick}>
+        {hasClicker ? "Hide" : "Show "} Clicker
+      </button>
+      {hasClicker && (<Clicker/>)}
+      {hasClicker && (<Clicker/>)}
+      {hasClicker && (<Clicker/>)}
+  )
+}
+```
+
+このように記述することもできる
+
+```jsx
+// ...
+
+export default function App({ children }) {
+  //...
+  return (
+    <>
+      <button type="button" onClick={toggleClickerClick}>
+        {hasClicker ? "Hide" : "Show "} Clicker
+      </button>
+      {hasClicker && (
+        <>
+          <Clicker />
+          <Clicker />
+          <Clicker />
+        </>
+      )}
+    </>
+  );
+}
+```
+
+[![Image from Gyazo](https://i.gyazo.com/8d98333345cb341185363ae03988a62b.jpg)](https://gyazo.com/8d98333345cb341185363ae03988a62b)
+
+このままだとすべて同じ`count`という`Key`で保存しているため
+それぞれに異なる`Key`を送信します
+
+```jsx
+// ...
+
+export default function App({ children }) {
+  //...
+  return (
+    <>
+      <button type="button" onClick={toggleClickerClick}>
+        {hasClicker ? "Hide" : "Show "} Clicker
+      </button>
+      {hasClicker && (
+        <>
+          <Clicker KeyName="countA" />
+          <Clicker KeyName="countB" />
+          <Clicker KeyName="countC" />
+        </>
+      )}
+    </>
+  );
+}
+```
+
+props はオブジェクトで送信されるので分割代入を利用して`{KeyName}`と記述することができる
+
+```jsx
+import { useEffect, useState } from "react";
+
+export default function Clicker({ KeyName, color }) {
+  const [count, setCount] = useState(
+    Number.parseInt(localStorage.getItem(KeyName) ?? 0)
+  );
+
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem(KeyName);
+    };
+  }, [KeyName]);
+
+  useEffect(() => {
+    Number.parseInt(localStorage.setItem(KeyName, count));
+  }, [count, KeyName]);
+
+  const buttonClick = () => {
+    setCount((prevCount) => prevCount + 1);
+  };
+  return (
+    <div>
+      <div>Clicks count: {count}</div>
+      <button type="button" onClick={buttonClick}>
+        add count
+      </button>
+    </div>
+  );
+}
+```
+
+### 異なるテキストカラーを props から設定する
+
+`HSL` を使用してランダムなテキストカラーを `props` に送信します
+
+HSL は
+
+- `H(色相)`: 0 から 360 deg で色を表現 (0 => 赤, 360 => 赤)
+- `S(彩度)`: 0% から 100 % で色の彩度を表現
+- `L(明度)`: 0% から 100% で色の明度を表現 (0% => 黒 100% => 白)
+
+```jsx
+import { useState } from "react";
+import Clicker from "./Clicker";
+
+export default function App({ children }) {
+  const [hasClicker, setHasCliker] = useState(true);
+
+  const toggleClickerClick = () => {
+    setHasCliker(!hasClicker);
+  };
+
+  return (
+    <>
+      <button type="button" onClick={toggleClickerClick}>
+        {hasClicker ? "Hide" : "Show "} Clicker
+      </button>
+      {hasClicker && (
+        <>
+          <Clicker
+            keyName="countA"
+            color={`hsl(${Math.random() * 360}deg, 100%, 70%)`}
+          />
+          <Clicker
+            keyName="countB"
+            color={`hsl(${Math.random() * 360}deg, 100%, 70%)`}
+          />
+          <Clicker
+            keyName="countC"
+            color={`hsl(${Math.random() * 360}deg, 100%, 70%)`}
+          />
+        </>
+      )}
+    </>
+  );
+}
+```
+
+```jsx
+import { useEffect, useState } from "react";
+
+export default function Clicker({ keyName, color }) {
+  // ...
+  return (
+    <div>
+      <div style={{ color: color }}>Clicks count: {count}</div>
+      <button type="button" onClick={buttonClick}>
+        add count
+      </button>
+    </div>
+  );
+}
+```
+
+<a href="https://gyazo.com/2e452d63c39461a93b749d142e273eeb"><img src="https://i.gyazo.com/2e452d63c39461a93b749d142e273eeb.gif" alt="Image from Gyazo" width="504"/></a>
