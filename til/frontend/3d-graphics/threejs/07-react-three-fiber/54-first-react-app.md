@@ -31,6 +31,9 @@ updated: 2024/09/20
 - [props について](#props-について)
   - [異なるテキストカラーを props から設定する](#異なるテキストカラーを-props-から設定する)
   - [children を使用して App.jsx の props を取得する](#children-を使用して-appjsx-の-props-を取得する)
+- [children が持つデータを親に移動させる](#children-が持つデータを親に移動させる)
+  - [children から状態を更新する](#children-から状態を更新する)
+  - [map メソッドを使用したループ処理](#map-メソッドを使用したループ処理)
 
 ## 下準備
 
@@ -427,6 +430,8 @@ export default function Clicker() {
 }
 ```
 
+**出力結果**
+
 <a href="https://gyazo.com/6cdff72a10536702198c4eb1802551ca"><img src="https://i.gyazo.com/6cdff72a10536702198c4eb1802551ca.gif" alt="Image from Gyazo" width="1000"/></a>
 
 ## クリッカーの表示、非表示の切り替え
@@ -455,6 +460,8 @@ export default function App() {
   );
 }
 ```
+
+**出力結果**
 
 <a href="https://gyazo.com/3440382263181b6222f0b3afb1fcf660"><img src="https://i.gyazo.com/3440382263181b6222f0b3afb1fcf660.gif" alt="Image from Gyazo" width="428"/></a>
 
@@ -524,6 +531,8 @@ export default function App({ children }) {
   );
 }
 ```
+
+**出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/8d98333345cb341185363ae03988a62b.jpg)](https://gyazo.com/8d98333345cb341185363ae03988a62b)
 
@@ -649,6 +658,8 @@ export default function Clicker({ KeyName, color }) {
 }
 ```
 
+**出力結果**
+
 <a href="https://gyazo.com/2e452d63c39461a93b749d142e273eeb"><img src="https://i.gyazo.com/2e452d63c39461a93b749d142e273eeb.gif" alt="Image from Gyazo" width="504"/></a>
 
 ### children を使用して App.jsx の props を取得する
@@ -701,4 +712,95 @@ export default function App({ children }) {
 }
 ```
 
+**出力結果**
+
 [![Image from Gyazo](https://i.gyazo.com/f46ac2d6bdfe99e8f05824a40b38cc09.jpg)](https://gyazo.com/f46ac2d6bdfe99e8f05824a40b38cc09)
+
+## children が持つデータを親に移動させる
+
+すべての`clicker`のトータルをカウントする`counter`を作成する
+
+```jsx
+// App.jsx に記述
+
+export default function App({ children }) {
+  const [hasClicker, setHasCliker] = useState(true);
+  const [count, setCount] = useState(0);
+
+  // ...
+}
+```
+
+```jsx
+import { useMemo, useState } from "react";
+import Clicker from "./Clicker";
+
+export default function App({ clickersCount, children }) {
+  const [hasClicker, setHasClicker] = useState(true);
+  const [count, setCount] = useState(0);
+
+  // ...
+  return (
+    <>
+      {children}
+      <div>Total count: {count}</div>
+      <button type="button" onClick={toggleClickerClick}>
+        {hasClicker ? "Hide" : "Show "} Clicker
+      </button>
+      {/* ... */}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/dd81bf289ab54b6dafaa8db6cd4a0f1a.jpg)](https://gyazo.com/dd81bf289ab54b6dafaa8db6cd4a0f1a)
+
+### children から状態を更新する
+
+`App`コンポーネントで count を増加させる関数を作成しその関数を`clicker`に提供する
+
+```jsx
+export default function App({ children }) {
+  // ...
+
+  const incrementCount = () => {
+    setCount(count + 1);
+  };
+
+  // ...
+}
+```
+
+次に、この関数をすべての`ckicker`の属性に送信する
+
+```jsx
+{
+  hasClicker && (
+    <>
+      <Clicker
+        increment={increment}
+        keyName="countA"
+        color={`hsl(${Math.random() * 360}deg, 100%, 75%)`}
+      />
+      <Clicker
+        increment={increment}
+        keyName="countB"
+        color={`hsl(${Math.random() * 360}deg, 100%, 75%)`}
+      />
+      <Clicker
+        increment={increment}
+        keyName="countC"
+        color={`hsl(${Math.random() * 360}deg, 100%, 75%)`}
+      />
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/793ee58d9a2c66165d54af0006aff5ef"><img src="https://i.gyazo.com/793ee58d9a2c66165d54af0006aff5ef.gif" alt="Image from Gyazo" width="654"/></a>
+
+### map メソッドを使用したループ処理
