@@ -33,7 +33,7 @@ updated: 2024/09/20
   - [children を使用して App.jsx の props を取得する](#children-を使用して-appjsx-の-props-を取得する)
 - [children が持つデータを親に移動させる](#children-が持つデータを親に移動させる)
   - [children から状態を更新する](#children-から状態を更新する)
-  - [map メソッドを使用したループ処理](#map-メソッドを使用したループ処理)
+- [map メソッドを使用したループ処理](#map-メソッドを使用したループ処理)
 
 ## 下準備
 
@@ -803,4 +803,4 @@ export default function App({ children }) {
 
 <a href="https://gyazo.com/793ee58d9a2c66165d54af0006aff5ef"><img src="https://i.gyazo.com/793ee58d9a2c66165d54af0006aff5ef.gif" alt="Image from Gyazo" width="654"/></a>
 
-### map メソッドを使用したループ処理
+## map メソッドを使用したループ処理
