@@ -1,7 +1,7 @@
 ---
 title: 54-first-react-app
 date: 2024/09/15
-updated: 2024/09/19
+updated: 2024/09/20
 ---
 
 # 初めての React アプリケーション制作
@@ -30,6 +30,7 @@ updated: 2024/09/19
 - [ローカルストレージのデータを削除する](#ローカルストレージのデータを削除する)
 - [props について](#props-について)
   - [異なるテキストカラーを props から設定する](#異なるテキストカラーを-props-から設定する)
+  - [children を使用して App.jsx の props を取得する](#children-を使用して-appjsx-の-props-を取得する)
 
 ## 下準備
 
@@ -635,7 +636,7 @@ export default function App({ children }) {
 ```jsx
 import { useEffect, useState } from "react";
 
-export default function Clicker({ keyName, color }) {
+export default function Clicker({ KeyName, color }) {
   // ...
   return (
     <div>
@@ -649,3 +650,55 @@ export default function Clicker({ keyName, color }) {
 ```
 
 <a href="https://gyazo.com/2e452d63c39461a93b749d142e273eeb"><img src="https://i.gyazo.com/2e452d63c39461a93b749d142e273eeb.gif" alt="Image from Gyazo" width="504"/></a>
+
+### children を使用して App.jsx の props を取得する
+
+`children`という特別な`props`があります。
+`children`は、React が提供する特別な prop です。コンポーネントのタグで囲まれた要素を自動的に受け取ります。これにより、コンポーネントの再利用性と柔軟性が向上します。
+
+`children` props を使用する利点：
+
+- コンポーネントの再利用性の向上: 同じコンポーネントを異なる内容で使用できます。
+- コンポーネントの柔軟性: 親コンポーネントが子要素の構造を制御できます。
+- コードの可読性: JSX の階層構造が明確になります。
+
+`App`コンポーネントで囲まれたタグなどを`children`を使用して取得します
+
+```jsx
+// index.jsx に記述
+
+import { createRoot } from "react-dom/client";
+import App from "./components/App";
+import "./style.css";
+
+const root = createRoot(document.querySelector("#root"));
+
+root.render(
+  <div>
+    <App>
+      <h1>My First React App</h1>
+      <h2>this is counter</h2>
+    </App>
+  </div>
+);
+```
+
+```jsx
+// App.jsx に記述
+
+import { useState } from "react";
+import Clicker from "./Clicker";
+
+export default function App({ children }) {
+  // ...
+
+  return (
+    <>
+      {children}
+      // ...
+    </>
+  );
+}
+```
+
+[![Image from Gyazo](https://i.gyazo.com/f46ac2d6bdfe99e8f05824a40b38cc09.jpg)](https://gyazo.com/f46ac2d6bdfe99e8f05824a40b38cc09)
