@@ -1,7 +1,7 @@
 ---
 title: 54-first-react-app
 date: 2024/09/15
-updated: 2024/09/20
+updated: 2024/09/21
 ---
 
 # 初めての React アプリケーション制作
@@ -34,6 +34,7 @@ updated: 2024/09/20
 - [children が持つデータを親に移動させる](#children-が持つデータを親に移動させる)
   - [children から状態を更新する](#children-から状態を更新する)
 - [map メソッドを使用したループ処理](#map-メソッドを使用したループ処理)
+- [useMemo で値を保存する](#usememo-で値を保存する)
 
 ## 下準備
 
@@ -71,7 +72,7 @@ JSX はタグベースの言語であり、HTML とよく似たものです。
 
 #### 1 つの要素を含める必要がある
 
-JSX では、`render`メソッドや関数コンポーネントの返り値は 1 つの親要素で包まれている必要があり`render`には 1 つの要素しか含めることができない
+JSX では、`render`メソッドや関数コンポーネントの返り値は 1 つの親要素で包まれている必要があります。
 
 ```jsx
 // bad: 要素が 2 つ以上ある
@@ -358,8 +359,14 @@ export default function App() {
 
 ### useState フック を使用してカウンターを更新
 
-`useState`フックの役割は変数と関数を提供すること
-変数を更新したい場合は変数を再度割り当てるかわりに関数を使用する
+`useState`は状態変数とその更新関数を提供する。
+状態を更新する際は、直接変数を変更するのではなく、更新関数を使用する。
+
+`useState` フックは、コンポーネントに状態を追加するための React の機能です。以下の特徴があります：
+
+- 状態変数と、その変数を更新するための関数を提供します。
+- コンポーネントの再レンダリングをトリガーします。
+- 直接変数を変更せずに更新関数を使用することで、React が状態の変更を正確に追跡し、必要な時にのみ再レンダリングを行うことができます。
 
 ### useState フックの使い方
 
@@ -394,9 +401,24 @@ export default function Clicker() {
 
 `useEffect`フックの役割はコンポーネントのレンダリング後に実行される副作用を定義すること
 
-### カウントの値をローカルストレージに保存
+useEffect の依存配列について
 
-useEffect の第二引数（[count]）は依存配列と呼ばれます。この配列に含まれる値が変更されたときのみ、effect が再実行されます。空の配列（[]）を渡すと、コンポーネントのマウント時とアンマウント時にのみ実行されます。
+- 空の配列 `[]` を渡した場合：コンポーネントのマウント時とアンマウント時にのみ実行されます。
+- 依存値がある場合（例：`[count]`）：その値が変更されるたびに実行されます。
+- 依存配列を省略した場合：コンポーネントの毎回のレンダリング後に実行されます。
+
+useEffect の第二引数（`[count]`）は依存配列と呼ばれます。この配列に含まれる値が変更されたときのみ、effect が再実行されます。空の配列（`[]`）を渡すと、コンポーネントのマウント時とアンマウント時にのみ実行される。
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> **マウントとアンマウント**
+>
+> マウント：コンポーネントが DOM に挿入され、画面に表示されること。
+> アンマウント：コンポーネントが DOM から削除されること。
+
+### カウントの値をローカルストレージに保存
 
 ローカルストレージに保存される値は文字列になるので数値(`number` 型)に変換する必要がある
 
@@ -413,7 +435,7 @@ export default function Clicker() {
   );
 
   useEffect(() => {
-    Number.parseInt(localStorage.setItem("count", count));
+    localStorage.setItem("count", count);
   }, [count]);
 
   const buttonClick = () => {
@@ -438,17 +460,17 @@ export default function Clicker() {
 
 `useState`を使用して`hasClicker`という状態変数を定義して
 
-`setHasCliker(!hasClicker)`をでの値を反転させることで状態を切り替える
+`setHasClicker(!hasClicker)`をでの値を反転させることで状態を切り替える
 
 ```jsx
 import { useState } from "react";
 import Clicker from "./Clicker";
 
 export default function App() {
-  const [hasClicker, setHasCliker] = useState(true);
+  const [hasClicker, setHasClicker] = useState(true);
 
   const toggleClickerClick = () => {
-    setHasCliker(!hasClicker);
+    setHasClicker(!hasClicker);
   };
   return (
     <>
@@ -469,7 +491,13 @@ export default function App() {
 
 `clicker`コンポーネントがアンマウントされたときに`localStorage`のデータを削除する
 
-`useEffect` 内に `return` を記述することでコンポーネントがアンマウントされたときに呼び出す必要がある指示を提供することが出来ます
+useEffect の return 文で定義される関数は「クリーンアップ関数」と呼ばれ、
+この関数は以下の時に実行される
+
+- コンポーネントがアンマウントされる時
+- 次の効果が実行される直前（依存配列の値が変更された場合）
+
+これにより、メモリリークやその他の問題を防ぐことができる
 
 ```jsx
 import { useEffect, useState } from "react";
@@ -487,6 +515,14 @@ import { useEffect, useState } from "react";
 ```
 
 ## props について
+
+props（プロパティの略）は、React コンポーネントに渡されるデータです。
+
+これにより
+
+- 親コンポーネントから子コンポーネントにデータを渡すことができます。
+- コンポーネントをより再利用可能にし、動的にします。
+- コンポーネント間のデータフローを管理します。
 
 まずは`Clicker`コンポーネントをいくつか複製します
 
@@ -551,9 +587,9 @@ export default function App({ children }) {
       </button>
       {hasClicker && (
         <>
-          <Clicker KeyName="countA" />
-          <Clicker KeyName="countB" />
-          <Clicker KeyName="countC" />
+          <Clicker keyName="countA" />
+          <Clicker keyName="countB" />
+          <Clicker keyName="countC" />
         </>
       )}
     </>
@@ -561,25 +597,25 @@ export default function App({ children }) {
 }
 ```
 
-props はオブジェクトで送信されるので分割代入を利用して`{KeyName}`と記述することができる
+props はオブジェクトで送信されるので分割代入を利用して`{keyName}`と記述することができる
 
 ```jsx
 import { useEffect, useState } from "react";
 
-export default function Clicker({ KeyName, color }) {
+export default function Clicker({ keyName, color }) {
   const [count, setCount] = useState(
-    Number.parseInt(localStorage.getItem(KeyName) ?? 0)
+    Number.parseInt(localStorage.getItem(keyName) ?? 0)
   );
 
   useEffect(() => {
     return () => {
-      localStorage.removeItem(KeyName);
+      localStorage.removeItem(keyName);
     };
-  }, [KeyName]);
+  }, [keyName]);
 
   useEffect(() => {
-    Number.parseInt(localStorage.setItem(KeyName, count));
-  }, [count, KeyName]);
+    Number.parseInt(localStorage.setItem(keyName, count));
+  }, [count, keyName]);
 
   const buttonClick = () => {
     setCount((prevCount) => prevCount + 1);
@@ -610,10 +646,10 @@ import { useState } from "react";
 import Clicker from "./Clicker";
 
 export default function App({ children }) {
-  const [hasClicker, setHasCliker] = useState(true);
+  const [hasClicker, setHasClicker] = useState(true);
 
   const toggleClickerClick = () => {
-    setHasCliker(!hasClicker);
+    setHasClicker(!hasClicker);
   };
 
   return (
@@ -645,7 +681,7 @@ export default function App({ children }) {
 ```jsx
 import { useEffect, useState } from "react";
 
-export default function Clicker({ KeyName, color }) {
+export default function Clicker({ keyName, color }) {
   // ...
   return (
     <div>
@@ -667,11 +703,19 @@ export default function Clicker({ KeyName, color }) {
 `children`という特別な`props`があります。
 `children`は、React が提供する特別な prop です。コンポーネントのタグで囲まれた要素を自動的に受け取ります。これにより、コンポーネントの再利用性と柔軟性が向上します。
 
-`children` props を使用する利点：
+children を使用する利点：
 
-- コンポーネントの再利用性の向上: 同じコンポーネントを異なる内容で使用できます。
-- コンポーネントの柔軟性: 親コンポーネントが子要素の構造を制御できます。
-- コードの可読性: JSX の階層構造が明確になります。
+1. コンポーネントの再利用性の向上: 同じコンポーネントを異なる内容で使用できます。
+2. コンポーネントの柔軟性: 親コンポーネントが子要素の構造を制御できます。
+3. コードの可読性: JSX の階層構造が明確になります。
+
+```jsx
+例
+<MyComponent>
+
+  <h1>これが children として渡されます</h1>
+</MyComponent>
+```
 
 `App`コンポーネントで囲まれたタグなどを`children`を使用して取得します
 
@@ -724,7 +768,7 @@ export default function App({ children }) {
 // App.jsx に記述
 
 export default function App({ children }) {
-  const [hasClicker, setHasCliker] = useState(true);
+  const [hasClicker, setHasClicker] = useState(true);
   const [count, setCount] = useState(0);
 
   // ...
@@ -804,3 +848,124 @@ export default function App({ children }) {
 <a href="https://gyazo.com/793ee58d9a2c66165d54af0006aff5ef"><img src="https://i.gyazo.com/793ee58d9a2c66165d54af0006aff5ef.gif" alt="Image from Gyazo" width="654"/></a>
 
 ## map メソッドを使用したループ処理
+
+`map`メソッドを使用して`Clicker`コンポーネントを複数回呼び出します
+
+`App`コンポーネントにクリッカーの数を管理する属性を追加します
+
+```jsx
+// index.jsx に記述
+
+import { createRoot } from "react-dom/client";
+import App from "./components/App";
+import "./style.css";
+
+const root = createRoot(document.querySelector("#root"));
+
+root.render(
+  <div>
+    <App clickersCount={3}>
+      <h1>My First React App</h1>
+      <h2>Click Counter</h2>
+    </App>
+  </div>
+);
+```
+
+`App.jsx` で `clickersCount`の `props` を取得する
+
+```jsx
+export default function App({ clickersCount, children }) {
+  // ...
+}
+```
+
+`... (スプレッド構文)`と`Array`メソッドを使用して`clickersCount`の要素数をもった配列を作成し`map`メソッドでループ処理を行う
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> **なぜ ...(スプレッド構文)を使用する必要がある？**
+>
+> `... (スプレッド構文)`を使用しない場合、配列の要素が`empty`となり空の配列と認識されるので`map`メソッドが使用できない
+>
+> `... (スプレッド構文)`を使用することで配列の要素が
+> `empty`から`undifind`になり`map`メソッドが使用できる
+
+```jsx
+export default function App({ clickersCount, children }) {
+      <div>
+      {hasClicker &&
+        [...Array(clickersCount)].map((item, index) => (
+          <Clicker
+            key={index}
+            incrementCount={incrementCount}
+            keyName={`count${index}`}
+            color={ `hsl(${ Math.random() * 360 }deg, 100%, 75%)` }
+          />
+        ))}
+      </div>
+   }
+}
+```
+
+> [!CAUTION]
+>
+> key に index を割り当てるのはアンチパターンなので注意
+>
+> 理由は要素の追加、削除、並び替えが発生した場合に
+> パフォーマンスの低下、予期せぬバグ、コンポーネントの状態の不整合が起こるため
+
+## useMemo で値を保存する
+
+このままだと、`add count` が押されるたびに再レンダリングが発生し
+毎回、文字の色が変わってしまう
+
+`useMemo`フックを使用して 1 度作成した色を保存しておく
+
+`useMemo` は React のフックの一つで、計算コストの高い処理の結果をメモ化（キャッシュ）します。
+
+基本的な概念：
+
+- 指定した依存配列の値が変更されない限り、前回の計算結果を再利用します。
+- パフォーマンスの最適化に役立ちます。
+
+useMemo を使用する主な理由：
+
+1. 不要な再計算を避け、アプリケーションのパフォーマンスを向上させる。
+2. 参照の安定性を保証し、不要な再レンダリングを防ぐ。
+
+`for` ループで `clickersCount` の値の数色を作成し
+`map` メソッドでそれを呼び出している
+
+```jsx
+// App.jsx に記述
+export default function App({ clickersCount, children }) {
+  // ...
+
+  const colors = useMemo(() => {
+    const colors = [];
+    for (let i = 0; i < clickersCount; i++) {
+      colors.push(`hsl(${Math.random() * 360}deg, 100%, 70%)`);
+    }
+    return colors;
+  }, [clickersCount]);
+  return (
+    <>
+      {/* ... */}
+      <div>
+        {hasClicker &&
+          [...Array(clickersCount)].map((item, index) => (
+            <Clicker
+              key={index}
+              incrementCount={incrementCount}
+              keyName={`count${index}`}
+              color={colors[index]}
+            />
+          ))}
+      </div>
+    </>
+  );
+}
+```
