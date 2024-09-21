@@ -35,6 +35,10 @@ updated: 2024/09/21
   - [children から状態を更新する](#children-から状態を更新する)
 - [map メソッドを使用したループ処理](#map-メソッドを使用したループ処理)
 - [useMemo で値を保存する](#usememo-で値を保存する)
+- [useRef で特定の要素にアクセスする](#useref-で特定の要素にアクセスする)
+- [People コンポーネントを作成する](#people-コンポーネントを作成する)
+  - [map メソッドでデータ表示](#map-メソッドでデータ表示)
+  - [API からデータを取得](#api-からデータを取得)
 
 ## 下準備
 
@@ -891,7 +895,7 @@ export default function App({ clickersCount, children }) {
 > `... (スプレッド構文)`を使用しない場合、配列の要素が`empty`となり空の配列と認識されるので`map`メソッドが使用できない
 >
 > `... (スプレッド構文)`を使用することで配列の要素が
-> `empty`から`undifind`になり`map`メソッドが使用できる
+> `empty`から`undefined`になり`map`メソッドが使用できる
 
 ```jsx
 export default function App({ clickersCount, children }) {
@@ -969,3 +973,188 @@ export default function App({ clickersCount, children }) {
   );
 }
 ```
+
+## useRef で特定の要素にアクセスする
+
+`useRef` フックは レンダー時には不要な値を参照するための React フック
+
+今回は`useRef` で`button`の DOM 要素にアクセスして色を変更してみる
+
+`buttonRef`変数に `useRef` を作成
+`button`タグに`ref`属性を追加することで参照することができる
+
+`ref.current`で特定の要素にアクセスできる
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> **useRef のアンチパターン**
+>
+> レンダー中に `useRef`の内容を読み書きするのはアンチパターン
+> 代わりにイベントハンドラや `useEffect`から読み書きすることが推奨されている
+>
+> 理由としては React のコンポーネントは純関数として振る舞うことを期待しているため
+>
+> 純関数とは:
+>
+> - 入力値(`props`, `state`など)が同じなら常に同じ`JSX`を返す
+> - 呼び出す順番が変わったり引数が変わっても、他の呼び出し結果に影響を与えない
+
+```jsx
+// Clickier.jsx に記述
+
+import { useEffect, useRef, useState } from "react";
+
+export default function Clicker({ incrementCount, keyName, color }) {
+  const [count, setCount] = useState(
+    Number.parseInt(localStorage.getItem(keyName) ?? 0)
+  );
+  const buttonRef = useRef();
+  useEffect(() => {
+    buttonRef.current.style.backgroundColor = "skyblue";
+    buttonRef.current.style.color = "orange";
+
+    return () => {
+      localStorage.removeItem(keyName);
+    };
+  }, [keyName]);
+
+  useEffect(() => {
+    localStorage.setItem(keyName, count);
+  }, [count, keyName]);
+
+  const buttonClick = () => {
+    setCount((prevCount) => prevCount + 1);
+    incrementCount();
+  };
+  return (
+    <div>
+      <div style={{ color: color }}>Clicks count: {count}</div>
+      <button type="button" ref={buttonRef} onClick={buttonClick}>
+        add count
+      </button>
+    </div>
+  );
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/11845da3bbb7f5742181cf4585d75b74.jpg)](https://gyazo.com/11845da3bbb7f5742181cf4585d75b74)
+
+## People コンポーネントを作成する
+
+API から取得したランダムな名前を表示する
+`People`コンポーネントを作成します
+
+### map メソッドでデータ表示
+
+まずはテストとして
+自分で定義した固定配列をレンダリングします
+
+```jsx
+// People.jsx に記述
+
+import { useState } from "react";
+
+export default function People() {
+  const [people, setPeople] = useState([
+    { id: 1, name: "daiki" },
+    { id: 2, name: "beppu" },
+    { id: 3, name: "momo-chan" },
+    { id: 4, name: "chi-chan" },
+    { id: 5, name: "ko-chan" },
+  ]);
+  return (
+    <>
+      <h2> People </h2>
+      <ul>
+        {people.map((item) => {
+          return <li key={item.id}>{item.name}</li>;
+        })}
+      </ul>
+    </>
+  );
+}
+```
+
+```jsx
+// App.jsx に記述
+
+import { useMemo, useState } from "react";
+import Clicker from "./Clicker";
+import People from "./People";
+
+export default function App({ clickersCount, children }) {
+  // ...
+  return (
+    <>
+      {children}
+      <div>Total count: {count}</div>
+      <button type="button" onClick={toggleClickerClick}>
+        {hasClicker ? "Hide" : "Show "} Clicker
+      </button>
+      <div>
+        {hasClicker &&
+          [...Array(clickersCount)].map((item, index) => (
+            <Clicker
+              key={index}
+              incrementCount={incrementCount}
+              keyName={`count${index}`}
+              color={colors[index]}
+            />
+          ))}
+      </div>
+
+      <People />
+    </>
+  );
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/233e814b0ea7665084d5bcf16fc82644.png)](https://gyazo.com/233e814b0ea7665084d5bcf16fc82644)
+
+### API からデータを取得
+
+`fetch`を使用して API からデータを取得します
+
+今回使用する API は [JSONPlaceholder](https://jsonplaceholder.typicode.com/)の`/user`のデータを使用します
+
+`getPeople`関数を作成し`async`関数にします
+`fetch`で`API`からデータを取得して`.json()`で JSON 形式に`parse`(変換)し
+`setPeople`で表示する配列のデータを更新するという流れです
+
+```jsx
+import { useEffect, useState } from "react";
+
+export default function People() {
+  const [people, setPeople] = useState([]);
+
+  const getPeople = async () => {
+    const response = await fetch("https://jsonplaceholder.typicode.com/users");
+    const result = await response.json();
+    setPeople(result);
+  };
+
+  useEffect(() => {
+    getPeople();
+  }, []);
+  return (
+    <>
+      <h2> People </h2>
+      <ul>
+        {people.map((item) => {
+          return <li key={item.id}>{item.name}</li>;
+        })}
+      </ul>
+    </>
+  );
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/7b881fc75020a05b5437fd6906eff54b.png)](https://gyazo.com/7b881fc75020a05b5437fd6906eff54b)
