@@ -7,11 +7,13 @@ updated: 2024/09/21
 # 最初の R3F アプリケーションの制作
 
 - [下準備](#下準備)
-- [React Three Fiber (R3F) のセットアップ](#react-three-fiber-r3f-のセットアップ)
+- [React Three Fiber (R3F) の準備](#react-three-fiber-r3f-の準備)
 - [R3F の構文](#r3f-の構文)
   - [シンプルなメッシュ(ボックスジオメトリ)](#シンプルなメッシュボックスジオメトリ)
   - [位置と回転](#位置と回転)
   - [グループ化されたオブジェクト](#グループ化されたオブジェクト)
+- [最初のシーンを作成](#最初のシーンを作成)
+  - [Canvas の追加](#canvas-の追加)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -21,7 +23,7 @@ updated: 2024/09/21
 
 ## 下準備
 
-以下のソースコードからスタート
+以下のソースコードから開始
 
 <details>
 <summary>. jsxファイル(クリックして展開)</summary>
@@ -42,7 +44,7 @@ root.render(<div>Soon to be a badass R3F application</div>);
 
 </details>
 
-## React Three Fiber (R3F) のセットアップ
+## React Three Fiber (R3F) の準備
 
 > [!WARNING]
 >
@@ -96,7 +98,7 @@ scene.add(mesh);
 ```jsx
 // R3F の場合
 <mesh position={[1, 2, 3]} rotation-x={Math.PI / 2}>
-  <boxGeometry  />
+  <boxGeometry />
   <meshBasicMaterial color="red" />
 </mesh>
 ```
@@ -160,3 +162,97 @@ group.add(boxMesh, sphereMesh);
 >
 > - `Three.js`の命名規則を踏襲
 > - 例: `<mesh>`, `<boxGeomrtry />`
+
+## 最初のシーンを作成
+
+### Canvas の追加
+
+`Canvas`をインポートして`index.jsx`に追加
+
+```jsx
+import { Canvas } from "@react-three/fiber";
+```
+
+```jsx
+import { Canvas } from "@react-three/fiber";
+import ReactDOM from "react-dom/client";
+import Experience from "./components/Experience";
+import "./style.css";
+
+const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+root.render(<Canvas></Canvas>);
+```
+
+`R3F` に関連するすべてのものをカプセル化するための
+コンポーネント(`/src/componenst/Experience.jsx`)を作成
+
+```jsx
+export default function Experience() {
+  return (
+    <>
+      <mesh>
+        <torusKnotGeometry />
+        <meshNormalMaterial />
+      </mesh>
+    </>
+  );
+}
+```
+
+```jsx
+import { Canvas } from "@react-three/fiber";
+import ReactDOM from "react-dom/client";
+import Experience from "./components/Experience";
+import "./style.css";
+
+const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+root.render(
+  <Canvas>
+    <Experience />
+  </Canvas>
+);
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/aa5c1b7fa49c28d282c91d532191710a.png)](https://gyazo.com/aa5c1b7fa49c28d282c91d532191710a)
+
+3D オブジェクトが表示されたが小さい
+これは`<cavas>`タグのサイズが原因
+
+css で<canvas>のサイズを変更する
+
+```css
+html,
+body,
+#root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: darkgrey;
+}
+```
+
+**出力結果**
+
+`<canvas>`タグがビューポートいっぱいに表示された！
+
+[![Image from Gyazo](https://i.gyazo.com/9281813ffdcaab3facc6c0a91259991d.png)](https://gyazo.com/9281813ffdcaab3facc6c0a91259991d)
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> **`<Canvas></Canvas>`でなにがおきているのか？**
+>
+> - 自動レンダリング:動きがないのでわからないがシーンを各フレームでレンダリングされている
+> - シーンの自動生成: あらかじめ`Scene`が作成されている
+> - レンダラーの自動生成: あらかじめ`WebGLRenderer`の作成されていてる
+> - カメラの自動設定: あらかじめ`PerspectiveCamera`の配置され、あらかじめカメラをシーンの中央から引いて移す必要もない
+> - 自動リサイズ設定: ビューポートのリサイズも自動的に処理される
+> - デフォルト値の設定: ほとんどのコンポーネントにデフォルトの値が設定されているので値の指定が必要ない
