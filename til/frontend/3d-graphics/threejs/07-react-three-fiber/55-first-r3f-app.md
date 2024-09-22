@@ -1,7 +1,7 @@
 ---
 title: 55-first-r3f-app
 date: 2024/09/21
-updated: 2024/09/21
+updated: 2024/09/23
 ---
 
 # 最初の R3F アプリケーションの制作
@@ -14,6 +14,10 @@ updated: 2024/09/21
   - [グループ化されたオブジェクト](#グループ化されたオブジェクト)
 - [最初のシーンを作成](#最初のシーンを作成)
   - [Canvas の追加](#canvas-の追加)
+- [メッシュの作成とパラメータ処理](#メッシュの作成とパラメータ処理)
+  - [ジオメトリのパラメータ設定](#ジオメトリのパラメータ設定)
+  - [マテリアルのパラメータ設定](#マテリアルのパラメータ設定)
+  - [メッシュの変換](#メッシュの変換)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -53,6 +57,16 @@ root.render(<div>Soon to be a badass R3F application</div>);
 ターミナルから
 
 ```bash
+# npm を使用する場合
+npm install three@0.166 @react-three/fiber@8.16
+
+# yarn を使用する場合
+yarn add three@0.166 @react-three/fiber@8.16
+
+# pnpm を使用する場合
+pnpm install three@0.166 @react-three/fiber@8.16
+
+# bun を使用する場合
 bun add three@0.166 @react-three/fiber@8.16
 ```
 
@@ -167,6 +181,8 @@ group.add(boxMesh, sphereMesh);
 
 ### Canvas の追加
 
+`Canvas` コンポーネントは R3F アプリケーションの基盤となる重要な要素です。このコンポーネントは Three.js のレンダリングコンテキストを設定し、その中に配置された全ての 3D オブジェクトを管理します。`Canvas` の中に配置されたコンポーネントは、3D シーンの一部として扱われます。
+
 `Canvas`をインポートして`index.jsx`に追加
 
 ```jsx
@@ -186,6 +202,8 @@ root.render(<Canvas></Canvas>);
 
 `R3F` に関連するすべてのものをカプセル化するための
 コンポーネント(`/src/componenst/Experience.jsx`)を作成
+
+`Experience` コンポーネントは、R3F に関連するすべての要素を一つにまとめます。これにより、3D シーンの管理が容易になり、アプリケーションの構造がより明確になります。
 
 ```jsx
 export default function Experience() {
@@ -222,7 +240,7 @@ root.render(
 3D オブジェクトが表示されたが小さい
 これは`<cavas>`タグのサイズが原因
 
-css で<canvas>のサイズを変更する
+css で`<canvas>`のサイズを変更する
 
 ```css
 html,
@@ -253,6 +271,89 @@ body,
 > - 自動レンダリング:動きがないのでわからないがシーンを各フレームでレンダリングされている
 > - シーンの自動生成: あらかじめ`Scene`が作成されている
 > - レンダラーの自動生成: あらかじめ`WebGLRenderer`の作成されていてる
-> - カメラの自動設定: あらかじめ`PerspectiveCamera`の配置され、あらかじめカメラをシーンの中央から引いて移す必要もない
+> - カメラの自動設定: あらかじめ`PerspectiveCamera`の配置され、カメラをシーンの中央から引いて移す必要もない
 > - 自動リサイズ設定: ビューポートのリサイズも自動的に処理される
 > - デフォルト値の設定: ほとんどのコンポーネントにデフォルトの値が設定されているので値の指定が必要ない
+
+## メッシュの作成とパラメータ処理
+
+メッシュの作成は `<mesh>` タグでジオメトリとマテリアルを囲むことで行います。R3F では、Three.js のオブジェクトに対応するコンポーネントを提供しており、これらを組み合わせることで 3D オブジェクトを作成できます。
+
+### ジオメトリのパラメータ設定
+
+ジオメトリは `args` 属性でパラメータを設定します。`args` 属性は配列を受け取り、その要素は `Three.js` のコンストラクタに渡される引数と同じ順序で指定する。
+
+```jsx
+// 記述例
+
+<sphereGeometry args={[radius, widthSegments, heightSegments]} />
+<boxGeometry args={[width, height, depth]} />
+<cylinderGeometry args={[radiusTop, radiusBottom, height, radialSegments]} />
+```
+
+注意点：
+
+- `args` の値は必ず配列で指定する
+- パラメータの順序は `Three.js` のドキュメントを参照する
+
+### マテリアルのパラメータ設定
+
+マテリアルも args 属性でパラメータを設定できますが、プロパティ名を直接指定する方がより読みやすく、柔軟性が高い。
+
+```jsx
+// 記述例
+
+<meshBasicMaterial color="orange" wireframe />
+<meshStandardMaterial roughness={0.4} metalness={0.7} color="#00ff00" />
+<meshPhongMaterial specular="#ff0000" shininess={100} />
+```
+
+### メッシュの変換
+
+メッシュの変換は`<mesh>`タグ内で行う
+
+**メッシュの位置**
+
+- Threejs: `mesh.position.x = 2` => R3F: `position-x={2}`
+- Threejs: `mesh.position.set(x, y, z)` => R3F: `position={[x, y, z]}`
+
+**メッシュのスケール**
+
+- Threejs: `mesh.scale.x = 2` => R3F: `scale-x={2}`
+- Threejs: `mesh.scale.set(x, y, z)` => R3F: `scale={[x, y, z]}`
+
+**メッシュの回転**
+
+- Threejs: `mesh.rotation.x = Math.PI / 2` => R3F: `rotation-x={Math.PI / 2}`
+
+```jsx
+export default function Experience() {
+  return (
+    <>
+      <group>
+        {/*右側（x軸の正の方向）に配置し、サイズを1.5倍に拡大。*/}
+        <mesh position-x={2} scale={1.5}>
+          <boxGeometry />
+          <meshBasicMaterial color={"skyblue"} /> {/* 水色に変更*/}
+        </mesh>
+        <mesh position-x={-2}>
+          {" "}
+          {/*左側（x軸の負の方向）に配置*/}
+          <sphereGeometry args={[1, 32, 32]} />
+          <meshBasicMaterial color={"orange"} />
+        </mesh>
+      </group>
+
+      {/*下側（y軸の負の方向）に配置し、x軸を基準に90度回転させ、サイズを10倍に拡大*/}
+      <mesh position-y={-1} rotation-x={-Math.PI / 2} scale={10}>
+        <planeGeometry />
+        <meshBasicMaterial color={"yellowgreen"} />
+      </mesh>
+    </>
+  );
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/e6e55352cb41c01669fb2bc060ec83f4.png)](https://gyazo.com/e6e55352cb41c01669fb2bc060ec83f4)
