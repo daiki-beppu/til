@@ -18,6 +18,11 @@ updated: 2024/09/23
   - [ジオメトリのパラメータ設定](#ジオメトリのパラメータ設定)
   - [マテリアルのパラメータ設定](#マテリアルのパラメータ設定)
   - [メッシュの変換](#メッシュの変換)
+- [useFrame と useRef を使用したアニメーション](#useframe-と-useref-を使用したアニメーション)
+  - [useFrame とは](#useframe-とは)
+  - [useFrame の使用方法](#useframe-の使用方法)
+  - [useRef と組み合わせてアニメーションを適用](#useref-と組み合わせてアニメーションを適用)
+- [オービットコントロール](#オービットコントロール)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -64,7 +69,7 @@ npm install three@0.166 @react-three/fiber@8.16
 yarn add three@0.166 @react-three/fiber@8.16
 
 # pnpm を使用する場合
-pnpm install three@0.166 @react-three/fiber@8.16
+pnpm add three@0.166 @react-three/fiber@8.16
 
 # bun を使用する場合
 bun add three@0.166 @react-three/fiber@8.16
@@ -357,3 +362,106 @@ export default function Experience() {
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/e6e55352cb41c01669fb2bc060ec83f4.png)](https://gyazo.com/e6e55352cb41c01669fb2bc060ec83f4)
+
+## useFrame と useRef を使用したアニメーション
+
+### useFrame とは
+
+`useFrame`は、`R3F`ライブラリの中核的なフックの一つで、3D シーンのアニメーションと更新を管理するために使用されます。
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> `useFrame`は`Three.js`の`requestAnimationFrame`を`React`に適応させたものと考えるとわかりやすい
+
+### useFrame の使用方法
+
+`useFrame`はコールバック関数として使用し
+コールバック内で記述された処理を各フレームで呼び出すフックです
+
+```jsx
+useFrame((state, delta) => {
+  console.log("test");
+});
+```
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> **引数の `state` と `delta` について**
+>
+> - `state`: カメラ、レンダラー、シーンなどの Three.js 環境に関する情報
+> - `delta`: 最後のフレームからの経過時間
+
+### useRef と組み合わせてアニメーションを適用
+
+`useRef`については[はじめての React アプリケーション](https://github.com/daiki-beppu/til/blob/main/til/frontend/3d-graphics/threejs/07-react-three-fiber/54-first-react-app.md#useref-%E3%81%A7%E7%89%B9%E5%AE%9A%E3%81%AE%E8%A6%81%E7%B4%A0%E3%81%AB%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%81%99%E3%82%8B)で詳しく記述
+
+```jsx
+import { useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+
+export default function Experience() {
+  const cubeRef = useRef();
+
+  useFrame((state, delta) => {
+    cubeRef.current.rotation.y += delta;
+  });
+
+  return (
+    <>
+      <group>
+        <mesh ref={cubeRef} position-x={2} scale={1.5}>
+          <boxGeometry />
+          <meshBasicMaterial color={"skyblue"} />
+        </mesh>
+
+       {* ... *}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/114be4f343cf04102531acd5defac2eb"><img src="https://i.gyazo.com/114be4f343cf04102531acd5defac2eb.gif" alt="Image from Gyazo" width="995"/></a>
+
+## オービットコントロール
+
+`@react-three-drei`を使うと簡単にできるが
+今回は`@react-three-drei`を使用しない方法で行う
+
+R3F の`extend`と`useThree`を使用する
+
+- `extend`: Three.js のクラスを宣言型に自動変換し`JSX`で使用できるようにする
+- `useThree`: 最初のレンダリング時にカメラ、レンダラー、シーンなどの Three.js 環境に関する情報を取得する
+
+```jsx
+import { extend, useFrame, useThree } from "@react-three/fiber";
+import { useRef } from "react";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
+
+extend({ OrbitControls });
+
+export default function Experience() {
+  const { camera, gl } = useThree();
+  const cubeRef = useRef();
+
+  useFrame((state, delta) => {
+    cubeRef.current.rotation.y += delta;
+  });
+
+  return (
+    <>
+      <orbitControls args={[camera, gl.domElement]} />
+      {* ... *}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/ea7245b044486908948adbd33cc343c3"><img src="https://i.gyazo.com/ea7245b044486908948adbd33cc343c3.gif" alt="Image from Gyazo" width="989"/></a>
