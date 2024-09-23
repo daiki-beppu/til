@@ -29,6 +29,13 @@ updated: 2024/09/23
   - [BufferGeometry と BufferAttribute の設定](#buffergeometry-と-bufferattribute-の設定)
   - [useMemo で頂点を最適化する](#usememo-で頂点を最適化する)
   - [useRef と useEffect を使用して法線を再計算する](#useref-と-useeffect-を使用して法線を再計算する)
+- [Canvas の設定](#canvas-の設定)
+  - [カメラの設定](#カメラの設定)
+  - [OrthographicCamera の設定](#orthographiccamera-の設定)
+  - [カメラのアニメーション](#カメラのアニメーション)
+  - [アンチエイリアスの設定](#アンチエイリアスの設定)
+  - [トーンマッピングの設定](#トーンマッピングの設定)
+  - [カラースペースの設定](#カラースペースの設定)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -864,4 +871,168 @@ export default function CustomObject() {
 }
 ```
 
+## Canvas の設定
 
+カメラ、レンダラー、アンチエイリアス、カラースペースなど
+R3F では自動的に設定されていますが属性を使用することで変更することもできます
+
+### カメラの設定
+
+```jsx
+root.render(
+  <Canvas
+    camera={{
+      fov: 45,
+      near: 0.1,
+      far: 200,
+      position: [3, 2, 6],
+    }}
+  >
+    <Experience />
+  </Canvas>
+);
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/eaac228dad21794827001839651027b6.png)](https://gyazo.com/eaac228dad21794827001839651027b6)
+
+### OrthographicCamera の設定
+
+`top,left,right,bottom`を設定するのではなく`zoom`で調整する
+
+```jsx
+root.render(
+  <Canvas
+    orthographic
+    camera={{
+      fov: 45,
+      zoom: 100,
+      near: 0.1,
+      far: 200,
+      position: [3, 2, 6],
+    }}
+  >
+    <Experience />
+  </Canvas>
+);
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/21f1efb9582515d6864717e0c76b6a65.png)](https://gyazo.com/21f1efb9582515d6864717e0c76b6a65)
+
+### カメラのアニメーション
+
+カメラを中心にフォーカスしたままシーンの周りを回転させる
+
+```jsx
+]import { extend, useFrame, useThree } from '@react-three/fiber'
+import { useRef } from 'react'
+import { OrbitControls } from 'three/examples/jsm/Addons.js'
+import CustomObject from './CustomObuject'
+
+extend({ OrbitControls })
+
+export default function Experience() {
+  const { camera, gl } = useThree()
+  const cubeRef = useRef()
+
+  useFrame((state, delta) => {
+    const angle = state.clock.elapsedTime
+    state.camera.position.x = Math.sin(angle) * 8
+    state.camera.position.z = Math.cos(angle) * 8
+    state.camera.lookAt(0, 0, 0)
+
+    cubeRef.current.rotation.y += delta
+  })
+
+  return (
+    <>
+      {/* ... */}
+    </>
+  )
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/1637c8bc69d07907f07665c0286a061b"><img src="https://i.gyazo.com/1637c8bc69d07907f07665c0286a061b.gif" alt="Image from Gyazo" width="992"/></a>
+
+### アンチエイリアスの設定
+
+R3F ではデフォルトで設定されています
+アンチエイリアスを無効にしたい場合は`gl`属性から設定できます
+
+```jsx
+import { Canvas } from "@react-three/fiber";
+import ReactDOM from "react-dom/client";
+import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
+import Experience from "./components/Experience";
+import "./style.css";
+
+const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+root.render(
+  <Canvas
+    gl={{
+      antialias: false,
+    }}
+  >
+    <Experience />
+  </Canvas>
+);
+```
+
+### トーンマッピングの設定
+
+デフォルトで`ACESFilmicToneMapping` が適用されています
+変更する場合は`gl`属性から設定できます
+
+```jsx
+import { Canvas } from "@react-three/fiber";
+import ReactDOM from "react-dom/client";
+import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
+import Experience from "./components/Experience";
+import "./style.css";
+
+const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+root.render(
+  <Canvas
+    gl={{
+      antialias: false,
+      toneMapping: CineonToneMapping,
+    }}
+  >
+    <Experience />
+  </Canvas>
+);
+```
+
+### カラースペースの設定
+
+デフォルトで`SRGBColorSpace`が適用されています
+変更する場合は`gl`属性から設定できます
+
+```jsx
+import { Canvas } from "@react-three/fiber";
+import ReactDOM from "react-dom/client";
+import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
+import Experience from "./components/Experience";
+import "./style.css";
+
+const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+root.render(
+  <Canvas
+    gl={{
+      antialias: false,
+      toneMapping: CineonToneMapping,
+      outputColorSpace: LinearSRGBColorSpace,
+    }}
+  >
+    <Experience />
+  </Canvas>
+);
+```
