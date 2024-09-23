@@ -24,6 +24,11 @@ updated: 2024/09/23
   - [useRef と組み合わせてアニメーションを適用](#useref-と組み合わせてアニメーションを適用)
 - [オービットコントロール](#オービットコントロール)
 - [ライトの追加](#ライトの追加)
+- [カスタムジオメトリの作成](#カスタムジオメトリの作成)
+  - [position 配列の作成](#position-配列の作成)
+  - [BufferGeometry と BufferAttribute の設定](#buffergeometry-と-bufferattribute-の設定)
+  - [useMemo で頂点を最適化する](#usememo-で頂点を最適化する)
+  - [useRef と useEffect を使用して法線を再計算する](#useref-と-useeffect-を使用して法線を再計算する)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -239,6 +244,56 @@ root.render(
 );
 ```
 
+<details>
+<summary>Three.jsの場合(クリックして展開)</summary>
+
+```js
+// Canvas
+const canvas = document.querySelector("canvas.webgl");
+
+// シーン
+const scene = new THREE.Scene();
+
+// リサイズ
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+// カメラ
+const camera = new THREE.PerspectiveCamera(
+  75,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
+camera.position.x = 4;
+camera.position.y = 2;
+camera.position.z = 8;
+scene.add(camera);
+
+// レンダラー
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+});
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+```
+
+</details>
+
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/aa5c1b7fa49c28d282c91d532191710a.png)](https://gyazo.com/aa5c1b7fa49c28d282c91d532191710a)
@@ -264,7 +319,7 @@ body,
 
 **出力結果**
 
-`<canvas>`タグがビューポートいっぱいに表示された！
+`<Canvas>`コンポーネントがビューポートいっぱいに表示された！
 
 [![Image from Gyazo](https://i.gyazo.com/9281813ffdcaab3facc6c0a91259991d.png)](https://gyazo.com/9281813ffdcaab3facc6c0a91259991d)
 
@@ -360,11 +415,42 @@ export default function Experience() {
 }
 ```
 
+<details>
+<summary>Three.js の場合(クリックして展開)</summary>
+
+```js
+const group = new THREE.Group();
+
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+const boxMaterial = new THREE.MeshBasicMaterial({ color: "skyblue" });
+const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+boxMesh.position.x = 2;
+boxMesh.scale.set(1.5, 1.5, 1.5);
+
+const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+const sphereMaterial = new THREE.MeshBasicMaterial({ color: "orange" });
+const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+sphereMesh.position.x = -2;
+
+group.add(boxMesh, sphereMesh);
+
+const planeGeometry = new THREE.PlaneGeometry(1, 1);
+const planeMaterial = new THREE.MeshBasicMaterial({ color: "yellowgreen" });
+const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+planeMesh.position.y = -1;
+planeMesh.rotation.x = -Math.PI / 2;
+planeMesh.scale.set(10, 10, 10);
+```
+
+</details>
+
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/e6e55352cb41c01669fb2bc060ec83f4.png)](https://gyazo.com/e6e55352cb41c01669fb2bc060ec83f4)
 
 ## useFrame と useRef を使用したアニメーション
+
+`useFrame` と `useRef` を組み合わせることで、特定のオブジェクトに対して毎フレーム更新を行うことができます。`useRef` で参照を作成し、その参照を通じて `useFrame` 内でオブジェクトを操作します。これにより、効率的かつ柔軟なアニメーションの実装が可能になります。
 
 ### useFrame とは
 
@@ -425,6 +511,27 @@ export default function Experience() {
 }
 ```
 
+<details>
+<summary>Three.js の場合(クリックして展開)</summary>
+
+```js
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: "skyblue" });
+const cube = new THREE.Mesh(geometry, material);
+cube.position.x = 2;
+cube.scale.set(1.5, 1.5, 1.5);
+scene.add(cube);
+
+function animate() {
+  requestAnimationFrame(animate);
+  cube.rotation.y += 0.01;
+  renderer.render(scene, camera);
+}
+animate();
+```
+
+</details>
+
 **出力結果**
 
 <a href="https://gyazo.com/114be4f343cf04102531acd5defac2eb"><img src="https://i.gyazo.com/114be4f343cf04102531acd5defac2eb.gif" alt="Image from Gyazo" width="995"/></a>
@@ -462,6 +569,26 @@ export default function Experience() {
   );
 }
 ```
+
+<details>
+<summary>Three.js の場合(クリックして展開)</summary>
+
+```js
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+```
+
+</details>
 
 **出力結果**
 
@@ -509,6 +636,232 @@ export default function Experience() {
 }
 ```
 
+<details>
+<summary>Three.js の場合(クリックして展開)</summary>
+
+```js
+const directionalLight = new THREE.DirectionalLight(0xffffff, 3.5);
+directionalLight.position.set(1, 2, 3);
+scene.add(directionalLight);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+scene.add(ambientLight);
+```
+
+</details>
+
 **出力結果**
 
 <a href="https://gyazo.com/40b0fc8f03766d3d81254e031d4331dc"><img src="https://i.gyazo.com/40b0fc8f03766d3d81254e031d4331dc.gif" alt="Image from Gyazo" width="989"/></a>
+
+## カスタムジオメトリの作成
+
+カスタムジオメトリを作成する前に新しいコンポーネント(`/src/components/CustomObuject.jsx`)を作成します
+
+```jsx
+..
+// CustomObuject.jsx に記述
+export default function CustomObject() {
+  // テストメッシュ
+  <mesh>
+    <boxGeometry />
+    <meshStandardMaterial color={"red"} />
+  </mesh>;
+}
+```
+
+```jsx
+// Experience.jsx に記述
+
+import { extend, useFrame, useThree } from "@react-three/fiber";
+import { useRef } from "react";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
+import CustomObject from "./CustomObuject";
+
+extend({ OrbitControls });
+
+export default function Experience() {
+  const { camera, gl } = useThree();
+  const cubeRef = useRef();
+
+  useFrame((state, delta) => {
+    cubeRef.current.rotation.y += delta;
+  });
+
+  return (
+    <>
+      {/* ... */}
+
+      <mesh position-y={-1} rotation-x={-Math.PI / 2} scale={10}>
+        <planeGeometry />
+        <meshStandardMaterial color={"yellowgreen"} />
+      </mesh>
+
+      <CustomObject />
+    </>
+  );
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/b63a6cd63f2b6fa63777410d78b18663.png)](https://gyazo.com/b63a6cd63f2b6fa63777410d78b18663)
+
+### position 配列の作成
+
+```jsx
+export default function CustomObject() {
+  const verticesCount = 10 * 3; // 三角形の数 * 頂点の数
+
+  // 頂点の位置を保存する配列
+  const positions = new Float32Array(verticesCount * 3);
+  // * 3 => 頂点ごとに x, y, z の値が必要なため
+
+  // -1.5 から 1.5 のランダムな値を配列に保存
+  for (let i = 0; i < verticesCount * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * 3;
+  }
+
+  return {
+    /* ... */
+  };
+}
+```
+
+### BufferGeometry と BufferAttribute の設定
+
+`BufferGeometry`は`<bufferGeometry>`タグで囲むことで設定する事ができる
+`<bufferGeometry>`タグ内に`<bufferAttribute />`タグを記述し各属性を設定することでことで`BufferAttribute`を設定することができる
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> **`<bufferAttribute />`の属性について**
+>
+> - `attach`: `"attributes-position"` => `geometry.attribute.position`に変換する
+> - `count`: 頂点の数
+> - `itemSize`: 1 つの頂点を構成する配列の項目数
+> - `array`: 適用する配列
+
+```jsx
+export default function CustomObject() {
+  // ...
+
+  return {
+  <mesh>
+      <bufferGeometry ref={geometryRef}>
+        <bufferAttribute
+          attach="attributes-position"
+          count={verticesCount}
+          itemSize={3}
+          array={positions}
+        />
+      </bufferGeometry>
+      <meshStandardMaterial color="red" side={DoubleSide} />
+    </mesh>
+  };
+}
+```
+
+<details>
+<summary>Three.js の場合(クリックして展開)</summary>
+
+```js
+const verticesCount = 10 * 3;
+const positions = new Float32Array(verticesCount * 3);
+
+for (let i = 0; i < verticesCount * 3; i++) {
+  i3 = i * 3;
+  positions[i] = (Math.random() - 0.5) * 3;
+  positions[i + 1] = (Math.random() - 0.5) * 3;
+  positions[i + 2] = (Math.random() - 0.5) * 3;
+}
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+const material = new THREE.MeshStandardMaterial({
+  color: "red",
+  side: THREE.DoubleSide,
+});
+
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+```
+
+</details>
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/5d5f781ca459043d4e5a51704ef5041b.png)](https://gyazo.com/5d5f781ca459043d4e5a51704ef5041b)
+
+### useMemo で頂点を最適化する
+
+`useMemo` で頂点の情報をキャシュしておき
+コンポーネントが再レンダリングされた場合キャッシュしている値を返すようにします
+
+```jsx
+import { useMemo, useRef } from "react";
+import { DoubleSide } from "three";
+
+export default function CustomObject() {
+  const verticesCount = 10 * 3;
+
+  const positions = useMemo(() => {
+    const positions = new Float32Array(verticesCount * 3);
+
+    for (let i = 0; i < verticesCount * 3; i++) {
+      positions[i] = (Math.random() - 0.5) * 3;
+    }
+
+    return positions;
+  }, []);
+
+  return {
+    {/* ... */}
+  };
+}
+```
+
+### useRef と useEffect を使用して法線を再計算する
+
+```jsx
+import { useEffect, useMemo, useRef } from "react";
+import { DoubleSide } from "three";
+
+export default function CustomObject() {
+  const geometryRef = useRef();
+  useEffect(() => {
+    geometryRef.current.computeVertexNormals();
+  }, []);
+
+  const verticesCount = 10 * 3;
+
+  const positions = useMemo(() => {
+    const positions = new Float32Array(verticesCount * 3);
+
+    for (let i = 0; i < verticesCount * 3; i++) {
+      positions[i] = (Math.random() - 0.5) * 3;
+    }
+
+    return positions;
+  }, []);
+
+  return (
+    <mesh>
+      <bufferGeometry ref={geometryRef}>
+        <bufferAttribute
+          attach="attributes-position"
+          count={verticesCount}
+          itemSize={3}
+          array={positions}
+        />
+      </bufferGeometry>
+      <meshStandardMaterial color="red" side={DoubleSide} />
+    </mesh>
+  );
+}
+```
+
+
