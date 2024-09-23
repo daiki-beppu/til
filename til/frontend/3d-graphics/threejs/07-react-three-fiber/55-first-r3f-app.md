@@ -23,6 +23,7 @@ updated: 2024/09/23
   - [useFrame の使用方法](#useframe-の使用方法)
   - [useRef と組み合わせてアニメーションを適用](#useref-と組み合わせてアニメーションを適用)
 - [オービットコントロール](#オービットコントロール)
+- [ライトの追加](#ライトの追加)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -465,3 +466,49 @@ export default function Experience() {
 **出力結果**
 
 <a href="https://gyazo.com/ea7245b044486908948adbd33cc343c3"><img src="https://i.gyazo.com/ea7245b044486908948adbd33cc343c3.gif" alt="Image from Gyazo" width="989"/></a>
+
+## ライトの追加
+
+シーンをよりリアルに見せるためライトを追加しマテリアルを
+`meshBasicMaterial` => `meshStanderdMaterial`に変更します
+
+ライトの追加は
+`<directionalLight />`, `<ambientLight />`で行うことが出来ます
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> `<directionalLight />`はデフォルトでは真上から照射する
+
+```jsx
+import { extend, useFrame, useThree } from "@react-three/fiber";
+import { useRef } from "react";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
+
+extend({ OrbitControls });
+
+export default function Experience() {
+  const { camera, gl } = useThree();
+  const cubeRef = useRef();
+
+  useFrame((state, delta) => {
+    cubeRef.current.rotation.y += delta;
+  });
+
+  return (
+    <>
+      <orbitControls args={[camera, gl.domElement]} />
+
+      <directionalLight position={[1, 2, 3]} intensity={3.5} />
+      <ambientLight intensity={1.5} />
+
+      {/* ... */}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/40b0fc8f03766d3d81254e031d4331dc"><img src="https://i.gyazo.com/40b0fc8f03766d3d81254e031d4331dc.gif" alt="Image from Gyazo" width="989"/></a>
