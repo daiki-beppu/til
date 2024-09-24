@@ -7,7 +7,7 @@ updated: 2024/09/24
 # React Three Drei について
 
 - [下準備](#下準備)
-- [R3F drei とは：React Three Fiber のための強力な拡張ライブラリ](#r3f-drei-とはreact-three-fiber-のための強力な拡張ライブラリ)
+- [R3F drei とは： React Three Fiber のための強力な拡張ライブラリ](#r3f-drei-とは-react-three-fiber-のための強力な拡張ライブラリ)
 - [R3F drei の準備](#r3f-drei-の準備)
 - [オービットコントロール](#オービットコントロール)
 - [トランスフォームコントロール](#トランスフォームコントロール)
@@ -20,6 +20,10 @@ updated: 2024/09/24
   - [Html の属性について](#html-の属性について)
 - [3D テキスト](#3d-テキスト)
   - [Text の属性について](#text-の属性について)
+- [Float ヘルパー](#float-ヘルパー)
+  - [Float の属性について](#float-の属性について)
+- [MeshReflectorMaterial](#meshreflectormaterial)
+  - [MeshReflectorMaterial の属性について](#meshreflectormaterial-の属性について)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -100,7 +104,7 @@ export default function Experience() {
 
 </details>
 
-## R3F drei とは：React Three Fiber のための強力な拡張ライブラリ
+## R3F drei とは： React Three Fiber のための強力な拡張ライブラリ
 
 `react-three-drei`（通称 drei）は、`React Three Fiber`（R3F）のための強力なヘルパーライブラリです。Three.js を React で使用するための R3F の機能を拡張し、3D シーンの作成と操作を大幅に簡素化します。
 
@@ -232,7 +236,7 @@ export default function Experience() {
 
 ### 修正: ギズモをオブジェクトと同じ位置に表示する
 
-`<mesh>`のあとに`<TransformControls />`を移動させ
+`<mesh>`の後に`<TransformControls />`を移動させ
 `useRef`を使用して`object`属性を使用して関連付けることで修正することができます
 
 ```jsx
@@ -508,3 +512,108 @@ export default function Experience() {
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/e864f6a8ce11bb1cd6de39337b5b9162.png)](https://gyazo.com/e864f6a8ce11bb1cd6de39337b5b9162)
+
+## Float ヘルパー
+
+オブジェクトを風船のようにふわふわ浮かせたいときに使用できるヘルパー
+
+浮かせたいオブジェクトを`<Float>`タグで囲むだけで適用することができる
+
+### Float の属性について
+
+- `speed`: 移動の速さを設定
+- `floatIntensity`: 移動範囲の大きさを設定
+
+```jsx
+import {
+  Float,
+  Html,
+  OrbitControls,
+  PivotControls,
+  Text,
+  TransformControls,
+} from "@react-three/drei";
+import { useRef } from "react";
+
+export default function Experience() {
+  const cubeRef = useRef();
+  const sphereRef = useRef();
+
+  return (
+    <>
+      {/* ... */}
+
+      <Float speed={5} floatIntensity={2}>
+        <Text
+          font="./bangers-v20-latin-regular.woff"
+          fontSize={1}
+          position-y={2}
+          color={"salmon"}
+          maxWidth={2}
+          textAlign="center"
+        >
+          I LOVE R3F
+          <meshNormalMaterial />
+        </Text>
+      </Float>
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/8d6bb6ebf5d90380928ecd8a50e035cc"><img src="https://i.gyazo.com/8d6bb6ebf5d90380928ecd8a50e035cc.gif" alt="Image from Gyazo" width="993"/></a>
+
+## MeshReflectorMaterial
+
+Three.js で反射の実装は大変でしたが
+`MeshReflectorMaterial`をマテリアルに設定するだけで反射を適用することができます
+
+ただし、`MeshReflectorMaterial`は平面のメッシュにしか適用できないので注意が必要
+
+### MeshReflectorMaterial の属性について
+
+- `resolution`: 反射の解像度を設定
+- `blur`,`mixblur`: 反射のぼやけ具合を設定
+- `mirror`: どのくらい反射するかを設定
+
+```jsx
+import {
+  Float,
+  Html,
+  OrbitControls,
+  PivotControls,
+  Text,
+  TransformControls,
+} from "@react-three/drei";
+import { useRef } from "react";
+
+export default function Experience() {
+  const cubeRef = useRef();
+  const sphereRef = useRef();
+
+  return (
+    <>
+      {/* ... */}
+
+      <mesh position-y={-1} rotation-x={-Math.PI * 0.5} scale={10}>
+        <planeGeometry />
+        <meshBasicMaterial color={"greenyellow"} />
+        <MeshReflectorMaterial
+          color="greenyellow"
+          resolution={512}
+          blur={[1000, 1000]}
+          mixBlur={0.3}
+          mirror={0.5}
+        />
+      </mesh>
+
+      {/* ... */}
+  );
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/84f5fb6c62a187c035c228441a16bb5f.png)](https://gyazo.com/84f5fb6c62a187c035c228441a16bb5f)
