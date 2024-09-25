@@ -26,6 +26,7 @@ updated: 2024/09/25
 > - React Three Fiber `@react-three/fiber: v8.16`
 > - react-three-drei `@react-three/drei@9.108`
 > - leva `leva@0.9.34`
+> - react-three-pref `r3f-perf@7.2`
 
 ## 下準備
 
