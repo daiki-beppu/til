@@ -12,6 +12,11 @@ updated: 2024/09/25
   - [ベクトルの設定](#ベクトルの設定)
   - [色の設定](#色の設定)
   - [オブジェクト表示、非表示の切り替え(チェックボックスの設定)](#オブジェクト表示非表示の切り替えチェックボックスの設定)
+  - [関数を呼び出すボタン](#関数を呼び出すボタン)
+  - [セレクターでの設定](#セレクターでの設定)
+  - [フォルダで整理する](#フォルダで整理する)
+  - [Leva の設定](#leva-の設定)
+- [r3f-perf でのパフォーマンスモニタリング](#r3f-perf-でのパフォーマンスモニタリング)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -283,7 +288,7 @@ export default function Experience() {
     },
     color: "orange",
     visible: true,
-    chackbox: true,
+    checkbox: true,
   });
 
   return (
@@ -304,3 +309,184 @@ export default function Experience() {
 **出力結果**
 
 <a href="https://gyazo.com/9f513a0a6c9e345747f0151122104b7f"><img src="https://i.gyazo.com/9f513a0a6c9e345747f0151122104b7f.gif" alt="Image from Gyazo" width="990"/></a>
+
+### 関数を呼び出すボタン
+
+`Leva`から`button`をインポートして
+`button(()=> {})`で使用することができる
+
+```jsx
+import { OrbitControls } from "@react-three/drei";
+import { button, useControls } from "leva";
+
+export default function Experience() {
+  const { position, color, visible } = useControls({
+    position: {
+      value: { x: -2, y: 0 },
+      step: 0.01,
+    },
+    color: "orange",
+    visible: true,
+    checkbox: true,
+    button: button(() => {
+      console.log("click");
+    }),
+  });
+
+  return (
+    <>
+      {/* ... */}
+
+      <mesh position={[position.x, position.y, position.z]}>
+        <sphereGeometry />
+        <meshStandardMaterial color={color} />
+      </mesh>
+
+      {/* ... */}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/2a8268a8637012fb9c06e63e03ba4f57"><img src="https://i.gyazo.com/2a8268a8637012fb9c06e63e03ba4f57.gif" alt="Image from Gyazo" width="1000"/></a>
+
+### セレクターでの設定
+
+`options`プロパティに配列を設定することで設定した要素からセレクターで選択できる様になる
+
+```jsx
+import { OrbitControls } from "@react-three/drei";
+import { useControls } from "leva";
+
+export default function Experience() {
+  const { position, color, visible } = useControls({
+    position: {
+      value: { x: -2, y: 0 },
+      step: 0.01,
+    },
+    color: "orange",
+    visible: true,
+    checkbox: true,
+    button: button(() => {
+      console.log("click");
+    }),
+    selecter: { options: ["case1", "case2", "case3"] },
+  });
+
+  return (
+    <>
+      {/* ... */}
+
+      <mesh position={[position.x, position.y, position.z]}>
+        <sphereGeometry />
+        <meshStandardMaterial color={color} />
+      </mesh>
+
+      {/* ... */}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/3033248a0a7eca107cc9562b144b1ab1"><img src="https://i.gyazo.com/3033248a0a7eca107cc9562b144b1ab1.gif" alt="Image from Gyazo" width="996"/></a>
+
+### フォルダで整理する
+
+フォルダを作成する場合は`useControls`の第一引数に`folderName`を指定してあげる
+フォルダを複数作成する場合は`useControls`を複数作成すればいい
+
+フォルダの中にフォルダを作成したい場合は`folder()`を使用する
+
+```jsx
+import { OrbitControls } from "@react-three/drei";
+import { useControls } from "leva";
+
+export default function Experience() {
+  const { position, color, visible } = useControls("sphere", {
+    position: {
+      value: { x: -2, y: 0 },
+      step: 0.01,
+    },
+    color: "orange",
+    bool: folder({
+      visible: true,
+      checkbox: true,
+    }),
+
+    button: button(() => {
+      console.log("click");
+    }),
+    selecter: { options: ["case1", "case2", "case3"] },
+  });
+
+  const { scale } = useControls("cube", {
+    scale: {
+      value: 1.5,
+      min: 1.5,
+      max: 4,
+      step: 0.01,
+    },
+  });
+
+  return (
+    <>
+      {/* ... */}
+
+      <mesh position={[position.x, position.y, position.z]}>
+        <sphereGeometry />
+        <meshStandardMaterial color={color} />
+      </mesh>
+
+      {/* ... */}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/9288e8b472bd18defdae762a122d0703"><img src="https://i.gyazo.com/9288e8b472bd18defdae762a122d0703.gif" alt="Image from Gyazo" width="989"/></a>
+
+### Leva の設定
+
+`Experience.jsx`内だと属性から設定を変更できないので
+`index.jsx`に`<Leva />`を記述します
+
+こうすることでコンポーネントの属性から設定を変更することが出来ます
+
+```jsx
+import { Canvas } from "@react-three/fiber";
+import { Leva } from "leva";
+import { StrictMode } from "react";
+import ReactDOM from "react-dom/client";
+import Experience from "./Experience.jsx";
+import "./style.css";
+
+const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+root.render(
+  <StrictMode>
+    <Leva collapsed /> {/* デフォルトで閉じる */}
+    <Canvas
+      camera={{
+        fov: 45,
+        near: 0.1,
+        far: 200,
+        position: [-4, 3, 6],
+      }}
+    >
+      <Experience />
+    </Canvas>
+  </StrictMode>
+);
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/981a96643b83685a6b6f69f466c821a2.png)](https://gyazo.com/981a96643b83685a6b6f69f466c821a2)
+
+## r3f-perf でのパフォーマンスモニタリング
