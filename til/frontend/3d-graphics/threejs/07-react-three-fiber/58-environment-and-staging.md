@@ -16,6 +16,7 @@ updated: 2024/09/25
 
 - [下準備](#下準備)
 - [背景色の変更](#背景色の変更)
+- [ライトヘルパー](#ライトヘルパー)
 
 ## 下準備
 
@@ -127,3 +128,48 @@ export default function Experience() {
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/c80c17861a9200630cd7402ef401c7b6.png)](https://gyazo.com/c80c17861a9200630cd7402ef401c7b6)
+
+## ライトヘルパー
+
+ライトヘルパーを表示するには`drei`の`useHelper`,`useRef`と`THREE.(DirectionalLight)Helper`を使用します(任意のライト)
+
+```jsx
+import { OrbitControls, useHelper } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { Perf } from "r3f-perf";
+import { useRef } from "react";
+import * as THREE from "three";
+
+export default function Experience() {
+  const cube = useRef();
+  const directionalLightRef = useRef();
+  useHelper(
+    directionalLightRef, // 参照を指定
+    THREE.DirectionalLightHelper, // 使用するヘルパー
+    1 // ヘルパーのサイズ 1 => デフォルト値
+    );
+
+  useFrame((state, delta) => {
+    cube.current.rotation.y += delta * 0.2;
+  });
+
+  return (
+    <>
+      {/* ... */}
+
+      <directionalLight
+        ref={directionalLightRef}
+        position={[1, 2, 3]}
+        intensity={4.5}
+      />
+      <ambientLight intensity={1.5} />
+
+      {/* ... /}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+[![Image from Gyazo](https://i.gyazo.com/4660c14fe7e2bce67bfb63327a7ed672.png)](https://gyazo.com/4660c14fe7e2bce67bfb63327a7ed672)
