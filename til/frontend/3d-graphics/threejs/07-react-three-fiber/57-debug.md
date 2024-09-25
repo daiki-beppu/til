@@ -17,6 +17,7 @@ updated: 2024/09/25
   - [フォルダで整理する](#フォルダで整理する)
   - [Leva の設定](#leva-の設定)
 - [r3f-perf でのパフォーマンスモニタリング](#r3f-perf-でのパフォーマンスモニタリング)
+  - [Leva に r3f-pref の表示切り替えを追加する](#leva-に-r3f-pref-の表示切り替えを追加する)
 
 > [!NOTE]
 > この記事は下記のバージョンを使用しています
@@ -490,3 +491,136 @@ root.render(
 [![Image from Gyazo](https://i.gyazo.com/981a96643b83685a6b6f69f466c821a2.png)](https://gyazo.com/981a96643b83685a6b6f69f466c821a2)
 
 ## r3f-perf でのパフォーマンスモニタリング
+
+`r3f-perf` は、FPS、レンダリング時間、メモリ使用量などの重要な指標を提供します。これらの指標を監視することで、パフォーマンスのボトルネックを特定し、最適化の方向性を決定できます。
+
+`r3f-perf` を使用するには依存関係を追加します
+
+```bash
+# npm を使用する場合
+npm install r3f-perf@7.2
+
+# yarn を使用する場合
+yarn add r3f-perf@7.2
+
+# pnpm を使用する場合
+pnpm add r3f-perf@7.2
+
+# bun を使用する場合
+bun add r3f-perf@7.2
+```
+
+あとは`JSX`に`<Perf />`を追加するだけです
+デフォルトでは右上に表示され`Leva`とかぶるので`position`属性に`top-left`を設定します
+
+```jsx
+import { OrbitControls } from "@react-three/drei";
+import { button, folder, useControls } from "leva";
+import { Perf } from "r3f-perf";
+
+export default function Experience() {
+  const { position, color, visible } = useControls("sphere", {
+    position: {
+      value: { x: -2, y: 0 },
+      step: 0.01,
+    },
+    color: "orange",
+    bool: folder({
+      visible: true,
+      checkbox: true,
+    }),
+
+    button: button(() => {
+      console.log("click");
+    }),
+    selecter: { options: ["case1", "case2", "case3"] },
+  });
+
+  const { scale } = useControls("cube", {
+    scale: {
+      value: 1.5,
+      min: 1.5,
+      max: 4,
+      step: 0.01,
+    },
+  });
+
+  return (
+    <>
+      <Perf position={"top-left"} />
+      <OrbitControls makeDefault />
+
+      <directionalLight position={[1, 2, 3]} intensity={4.5} />
+      <ambientLight intensity={1.5} />
+
+      <mesh position={[position.x, position.y, 0]} visible={visible}>
+        <sphereGeometry />
+        <meshStandardMaterial color={color} />
+      </mesh>
+
+      <mesh position-x={2} scale={scale}>
+        <boxGeometry />
+        <meshStandardMaterial color="mediumpurple" />
+      </mesh>
+
+      <mesh position-y={-1} rotation-x={-Math.PI * 0.5} scale={10}>
+        <planeGeometry />
+        <meshStandardMaterial color="greenyellow" />
+      </mesh>
+    </>
+  );
+}
+```
+
+### Leva に r3f-pref の表示切り替えを追加する
+
+`<Perf />`には`visible`属性が無いので少し回りくどい方法で行う必要がある
+`論理 AND 演算子(&&)`を使用して `ture` のときに表示 `false` のときに非表示にします
+
+> [!NOTE]
+>
+> 📝 **Memo**
+>
+> **論理 AND 演算子(&&)**
+>
+> 論理 AND 演算子は
+> `&&` より左の値が`truthy`な場合 `&&` より右の値を評価して返す
+> `&&` より左の値が`falsy`な場合 `&&` 左の値を評価して返す (短絡評価)
+>
+> **truthy, falsy な値**
+>
+> truthy な値は falsy な値以外の値のこと
+> fasly な値は `JavaScript`では以下の値のこと
+>
+> - `false`
+> - `0`
+> - `null`
+> - `''(空文字)`
+> - `undefined`
+> - `NaN`
+
+```jsx
+import { OrbitControls } from "@react-three/drei";
+import { button, folder, useControls } from "leva";
+import { Perf } from "r3f-perf";
+
+export default function Experience() {
+  const { prefVisible } = useControls({
+    prefVisible: true,
+  });
+
+  // ...
+
+  return (
+    <>
+      {prefVisible && <Perf position={"top-left"} />}
+
+      {/* ... */}
+    </>
+  );
+}
+```
+
+**出力結果**
+
+<a href="https://gyazo.com/c81be6a9c6489de6dbd7daed7944153b"><img src="https://i.gyazo.com/c81be6a9c6489de6dbd7daed7944153b.gif" alt="Image from Gyazo" width="989"/></a>
