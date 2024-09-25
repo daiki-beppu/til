@@ -93,7 +93,7 @@ export default function Experience() {
 
 ## 背景色の変更
 
-CSS で背景色を指定する方法は行なったが
+[CSS で背景色を指定する方法](https://github.com/daiki-beppu/til/blob/main/til/frontend/3d-graphics/threejs/07-react-three-fiber/55-first-r3f-app.md#canvas-%E3%81%AE%E8%BF%BD%E5%8A%A0)は行なったが
 今回は`R3F`で背景色を設定していく
 
 `<color />`タグを使用し`attach`属性を使用して
