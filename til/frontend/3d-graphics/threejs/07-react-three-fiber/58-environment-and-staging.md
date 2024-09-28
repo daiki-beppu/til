@@ -21,6 +21,7 @@ updated: 2024/09/25
   - [影の設定](#影の設定)
   - [影のベーキング](#影のベーキング)
   - [SoftShadows で影を柔らかくする](#softshadows-で影を柔らかくする)
+  - [AccumulatativeShadows でリアルな影をレンダリング](#accumulatativeshadows-でリアルな影をレンダリング)
 
 ## 下準備
 
@@ -422,3 +423,9 @@ export default function Experience() {
 **出力結果**
 
 [![Image from Gyazo](https://i.gyazo.com/330818b03374060503f51905cd062022.png)](https://gyazo.com/330818b03374060503f51905cd062022)
+
+### AccumulatativeShadows でリアルな影をレンダリング
+
+`AccumulatativeShadows`は複数の影のレンダリングを累積して
+各レンダリングの前にライトをランダムに移動させることで
+様々な角度からレンダリングした束で構成されるのでとてもリアルで柔らかい影をレンダリングすることができる
