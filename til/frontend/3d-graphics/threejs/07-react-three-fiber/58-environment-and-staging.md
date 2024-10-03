@@ -1,7 +1,7 @@
 ---
 title: 58-environment-and-staging
 date: 2024/09/25
-updated: 2024/09/25
+updated: 2024/10/03
 ---
 
 # 環境とステージングについて
