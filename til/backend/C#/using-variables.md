@@ -1,7 +1,7 @@
 ---
 title: using-variables
 date: 2024/09/12
-updated: 2024/09/12
+updated: 2024/10/03
 ---
 
 # 変数の使用方法
@@ -14,7 +14,6 @@ updated: 2024/09/12
   - [JavaScript との違い](#javascript-との違い-1)
 - [変数の上書き(再代入)](#変数の上書き再代入)
   - [JavaScript との違い](#javascript-との違い-2)
-
 
 ## 変数の宣言
 
@@ -43,8 +42,8 @@ myName = "Daiki Beppu"; // 後から値を代入することができる
 
 ```js
 // JavaScript での記述
-const myName = "Daiki Beppu" // データに関係なく再宣言、再代入不可
-let myName = "Daiki Beppu"   // データに関係なく再宣言不可、再代入可
+const myName = "Daiki Beppu"; // データに関係なく再宣言、再代入不可
+let myName = "Daiki Beppu"; // データに関係なく再宣言不可、再代入可
 ```
 
 > [!NOTE]
@@ -105,14 +104,12 @@ error CS0029: 型 'int' を 'string' に暗黙的に変換できません
 ビルドに失敗しました。ビルド エラーを修正して、もう一度実行してください。
 ```
 
-
-
 ### JavaScript との違い
 
 `JavaScript`はデータ型が異なる場合でも再代入可能です。
 また`let`を使用する場合のみ再代入可能となります。(`const`は不可)
 
 ```js
-let myName = "Daiki Beppu"
-myName = 27 // JavaScript ではエラーにならない
+let myName = "Daiki Beppu";
+myName = 27; // JavaScript ではエラーにならない
 ```
