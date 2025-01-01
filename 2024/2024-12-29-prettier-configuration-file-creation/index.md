@@ -71,26 +71,26 @@ function method(
 ```js
 // none
 const object = {
-  key1: 'value1',
-  key2: 'value2'  // カンマなし
-}
+  key1: "value1",
+  key2: "value2", // カンマなし
+};
 
 const array = [
-  'item1',
-  'item2'  // カンマなし
-]
+  "item1",
+  "item2" // カンマなし
+];
 ```
 
 ```js
 // all
 const object = {
-  key1: 'value1',
-  key2: 'value2',  // すべての末尾にカンマ
-}
+  key1: "value1",
+  key2: "value2", // すべての末尾にカンマ
+};
 
 function method(
   param1,
-  param2,  // 関数パラメータにもカンマ（ES5では非対応）
+  param2 // 関数パラメータにもカンマ（ES5では非対応）
 ) {
   // ...
 }
@@ -129,15 +129,18 @@ const value = 28; // セミコロンあり
 ```js
 // 80文字を超える行は自動的に改行されます
 // 改行前（長い1行）
-const obj = { name: 'John', age: 30, description: 'これは非常に長い説明文で、80文字を超えると自動的に改行されます' }
+const obj = {
+  name: "John",
+  age: 30,
+  description: "これは非常に長い説明文で、80文字を超えると自動的に改行されます",
+};
 
 // 改行後（Prettierによる整形）
 const obj = {
-  name: 'John',
+  name: "John",
   age: 30,
-  description:
-    'これは非常に長い説明文で、80文字を超えると自動的に改行されます'
-}
+  description: "これは非常に長い説明文で、80文字を超えると自動的に改行されます",
+};
 ```
 
 `"tabWidth": 2`
@@ -147,8 +150,8 @@ const obj = {
 function example() {
   // 2スペースでインデント
   const value = {
-    prop: true
-  }
+    prop: true,
+  };
 }
 ```
 
@@ -166,8 +169,8 @@ function example() {
 
 ```js
 // オブジェクトリテラルの括弧の内側にスペースを入れる
-const obj = { key: value }  // スペースあり
-const obj = {key: value}    // スペースなしの場合
+const obj = { key: value }; // スペースあり
+const obj = { key: value }; // スペースなしの場合
 ```
 
 `"bracketSameLine": false`
@@ -195,16 +198,17 @@ const obj = {key: value}    // スペースなしの場合
 
 ```js
 // "always"（デフォルト）の場合：
-const func = (x) => x
-const singleParam = (a) => a * 2
+const func = (x) => x;
+const singleParam = (a) => a * 2;
 
 // "avoid" の場合：
-const func = x => x
-const singleParam = a => a * 2
+const func = (x) => x;
+const singleParam = (a) => a * 2;
 ```
 
 `"endOfLine": "lf"`
 改行コードの設定
+
 - lf: Unix系の改行コード（\n）
 - Windows でも lf が推奨されている
 
@@ -216,7 +220,7 @@ const query = `
   SELECT *
   FROM users
   WHERE id = 1
-`
+`;
 ```
 
 `"quoteProps": "as-needed"`
@@ -224,19 +228,19 @@ const query = `
 ```js
 // "as-needed"（デフォルト）の場合：
 const obj = {
-  name: 'value',    // 通常のプロパティ名はクォートなし
-  'special-key': 1  // 特殊な文字を含む場合のみクォート付き
-}
+  name: "value", // 通常のプロパティ名はクォートなし
+  "special-key": 1, // 特殊な文字を含む場合のみクォート付き
+};
 ```
 
 `"jsxSingleQuote": false`
 
 ```js
 // false（デフォルト）の場合：
-const element = <div className="container">Text</div>
+const element = <div className="container">Text</div>;
 
 // true の場合：
-const element = <div className='container'>Text</div>
+const element = <div className="container">Text</div>;
 ```
 
 ### ハマったポイント
