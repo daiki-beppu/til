@@ -1,5 +1,6 @@
 {
   "name": "01-til",
+  "type": "module",
   "packageManager": "yarn@4.5.3",
   "scripts": {
     "format": "prettier --write .",
@@ -12,6 +13,8 @@
     "@typescript-eslint/parser": "^8.19.0",
     "eslint": "^9.17.0",
     "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
     "typescript": "^5.7.2"
