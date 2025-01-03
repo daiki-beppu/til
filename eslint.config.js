@@ -5,6 +5,8 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import unusedImports from 'eslint-plugin-unused-imports';
 import prettier from 'eslint-plugin-prettier';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   {
@@ -20,9 +22,12 @@ export default [
   {
     files: ['**/*.{js,jsx}'],
     ...js.configs.recommended,
+
     plugins: {
       simpleImportSort: simpleImportSort,
       unusedImports: unusedImports,
+      react: react,
+      reactHooks: reactHooks,
       prettier: prettier,
     },
     rules: {
@@ -51,6 +56,7 @@ export default [
   },
   {
     files: ['**/*.{ts,tsx}'],
+    ...next.configs.recommended,
     plugins: {
       '@typescript-eslint': tsPlugin,
     },
