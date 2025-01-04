@@ -1,8 +1,7 @@
 ---
 date: 2025-01-02
-time: 6:59:05
-title: `eslint`-flat-config
-tags: []
+title: eslint-flat-config
+tags: [eslint]
 categories: []
 ---
 

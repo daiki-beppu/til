@@ -2,8 +2,8 @@
 date: 2025-01-01
 time: 17:46:13
 title: configuration-for-using-prettier
-tags: []
-categories: []
+tags: [prettier]
+categories: [js/devtools]
 ---
 
 # configuration-for-using-prettier
