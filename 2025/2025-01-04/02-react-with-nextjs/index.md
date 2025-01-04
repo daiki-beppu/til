@@ -373,6 +373,292 @@ export default function Home() {
 
 </details>
 
+React は 必ず1つの親要素が必要
+
+<details>
+<summary>問題のあるコード(クリックで開く)</summary>
+
+```jsx
+import Image from 'next/image';
+
+export default function Home() {
+  return (
+    <h1 className="text-2xl"> index Page</h1>
+    <Image
+      className="dark:invert"
+      src="/next.svg"
+      alt="Next.js logo"
+      width={180}
+      height={38}
+      priority
+    />
+
+    <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+      <li className="mb-2">
+        Hello Get started by editing{' '}
+        <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+          src/pages/index.js
+        </code>
+        .
+      </li>
+      <li>Save and see your changes instantly.</li>
+    </ol>
+  );
+}
+```
+
+</details>
+
+この場合 `div` タグで囲むかフラグメントを使用する
+
+<details>
+<summary>問題を解消したコード(クリックで開く)</summary>
+
+```jsx
+// div タグで囲んで問題を解消
+import Image from 'next/image';
+
+export default function Home() {
+  return (
+    <div>
+      <h1 className="text-2xl"> index Page</h1>
+      <Image
+        className="dark:invert"
+        src="/next.svg"
+        alt="Next.js logo"
+        width={180}
+        height={38}
+        priority
+      />
+
+      <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+        <li className="mb-2">
+          Hello Get started by editing{' '}
+          <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+            src/pages/index.js
+          </code>
+          .
+        </li>
+        <li>Save and see your changes instantly.</li>
+      </ol>
+    </div>
+  );
+}
+```
+
+```jsx
+// フラグメントを使用して問題を解消
+import Image from 'next/image';
+
+export default function Home() {
+  return (
+    // React.Fragment は省略可能で <> でもいい
+    <React.Fragment>
+      <h1 className="text-2xl"> index Page</h1>
+      <Image
+        className="dark:invert"
+        src="/next.svg"
+        alt="Next.js logo"
+        width={180}
+        height={38}
+        priority
+      />
+
+      <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+        <li className="mb-2">
+          Hello Get started by editing{' '}
+          <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+            src/pages/index.js
+          </code>
+          .
+        </li>
+        <li>Save and see your changes instantly.</li>
+      </ol>
+    </React.Fragment>
+  );
+}
+```
+
+</details>
+
+`div` タグ とフラグメントどちらがいいのか？
+
+結論: チームによって様々だが `div` タグを推奨
+
+親コンポーネントからみて子コンポーネントが一つの要素を返すと決めておいたほうが
+不要な混乱を避けられるから
+
+props について
+
+props を使用することで異なる子コンポーネントに動的にデータを出し分ける事ができる
+
+子コンポーネントの引数に `props` を渡す
+親のコンポーネントに `props` を設定する
+`jsx` 内で `js` の構文を使うには `{}` で囲む必要がある
+`props` はいくつでも渡すことができる(可読性を考えると少なくできるなら少ないほうがいい)
+
+ちなみに `props` は `Properties` の略
+
+<details>
+<summary>props を使ってタイトルを動的に出し分ける(クリックで開く)</summary>
+
+```jsx
+// index.jsx
+
+// ... 必要な部分だけを抜粋
+
+export default function Home() {
+  return (
+    { // ...}
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+        <Headline title="Index Page" /> {// ここで props を指定}
+        <Links />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+```
+
+```jsx
+// about.jsx
+import { Geist, Geist_Mono } from 'next/font/google';
+
+// ... 必要な部分だけを抜粋
+
+export default function Home() {
+  return (
+      { // ...}
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+        <Headline title="About Page" /> {// ここで props を指定}
+        <Links />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+```
+
+```jsx
+// Headline.jsx
+
+/* eslint-disable react/prop-types */
+import Image from 'next/image';
+
+
+export default function Headline(props // 引数で props を受け取る) {
+  return (
+    <div className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+      <h1 className="text-2xl">{props.title}</h1>
+      {
+        /* 親コンポーネントで title と設定していたので props.title となる
+           foo と設定していたら props.foo となる
+           jsx ではドット記法(js の構文)で呼び出すことはできない
+           js の構文を使用するときは {} で囲む必要がある
+           ちなみにコメントアウトも同様
+        */
+      }
+      <Image
+        className="dark:invert"
+        src="/next.svg"
+        alt="Next.js logo"
+        width={180}
+        height={38}
+        priority
+      />
+      <ol className="list-inside list-decimal text-sm text-c enter sm:text-left font-[family-name:var(--font-geist-mono)]">
+        <li className="mb-2">
+          Hello Get started by editing{' '}
+          <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+            src/pages/index.js
+          </code>
+          .
+        </li>
+        <li>Save and see your changes instantly.</li>
+      </ol>
+    </div>
+  );
+}
+```
+
+</details>
+
+pages 配下のファイルは `export default` である必要がある
+
+props を使ったいろんなデータの渡し方
+
+<details>
+<summary>こんな感じの記述になる(クリックで開く)</summary>
+
+```jsx
+export default function Home() {
+  return (
+    <div
+      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
+    >
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+        <Headline
+          title="About Page"
+          number={1234}
+          array={[1, 2, 3, 4]}
+          obj={{ learn: 'react', difficulty: 'difficult' }}
+          bool
+          img={
+            <Image
+              className="dark:invert"
+              src="/next.svg"
+              alt="Next.js logo"
+              width={180}
+              height={38}
+              priority
+            />
+          }
+        />
+
+        {/* bool={true} の場合は bool と省略可能*/}
+
+        {// ...}
+  );
+}
+```
+
+</details>
+
+コンポーネントで囲まれたものはすべて children として扱われる
+1 つのコンポーネントを渡すときは children を使用することが多い
+
+<details>
+<summary>children の場合(クリックで開く)</summary>
+
+```jsx
+export default function Home() {
+  return (
+    <div
+      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
+    >
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+        <Headline title="Index Page" onClick={() => alert('ほら！呼べた！！')}>
+          <Image
+            className="dark:invert"
+            src="/next.svg"
+            alt="Next.js logo"
+            width={180}
+            height={38}
+            priority
+          />
+        </Headline>
+
+        {// Headline で囲まれているものは children として扱われる}
+
+        {// ...}
+    </div>
+  );
+}
+
+```
+
 ### ハマったポイント
 
 ## 🔍 気づき・感想
