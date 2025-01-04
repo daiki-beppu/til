@@ -663,6 +663,9 @@ export default function Home() {
 
 ## 🔍 気づき・感想
 
+props, children あたりはちゃんと覚えていた
+tailwind は一旦無効で良かったなと反省
+
 ## 📚 参考リンク
 
 [Next.jsのビルドプロセスに関するメモ](https://zenn.dev/watarunakayama/articles/2e1e1d89359010)
