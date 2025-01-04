@@ -25,7 +25,14 @@ export default [
         ...globals.node,
       },
     },
+  },
 
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  jsxA11y.flatConfigs.recommended,
+  pluginReact.configs.flat.recommended,
+
+  {
     plugins: {
       'simple-import-sort': simpleImportSort,
       'unused-imports': unusedImports,
@@ -47,13 +54,10 @@ export default [
         },
       ],
       'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
       ...pluginHooks.configs.recommended.rules,
     },
   },
 
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
-  jsxA11y.flatConfigs.recommended,
   eslintConfigPrettier,
 ];
