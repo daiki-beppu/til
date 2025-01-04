@@ -1,35 +1,23 @@
-import js from '@eslint/js';
-import globals from 'globals';
+import pluginJs from '@eslint/js';
+import pluginReact from 'eslint-plugin-react';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import tsPlugin from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
 import unusedImports from 'eslint-plugin-unused-imports';
-import prettier from 'eslint-plugin-prettier';
-import react from 'eslint-plugin-react';
-import reactHooks from 'eslint-plugin-react-hooks';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
+/** @type {import('eslint').Linter.Config[]} */
 export default [
   {
-    ignores: [
-      '**/dist/**',
-      '**/node_modules/**',
-      '**/.next/**',
-      '**/__snapshots__/**',
-      '**/*.min.js',
-    ],
-  },
+    files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
+    ignores: ['*.config.js'],
 
-  {
-    files: ['**/*.{js,jsx}'],
-    ...js.configs.recommended,
+    languageOptions: { globals: globals.browser },
 
     plugins: {
-      simpleImportSort: simpleImportSort,
-      unusedImports: unusedImports,
-      react: react,
-      reactHooks: reactHooks,
-      prettier: prettier,
+      'simple-import-sort': simpleImportSort,
+      'unused-imports': unusedImports,
     },
+
     rules: {
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
@@ -45,36 +33,9 @@ export default [
         },
       ],
     },
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
   },
-  {
-    files: ['**/*.{ts,tsx}'],
-    ...next.configs.recommended,
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-    },
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        project: './tsconfig.json',
-      },
-    },
-    rules: {
-      ...tsPlugin.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          argsIgnorePattern: '^_',
-        },
-      ],
-      '@typescript-eslint/no-explicit-any': 'error',
-    },
-  },
+
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  pluginReact.configs.flat.recommended,
 ];
