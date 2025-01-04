@@ -2,7 +2,7 @@
 
 ## 📝 本日のトピックス
 
-- 18:58 [02. test](./02-test/)
+- 19:28 [02. react-with-nextjs](./02-react/)
 - 18:55 [eslint-flat-config-3](./eslint-flat-config-3/)
 
 ## 💡 トピック間の関連性

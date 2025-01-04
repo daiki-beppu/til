@@ -1,4 +1,4 @@
-# Code Examples: 02. test
+# Code Examples: 02. react
 
 ## 🔧 実行環境
 - Node.js v22.12.0
