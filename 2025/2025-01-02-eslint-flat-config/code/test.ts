@@ -15,4 +15,3 @@ function noTypeFunction(param) {
 }
 
 // import typeのテスト
-import { String } from 'typescript';
