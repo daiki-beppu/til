@@ -2,8 +2,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import Head from 'next/head';
 
 import Footer from '@/components/Footer';
-import Headline from '@/components/Headline';
-import Links from '@/components/Links';
+import Header from '@/components/Header';
+import Main from '@/components/Main';
 import styles from '@/styles/Home.module.css';
 
 const geistSans = Geist({
@@ -28,11 +28,8 @@ export default function Home() {
       <div
         className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
       >
-        <main className={styles.main}>
-          <Headline title="index" />
-          <Links />
-        </main>
-
+        <Header />
+        <Main title="index" />
         <Footer />
       </div>
     </>
