@@ -119,7 +119,103 @@ export default function App({ Component, pageProps }) {
 
 </details>
 
+繰り返しについて
+
+`React` では 繰り返しは `for 文`ではなく `map` を使用する
+また `map` を使用することでデータと処理を分けて記述できるため
+可読性、メンテナンス性が高くなる
+
+<details>
+<summary>map を使用してリファクタリング(クリックで開く)</summary>
+
+```jsx
+import Image from 'next/image';
+import styles from 'src/components/Footer/Footer.module.css';
+
+const items = [
+  {
+    href: 'https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app',
+    src: '/file.svg',
+    alt: 'File icon',
+    description: 'Learn',
+  },
+  {
+    href: 'https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app',
+    src: '/window.svg',
+    alt: 'Window icon',
+    description: 'Examples',
+  },
+  {
+    href: 'https://nextjs.org?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app',
+    src: '/globe.svg',
+    alt: 'Globe icon',
+    description: ' Go to nextjs.org →',
+  },
+];
+
+export default function Footer() {
+  return (
+    <footer className={styles.footer}>
+      {items.map((item) => {
+        return (
+          <a
+            key={item.href}
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              aria-hidden
+              src={item.src}
+              alt={item.alt}
+              width={16}
+              height={16}
+            />
+            {item.description}
+          </a>
+        );
+      })}
+    </footer>
+  );
+}
+```
+
+</details>
+
 ### ハマったポイント
+
+`map` 内でも`return` を記述しないといけない
+`return` の記述漏れ
+
+```jsx
+export default function Footer() {
+  return (
+    <footer className={styles.footer}>
+      {items.map((item) => {
+        return (
+          <a
+            key={item.href}
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              aria-hidden
+              src={item.src}
+              alt={item.alt}
+              width={16}
+              height={16}
+            />
+            {item.description}
+          </a>
+        );
+      })}
+    </footer>
+  );
+}
+```
+
+イベント処理について
 
 ## 🔍 気づき・感想
 
