@@ -112,6 +112,69 @@ const handleClick = useCallback(() => {
 
 </details>
 
+useState でいろんな値を扱う
+
+文字列の扱い
+
+<details>
+<summary>サンプルコード(クリックで開く)</summary>
+
+```jsx
+import { useCallback, useEffect, useState } from 'react';
+import Headline from 'src/components/Headline';
+import Links from 'src/components/Links';
+import styles from 'src/components/Main/Main.module.css';
+
+export default function Main(props) {
+  const [text, setText] = useState('');
+
+  const handleChange = useCallback((e) => {
+    if (e.target.value.length > 5) {
+      alert('制限文字数を超えています、5文字以内にしてください');
+    }
+    setText(e.target.value.trim());
+  }, []);
+
+  return (
+    <main className={styles.main}>
+      <input type="text" value={text} onChange={handleChange} />d
+    </main>
+  );
+}
+```
+
+</details>
+
+真偽値の扱い
+
+<details>
+<summary>サンプルコード(クリックで開く)</summary>
+
+```jsx
+import { useCallback, useEffect, useState } from 'react';
+import Headline from 'src/components/Headline';
+import Links from 'src/components/Links';
+import styles from 'src/components/Main/Main.module.css';
+
+export default function Main(props) {
+  const [isView, setIsView] = useState(true);
+  const [count, setCount] = useState(1);
+
+  const handleView = useCallback(() => {
+    setIsView((isView) => !isView);
+  }, []);
+
+  return (
+    <main className={styles.main}>
+      {isView ? <h1>{count}</h1> : null}
+      <button onClick={handleView}>{isView ? '非表示' : '表示'}</button>
+    </main>
+  );
+}
+```
+
+</details>
+
 ### ハマったポイント
 
 ## 🔍 気づき・感想
