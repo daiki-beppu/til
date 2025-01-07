@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Headline from 'src/components/Headline';
 import Links from 'src/components/Links';
 import styles from 'src/components/Main/Main.module.css';
@@ -8,9 +8,11 @@ import styles from 'src/components/Main/Main.module.css';
 export default function Main(props) {
   const [count, setCount] = useState(1);
 
-  const handleClick = () => {
-    setCount((count) => count + 1);
-  };
+  const handleClick = useCallback(() => {
+    if (count < 5) {
+      setCount((count) => count + 1);
+    }
+  }, [count]);
 
   useEffect(() => {
     alert('コンポーネントがマウントされました');
