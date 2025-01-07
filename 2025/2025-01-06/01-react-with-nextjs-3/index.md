@@ -3,8 +3,8 @@ date: 2025-01-06
 time: 07:04:20
 title: react-with-nextjs-3
 number: 01
-labels: [react]
-topics: [js/devtools]
+labels: [react, next.js]
+topics: [js/react]
 ---
 
 ## 💡 学んだことの要約
