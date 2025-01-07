@@ -9,7 +9,7 @@ export default function Main(props) {
   const [count, setCount] = useState(1);
 
   // let count = 1;
-  const handleClick = (e) => {
+  const handleClick = () => {
     setCount((count) => count + 1);
     // count = count + 1;
   };
