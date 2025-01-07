@@ -1,6 +1,5 @@
 ---
-date: 2025-01-07
-time: 20:26:42
+date: 2025-01-07 20:26:42
 title: react-with-nextjs-4
 number: 01
 labels: [react, next.js]
