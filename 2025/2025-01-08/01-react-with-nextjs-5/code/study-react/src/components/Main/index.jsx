@@ -9,10 +9,11 @@ export default function Main(props) {
   const [count, setCount] = useState(1);
   const [text, setText] = useState('');
   const [isView, setIsView] = useState(true);
+  const [array, setArray] = useState([]);
 
   const handleClick = useCallback(() => {
     if (count < 5) {
-      setCount((count) => count + 1);
+      setCount((prevCount) => prevCount + 1);
     }
   }, [count]);
 
@@ -24,8 +25,15 @@ export default function Main(props) {
   }, []);
 
   const handleView = useCallback(() => {
-    setIsView((isView) => !isView);
+    setIsView((prevIsView) => !prevIsView);
   }, []);
+
+  const handleAdd = useCallback(() => {
+    setArray((prevArray) => {
+      const newArray = [...prevArray, text];
+      return newArray;
+    });
+  }, [text]);
 
   useEffect(() => {
     // alert('コンポーネントがマウントされました');
@@ -45,6 +53,12 @@ export default function Main(props) {
 
       <button onClick={handleClick}>イベント処理</button>
       <input type="text" value={text} onChange={handleChange} />
+      <button onClick={handleAdd}>追加</button>
+      <ul>
+        {array.map((item) => {
+          return <li key={item}>{item}</li>;
+        })}
+      </ul>
       <Headline title={props.title} />
       <Links />
     </main>
