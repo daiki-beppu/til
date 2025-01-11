@@ -1,27 +1,30 @@
-import { Geist, Geist_Mono } from 'next/font/google';
+/* eslint-disable react/prop-types */
 import Footer from 'src/components/Footer';
 import Header from 'src/components/Header';
 import Main from 'src/components/Main';
-import styles from 'src/styles/Home.module.css';
+import styles from 'src/components/Main/Main.module.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
-export default function Home() {
+export default function Home(props) {
   return (
-    <div
-      className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
-    >
+    <>
       <Header />
-      <Main title="index" />
+      <main className={styles.main}>
+        {props.isView ? <h1>{props.count}</h1> : null}
+        <button onClick={props.handleView}>
+          {props.isView ? '非表示' : '表示'}
+        </button>
+        <button onClick={props.handleClick}>イベント処理</button>
+
+        <input type="text" value={props.text} onChange={props.handleChange} />
+        <button onClick={props.handleAdd}>追加</button>
+        <ul>
+          {props.array.map((item) => {
+            return <li key={item}>{item}</li>;
+          })}
+        </ul>
+        <Main title="index" />
+      </main>
       <Footer />
-    </div>
+    </>
   );
 }

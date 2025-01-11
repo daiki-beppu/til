@@ -1,9 +1,27 @@
 /* eslint-disable react/prop-types */
 import 'src/styles/globals.css';
 
+import { Geist, Geist_Mono } from 'next/font/google';
 import Head from 'next/head';
+import { useCounter } from 'src/hooks/useCounter';
+import { useInput } from 'src/hooks/useInput';
+import { useSetBgColor } from 'src/hooks/useSetBgColor';
+import styles from 'src/styles/Home.module.css';
+
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
 
 export default function App({ Component, pageProps }) {
+  const counter = useCounter();
+  const input = useInput();
+  useSetBgColor();
   return (
     <>
       <Head>
@@ -13,7 +31,11 @@ export default function App({ Component, pageProps }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Component {...pageProps} />
+      <div
+        className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
+      >
+        <Component {...pageProps} {...counter} {...input} />
+      </div>
     </>
   );
 }
