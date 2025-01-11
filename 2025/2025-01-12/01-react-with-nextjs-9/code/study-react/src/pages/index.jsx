@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import Footer from 'src/components/Footer';
-import Header from 'src/components/Header';
-import Main from 'src/components/Main';
+import { Footer } from 'src/components/Footer';
+import { Header } from 'src/components/Header';
+import { Main } from 'src/components/Main';
 import styles from 'src/components/Main/Main.module.css';
 
 const Home = (props) => {

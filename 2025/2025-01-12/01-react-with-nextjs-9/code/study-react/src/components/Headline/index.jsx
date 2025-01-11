@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import styles from 'src/components/Headline/Headline.module.css';
 
-const Headline = (props) => {
+export const Headline = (props) => {
   return (
     <div className={styles.main}>
       <h1>{props.title} Page</h1>
@@ -24,4 +24,3 @@ const Headline = (props) => {
     </div>
   );
 };
-export default Headline;

@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 
 import { useCallback, useState } from 'react';
-import Headline from 'src/components/Headline';
-import Links from 'src/components/Links';
+import { Headline } from 'src/components/Headline';
+import { Links } from 'src/components/Links';
 import styles from 'src/components/Main/Main.module.css';
 
 const ITEMS = [
@@ -18,7 +18,7 @@ const ITEMS = [
   },
 ];
 
-const Main = (props) => {
+export const Main = (props) => {
   const [items, setItems] = useState(ITEMS);
   const handleReduce = useCallback(() => {
     setItems((prevItems) => {
@@ -33,5 +33,3 @@ const Main = (props) => {
     </div>
   );
 };
-
-export default Main;
