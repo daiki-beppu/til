@@ -18,7 +18,7 @@ const ITEMS = [
   },
 ];
 
-export default function Main(props) {
+const Main = (props) => {
   const [items, setItems] = useState(ITEMS);
   const handleReduce = useCallback(() => {
     setItems((prevItems) => {
@@ -32,4 +32,6 @@ export default function Main(props) {
       <button onClick={handleReduce}>削除</button>
     </div>
   );
-}
+};
+
+export default Main;

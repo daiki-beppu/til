@@ -4,29 +4,21 @@ import Header from 'src/components/Header';
 import Main from 'src/components/Main';
 import styles from 'src/components/Main/Main.module.css';
 
-export default function Home(props) {
-  const {
-    doubleCount,
-    isView,
-    handleClick,
-    handleView,
-    text,
-    array,
-    handleChange,
-    handleAdd,
-  } = props;
+const About = (props) => {
   return (
     <>
       <Header />
       <main className={styles.main}>
-        {isView ? <h1>{doubleCount}</h1> : null}
-        <button onClick={handleView}>{isView ? '非表示' : '表示'}</button>
-        <button onClick={handleClick}>カウントアップ</button>
+        {props.isView ? <h1>{props.doubleCount}</h1> : null}
+        <button onClick={props.handleView}>
+          {props.isView ? '非表示' : '表示'}
+        </button>
+        <button onClick={props.handleClick}>カウントアップ</button>
 
-        <input type="text" value={text} onChange={handleChange} />
-        <button onClick={handleAdd}>追加</button>
+        <input type="text" value={props.text} onChange={props.handleChange} />
+        <button onClick={props.handleAdd}>追加</button>
         <ul>
-          {array.map((item) => {
+          {props.array.map((item) => {
             return <li key={item}>{item}</li>;
           })}
         </ul>
@@ -35,4 +27,6 @@ export default function Home(props) {
       <Footer />
     </>
   );
-}
+};
+
+export default About;

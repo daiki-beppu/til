@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import styles from 'src/components/Headline/Headline.module.css';
 
-export default function Headline(props) {
+const Headline = (props) => {
   return (
     <div className={styles.main}>
       <h1>{props.title} Page</h1>
@@ -23,4 +23,5 @@ export default function Headline(props) {
       <button onClick={props.handleReduce}>削除</button>
     </div>
   );
-}
+};
+export default Headline;

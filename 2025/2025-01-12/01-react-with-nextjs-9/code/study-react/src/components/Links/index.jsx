@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import styles from 'src/components/Links/Links.module.css';
 
-export default function Links(props) {
+const Links = (props) => {
   return (
     <div className={styles.ctas}>
       {props.items.map((item) => {
@@ -19,4 +19,6 @@ export default function Links(props) {
       })}
     </div>
   );
-}
+};
+
+export default Links;

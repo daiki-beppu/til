@@ -22,7 +22,7 @@ const items = [
   },
 ];
 
-export default function Footer() {
+const Footer = () => {
   return (
     <footer className={styles.footer}>
       {items.map((item) => {
@@ -46,4 +46,6 @@ export default function Footer() {
       })}
     </footer>
   );
-}
+};
+
+export default Footer;

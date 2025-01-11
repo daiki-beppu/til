@@ -4,7 +4,7 @@ import Header from 'src/components/Header';
 import Main from 'src/components/Main';
 import styles from 'src/components/Main/Main.module.css';
 
-export default function Home(props) {
+const Home = (props) => {
   return (
     <>
       <Header />
@@ -27,4 +27,6 @@ export default function Home(props) {
       <Footer />
     </>
   );
-}
+};
+
+export default Home;

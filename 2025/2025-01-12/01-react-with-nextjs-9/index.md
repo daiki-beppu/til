@@ -95,7 +95,7 @@ export default function Home(props) {
 
 `useRouter` は `Next.js` の機能
 
-<details>
+<details>s
 <summary>(クリックで開く)</summary>
 
 `useRouter` を使用してパスに応じて背景色を切り替える

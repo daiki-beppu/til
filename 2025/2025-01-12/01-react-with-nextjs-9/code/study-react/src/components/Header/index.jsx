@@ -2,11 +2,13 @@
 import Link from 'next/link';
 import styles from 'src/components/Header/Header.module.css';
 
-export default function Header() {
+const Header = () => {
   return (
     <header className={styles.header}>
       <Link href="/">Index Page</Link>
       <Link href="/about">About Page</Link>
     </header>
   );
-}
+};
+
+export default Header;

@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-export default function App({ Component, pageProps }) {
+const App = ({ Component, pageProps }) => {
   const counter = useCounter();
   const input = useInput();
   useSetBgColor();
@@ -38,4 +38,6 @@ export default function App({ Component, pageProps }) {
       </div>
     </>
   );
-}
+};
+
+export default App;
