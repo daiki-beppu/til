@@ -3,7 +3,6 @@ import Image from 'next/image';
 import styles from 'src/components/Headline/Headline.module.css';
 
 export default function Headline(props) {
-  console.log(props);
   return (
     <div className={styles.main}>
       <h1>{props.title} Page</h1>

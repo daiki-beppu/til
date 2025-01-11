@@ -10,6 +10,7 @@ topics: [js/]
 
 `useMemo`, `useRouter` について
 
+`useMemo` は `React` の機能
 `useMemo` は計算結果をキャッシュして不要な再計算を避ける目的で使用
 パフォーマンス向上目的で使用するフックスなので `useMemo` を使用しないと
 実現できない要件は存在しない
@@ -86,6 +87,72 @@ export default function Home(props) {
     </>
   );
 }
+```
+
+</details>
+
+`useRouter` について
+
+`useRouter` は `Next.js` の機能
+
+<details>
+<summary>(クリックで開く)</summary>
+
+`useRouter` を使用してパスに応じて背景色を切り替える
+
+```jsx
+import { useRouter } from 'next/router';
+import { useEffect, useMemo } from 'react';
+
+export const useSetBgColor = () => {
+  const router = useRouter();
+
+  const bgColor = useMemo(() => {
+    return router.pathname === '/' ? 'skyblue' : 'orange';
+  }, [router.pathname]);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = bgColor;
+
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, [bgColor]);
+};
+```
+
+さっきのは三項演算子だけど switch 文でも実現可能
+
+```jsx
+import { useRouter } from 'next/router';
+import { useEffect, useMemo } from 'react';
+
+export const useSetBgColor = () => {
+  const router = useRouter();
+
+  const bgColor = useMemo(() => {
+    switch (router.pathname) {
+      case '/': {
+        return 'skyblue';
+      }
+
+      case '/about': {
+        return 'orange';
+      }
+
+      default:
+        return '';
+    }
+  }, [router.pathname]);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = bgColor;
+
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, [bgColor]);
+};
 ```
 
 </details>
