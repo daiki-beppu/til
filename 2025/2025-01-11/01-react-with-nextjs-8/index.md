@@ -20,7 +20,7 @@ State のリフトアップについて
 ```jsx
 // _app.js
 
-/* eslint-disable react/prop-types */
+/* eslint-disable react/prop-types */ x;
 import 'src/styles/globals.css';
 
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -187,6 +187,114 @@ export default function Home(props) {
       </main>
       <Footer />
     </>
+  );
+}
+```
+
+</details>
+
+コンポーネント間のリフトアップについて
+
+コンポーネント間で共通化したい場合は
+親コンポーネントで定義してあげて子コンポーネントに渡すことで可能
+
+<details>
+<summary>サンプルコード(クリックで開く)</summary>
+
+子コンポーネントで定義していた `ITEMS` を親コンポーネントである
+Main/index.jsx で定義し `items` としてステートを子コンポーネントである `Links`に渡す
+
+```jsx
+// Main/index.jsx (親コンポーネント)
+import { useCallback, useState } from 'react';
+import Headline from 'src/components/Headline';
+import Links from 'src/components/Links';
+import styles from 'src/components/Main/Main.module.css';
+
+const ITEMS = [
+  {
+    style: 'primary',
+    href: 'https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app',
+    description: 'Deploy now',
+  },
+  {
+    style: 'secondary',
+    href: 'https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app',
+    description: 'Read our docs',
+  },
+];
+
+export default function Main(props) {
+  const [items, setItems] = useState(ITEMS);
+  const handleReduce = useCallback(() => {
+    setItems((prevItems) => {
+      return prevItems.slice(0, prevItems.length - 1);
+    });
+  }, []);
+  return (
+    <div className={styles.main}>
+      <Headline title={props.title} handleReduce={handleReduce} />
+      <Links items={items} handleReduce={handleReduce} />
+      <button onClick={handleReduce}>削除</button>
+    </div>
+  );
+}
+```
+
+子コンポーネント側では `props` を受け取って記述を変更する
+こうすることで `Main/index.jsx` でも `ITEMS` のデータを使用できるし
+別の子コンポーネントである `Headline` コンポーネントでも同じデータを使用できる
+
+```jsx
+import styles from 'src/components/Links/Links.module.css';
+
+export default function Links(props) {
+  console.log(props.items);
+  return (
+    <div className={styles.ctas}>
+      {props.items.map((item) => {
+        return (
+          <a
+            key={item.href}
+            className={`${styles[item.style]}`}
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {item.description}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+```
+
+```jsx
+import Image from 'next/image';
+import styles from 'src/components/Headline/Headline.module.css';
+
+export default function Headline(props) {
+  console.log(props);
+  return (
+    <div className={styles.main}>
+      <h1>{props.title} Page</h1>
+      <Image
+        className={styles.logo}
+        src="/next.svg"
+        alt="Next.js logo"
+        width={180}
+        height={38}
+        priority
+      />
+      <ol>
+        <li>
+          Get started by editing <code>{props.title}.js</code>.
+        </li>
+        <li>Save and see your changes instantly.</li>
+      </ol>
+      <button onClick={props.handleReduce}>削除</button>
+    </div>
   );
 }
 ```
