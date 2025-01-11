@@ -95,7 +95,7 @@ export default function Home(props) {
 
 `useRouter` は `Next.js` の機能
 
-<details>s
+<details>
 <summary>(クリックで開く)</summary>
 
 `useRouter` を使用してパスに応じて背景色を切り替える
@@ -156,6 +156,23 @@ export const useSetBgColor = () => {
 ```
 
 </details>
+
+`export` と `export default` の使い分け
+
+`export`:
+
+- 複数のものを export できる
+- インポート時に元の名前を使用する必要がある
+
+`export default`:
+
+- ファイルごとに1つだけ定義できる
+- インポート時に任意の名前をつけられる
+
+今後は基本的に `export` を使用するようにする
+
+理由はインポート時に命名を変更したくない
+任意に命名できるため最終的にどのコンポーネントを呼び出しているのかわからなくなるのを防ぐ
 
 ### ハマったポイント
 
