@@ -2,9 +2,9 @@
 
 ## 📝 本日のトピックス
 
-### React Hooks と Next.js の機能について
+05:57 [01. react-with-nextjs-9](./01-react-with-nextjs-9/)
 
-#### useMemo
+### useMemo
 
 - Reactのパフォーマンス最適化のためのHook
 - 計算結果をキャッシュして不要な再計算を防ぐ
@@ -13,7 +13,7 @@
   - useMemoがなくても機能的な実装は可能
   - 依存配列の値が変更された時のみ再計算を実行
 
-#### useRouter
+### useRouter
 
 - Next.jsが提供する機能
 - ルーティング関連の情報とメソッドを提供
@@ -21,7 +21,7 @@
   - パスに応じた背景色の動的な切り替え
   - 三項演算子やswitch文による条件分岐の実装が可能
 
-#### export と export default の使い分け
+### export と export default の使い分け
 
 - export
   - 複数のエクスポートが可能

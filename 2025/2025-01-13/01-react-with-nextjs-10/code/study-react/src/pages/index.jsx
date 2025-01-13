@@ -1,30 +1,28 @@
-/* eslint-disable react/prop-types */
-import { Footer } from 'src/components/Footer';
+import { useCallback, useEffect, useState } from 'react';
 import { Header } from 'src/components/Header';
-import { Main } from 'src/components/Main';
-import styles from 'src/components/Main/Main.module.css';
 
-const Home = (props) => {
+const Home = () => {
+  const [posts, setPosts] = useState([]);
+
+  const fetchPosts = useCallback(async () => {
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+    const json = await response.json();
+    setPosts(json);
+  }, []);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
   return (
     <>
       <Header />
-      <main className={styles.main}>
-        {props.isView ? <h1>{props.count}</h1> : null}
-        <button onClick={props.handleView}>
-          {props.isView ? '非表示' : '表示'}
-        </button>
-        <button onClick={props.handleClick}>カウントアップ</button>
-
-        <input type="text" value={props.text} onChange={props.handleChange} />
-        <button onClick={props.handleAdd}>追加</button>
-        <ul>
-          {props.array.map((item) => {
-            return <li key={item}>{item}</li>;
+      {posts.length > 0 ? (
+        <ol>
+          {posts.map((post) => {
+            return <li key={post.id}>{post.title}</li>;
           })}
-        </ul>
-        <Main title="index" />
-      </main>
-      <Footer />
+        </ol>
+      ) : null}
     </>
   );
 };
