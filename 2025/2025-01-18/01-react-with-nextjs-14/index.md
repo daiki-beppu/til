@@ -6,12 +6,6 @@ labels: [react]
 topics: [js/]
 ---
 
-## 💡 学んだことの要約
-
-## 📝 詳細
-
-### 背景
-
 ### 内容
 
 `pages router` におけるファイルシステムルーティングについて
@@ -30,8 +24,6 @@ pages の配下にディレクトリを作成することでネストしたル�
 
 `pages/index.jsx` の場合 `/`
 `pages/about/index.jsx` の場合 `/about` となる
-
-動的なルーティング
 
 ### ハマったポイント
 
