@@ -14,7 +14,24 @@ topics: [js/]
 
 ### 内容
 
-pages router におけるファイルシステムルーティングについて
+`pages router` におけるファイルシステムルーティングについて
+
+`pages` 配下のファイル名がそのままルーティングと対応している
+
+`pages/about.jsx` の場合 `/about` となる
+
+ネストしたルーティング
+
+pages の配下にディレクトリを作成することでネストしたルーティングが可能
+
+`pages/about/about.jsx` の場合 `/about/about` となる
+
+`index` は常にディレクトリのルートとして扱われる
+
+`pages/index.jsx` の場合 `/`
+`pages/about/index.jsx` の場合 `/about` となる
+
+動的なルーティング
 
 ### ハマったポイント
 
