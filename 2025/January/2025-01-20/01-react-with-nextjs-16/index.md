@@ -2,7 +2,7 @@
 date: 2025-01-20 05:30
 title: 01-react-with-nextjs-16
 number: 01
-labels: [01]
+labels: [react]
 topics: [js/]
 ---
 
@@ -11,6 +11,8 @@ topics: [js/]
 ## 📝 詳細
 
 ### 背景
+
+動的な fetch
 
 ### 内容
 
