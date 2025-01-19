@@ -1,6 +1,6 @@
 ---
 date: 2025-01-19 23:14
-title: news-share
+title: 01-react-with-nextjs-15
 number: 01
 labels: [news]
 topics: [js/]
