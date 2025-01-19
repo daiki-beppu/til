@@ -1,6 +1,9 @@
+import { useRouter } from 'next/router';
+import { Header } from 'src/components/Header';
 import { usePosts } from 'src/hooks/usePosts';
 
-const Posts = () => {
+const PostId = () => {
+  const router = useRouter();
   const { data, error, isLoading, isEmpty } = usePosts();
 
   if (isLoading) {
@@ -16,16 +19,11 @@ const Posts = () => {
   }
 
   return (
-    <ol>
-      {data.map((post) => {
-        return (
-          <li key={post.id}>
-            <a href={`/post/${post.id}`}>{post.title}</a>
-          </li>
-        );
-      })}
-    </ol>
+    <>
+      <Header />
+      <div>{data[router.query.id].body}</div>
+    </>
   );
 };
 
-export default Posts;
+export default PostId;
