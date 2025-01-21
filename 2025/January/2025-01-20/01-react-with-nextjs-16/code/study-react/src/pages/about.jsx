@@ -1,13 +1,11 @@
 /* eslint-disable react/prop-types */
 import { Footer } from 'src/components/Footer';
-import { Header } from 'src/components/Header';
 import { Main } from 'src/components/Main';
 import styles from 'src/components/Main/Main.module.css';
 
 const About = (props) => {
   return (
     <>
-      <Header />
       <main className={styles.main}>
         {props.isView ? <h1>{props.doubleCount}</h1> : null}
         <button onClick={props.handleView}>

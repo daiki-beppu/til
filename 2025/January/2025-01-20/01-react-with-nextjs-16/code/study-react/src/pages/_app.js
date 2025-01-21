@@ -3,6 +3,7 @@ import 'src/styles/globals.css';
 
 import { Geist, Geist_Mono } from 'next/font/google';
 import Head from 'next/head';
+import { Header } from 'src/components/Header';
 import { useCounter } from 'src/hooks/useCounter';
 import { useInput } from 'src/hooks/useInput';
 import { useSetBgColor } from 'src/hooks/useSetBgColor';
@@ -34,6 +35,7 @@ const App = ({ Component, pageProps }) => {
       <div
         className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
       >
+        <Header />
         <Component {...pageProps} {...counter} {...input} />
       </div>
     </>
