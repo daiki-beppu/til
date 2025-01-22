@@ -64,6 +64,9 @@ yarn create next-app --typescript
 
 ## 🔍 気づき・感想
 
+React, Next.js が一段落して
+いよいよ本格的に TypeScript を学ぶ事ができる！
+
 ## 📚 参考リンク
 
 ## ⏭️ 次に学びたいこと
