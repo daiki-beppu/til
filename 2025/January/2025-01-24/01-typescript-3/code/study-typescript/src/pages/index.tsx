@@ -22,6 +22,15 @@ const foo: null = null; // null のみ
 // プリミティブ型: undefined
 const bar: undefined = undefined; // undefined のみ
 
+// リテラル型: boolean
+const bool: true = true; // true のみ
+
+//  リテラル型: string
+const gender: 'male' | 'female' = 'male'; // male か female のみ
+
+// リテラル型: number
+const num: 1 = 1; // 1 のみ
+
 export default function Home() {
   return (
     <div>
