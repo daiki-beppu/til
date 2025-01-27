@@ -1,8 +1,8 @@
 ---
-date: 2025-01-26 02:39
-title: typescript-5
+date: 2025-01-27 23:37
+title: lessons-from-discussion
 number: 01
-labels: [typescript]
+labels: [lessons]
 topics: [js/]
 ---
 
