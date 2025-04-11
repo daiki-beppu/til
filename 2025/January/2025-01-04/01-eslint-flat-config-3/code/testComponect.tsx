@@ -15,10 +15,10 @@ interface Props {
 // React関数コンポーネント（react/react-in-jsx-scope: 'off'のテスト）
 const TestComponent: FC<Props> = ({ initialCount = 0, onCountChange }) => {
   const [count, setCount] = useState(initialCount);
-  
+
   // 未使用変数のテスト（unused-imports/no-unused-vars）
   const unusedVariable = 'test';
-  
+
   // useEffectの依存配列テスト（react-hooks/exhaustive-deps）
   useEffect(() => {
     if (count !== initialCount) {
@@ -35,9 +35,7 @@ const TestComponent: FC<Props> = ({ initialCount = 0, onCountChange }) => {
   return (
     <div>
       {/* jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-      <div onClick={() => setCount(0)}>
-        Reset Count
-      </div>
+      <div onClick={() => setCount(0)}>Reset Count</div>
 
       <p>Current count: {count}</p>
 
@@ -47,10 +45,7 @@ const TestComponent: FC<Props> = ({ initialCount = 0, onCountChange }) => {
       </div>
 
       {/* アクセシビリティ対応の正しい実装 */}
-      <button
-        onClick={handleIncrement}
-        aria-label="Increment counter"
-      >
+      <button onClick={handleIncrement} aria-label="Increment counter">
         Correct Button
       </button>
     </div>

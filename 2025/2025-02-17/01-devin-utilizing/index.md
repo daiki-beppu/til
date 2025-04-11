@@ -10,13 +10,13 @@ topics: [js/]
 
 - 西尾さん(サイボウズ・ラボ株式会社)
   - イチオシ記事:
-  [Devinを見る会 - 西尾泰和の外部脳](https://scrapbox.io/nishio/Devin%E3%82%92%E8%A6%8B%E3%82%8B%E4%BC%9A)
+    [Devinを見る会 - 西尾泰和の外部脳](https://scrapbox.io/nishio/Devin%E3%82%92%E8%A6%8B%E3%82%8B%E4%BC%9A)
 - 寺本さん(株式会社Helpfeel)
   - イチオシ記事:
-  [ここまでのDevin観察日記のまとめ。なぜDevinは「破壊的」なのか？｜Daiki Teramoto](https://note.com/teramotodaiki/n/n349d1d361804)
+    [ここまでのDevin観察日記のまとめ。なぜDevinは「破壊的」なのか？｜Daiki Teramoto](https://note.com/teramotodaiki/n/n349d1d361804)
 - 鹿野さん(Ubie株式会社)
   - イチオシ記事:
-  [Devin AIにテストを丸ごと書かせてCIがパスするまで作業してもらう方法](https://zenn.dev/ubie_dev/articles/devin-for-test)
+    [Devin AIにテストを丸ごと書かせてCIがパスするまで作業してもらう方法](https://zenn.dev/ubie_dev/articles/devin-for-test)
 
 Devin が操作できるものは3つある
 

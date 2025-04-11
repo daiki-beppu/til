@@ -71,21 +71,21 @@ function method(
 ```js
 // none
 const object = {
-  key1: "value1",
-  key2: "value2", // カンマなし
+  key1: 'value1',
+  key2: 'value2', // カンマなし
 };
 
 const array = [
-  "item1",
-  "item2" // カンマなし
+  'item1',
+  'item2', // カンマなし
 ];
 ```
 
 ```js
 // all
 const object = {
-  key1: "value1",
-  key2: "value2", // すべての末尾にカンマ
+  key1: 'value1',
+  key2: 'value2', // すべての末尾にカンマ
 };
 
 function method(
@@ -100,7 +100,7 @@ function method(
 シングルクォートの使用設定
 
 ```js
-const text = "hello world"; // シングルクォートを使用
+const text = 'hello world'; // シングルクォートを使用
 ```
 
 `"semi": true`(デフォルトは false)
@@ -130,16 +130,16 @@ const value = 28; // セミコロンあり
 // 80文字を超える行は自動的に改行されます
 // 改行前（長い1行）
 const obj = {
-  name: "John",
+  name: 'John',
   age: 30,
-  description: "これは非常に長い説明文で、80文字を超えると自動的に改行されます",
+  description: 'これは非常に長い説明文で、80文字を超えると自動的に改行されます',
 };
 
 // 改行後（Prettierによる整形）
 const obj = {
-  name: "John",
+  name: 'John',
   age: 30,
-  description: "これは非常に長い説明文で、80文字を超えると自動的に改行されます",
+  description: 'これは非常に長い説明文で、80文字を超えると自動的に改行されます',
 };
 ```
 
@@ -228,8 +228,8 @@ const query = `
 ```js
 // "as-needed"（デフォルト）の場合：
 const obj = {
-  name: "value", // 通常のプロパティ名はクォートなし
-  "special-key": 1, // 特殊な文字を含む場合のみクォート付き
+  name: 'value', // 通常のプロパティ名はクォートなし
+  'special-key': 1, // 特殊な文字を含む場合のみクォート付き
 };
 ```
 
