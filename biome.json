@@ -7,7 +7,26 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"ignore": ["*.config.js, node_modules/"]
+		"ignore": [
+			"*.config.js",
+			"node_modules/**/*",
+			"package.json",
+			"package-lock.json",
+			"yarn.lock",
+			"pnpm-lock.yaml",
+			"dist/**/*",
+			"build/**/*",
+			".next/**/*",
+			"out/**/*",
+			"coverage/**/*",
+			".git/**/*",
+			".github/**/*",
+			".vscode/**/*",
+			"public/**/*",
+			"static/**/*",
+			"*.min.js",
+			"*.d.ts"
+		]
 	},
 	"formatter": {
 		"enabled": true,
@@ -47,7 +66,26 @@
 				"useImportType": "error"
 			}
 		},
-		"ignore": ["*.config.js", "node_modules", "package.json"],
+		"ignore": [
+			"*.config.js",
+			"node_modules/**/*",
+			"package.json",
+			"package-lock.json",
+			"yarn.lock",
+			"pnpm-lock.yaml",
+			"dist/**/*",
+			"build/**/*",
+			".next/**/*",
+			"out/**/*",
+			"coverage/**/*",
+			".git/**/*",
+			".github/**/*",
+			".vscode/**/*",
+			"public/**/*",
+			"static/**/*",
+			"*.min.js",
+			"*.d.ts"
+		],
 		"include": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"]
 	},
 	"javascript": {
