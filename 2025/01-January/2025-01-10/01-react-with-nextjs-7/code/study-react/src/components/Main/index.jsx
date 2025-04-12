@@ -2,10 +2,10 @@
 
 import Headline from 'src/components/Headline';
 import Links from 'src/components/Links';
+import styles from 'src/components/Main/Main.module.css';
 import { useCounter } from 'src/components/Main/hooks/useCounter';
 import { useInput } from 'src/components/Main/hooks/useInput';
 import { useSetBgColor } from 'src/components/Main/hooks/useSetBgColor';
-import styles from 'src/components/Main/Main.module.css';
 
 export default function Main(props) {
   const { count, isView, handleClick, handleView } = useCounter();
