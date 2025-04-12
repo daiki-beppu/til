@@ -12,6 +12,7 @@ topics: [js/]
 ## Biome で className を並び替え変える方法
 
 こちらを参考にしました
+
 [biomejs/biome PR feat(linter): implement class sorting rule (first pass) #1362](https://github.com/biomejs/biome/pull/1362#issuecomment-2463860207)
 
 ```json
@@ -53,6 +54,7 @@ topics: [js/]
 ## 📚 参考リンク
 
 公式ドキュメント: https://biomejs.dev/
+
 GitHub: https://github.com/biomejs/biome
 
 
