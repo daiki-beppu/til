@@ -1,5 +1,5 @@
 ---
-date: 2025-04-16 22:45
+date: 2025-04-27 22:45
 title: typescript-6
 number: 01
 labels: [typescript]
@@ -12,7 +12,7 @@ topics: [js/]
 
 Intersection Types は複数の型を1つにまとめることができる
 
-### Interesection Types の定義方法
+### Intersection Types の定義方法
 
 型同士を `&(アンパサンド)` でつなげることで定義できる
 プリミティブ型にも使用することはできるが型 Never になる
