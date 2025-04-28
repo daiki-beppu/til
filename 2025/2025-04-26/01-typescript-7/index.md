@@ -12,7 +12,6 @@ topics: [js/]
 
 Intersection Types は複数の型を1つにまとめることができる
 
-
 ### Interesection Types の定義方法
 
 型同士を `&(アンパサンド)` でつなげることで定義できる
@@ -41,13 +40,12 @@ const newHire: EmployedPerson = {
 const correctHire: EmployedPerson = {
   age: 28,
   name: "田中",
-  isFullTime: true
+  isFullTime: true,
 };
 
-type NumberType = number
-type StringType = string
-type ImpossibleType = NumberType & StringType // こちらは never 型
-
+type NumberType = number;
+type StringType = string;
+type ImpossibleType = NumberType & StringType; // こちらは never 型
 ```
 
 ## Union Types (共用体型)
@@ -115,8 +113,7 @@ const visitor: User = {
 
 type Zero = 0;
 type Greeting = "hello";
-type LiteralUinon = Zero | Greeting; // 0 または "hello" のみ OK
-
+type LiteralUnion = Zero | Greeting; // 0 または "hello" のみ OK
 ```
 
 ## 🔍 気づき・感想
